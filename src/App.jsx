@@ -391,8 +391,30 @@ function HomePage({ setPage }) {
             { stat: "94%", label: "adoption rate for Asana across distributed teams" },
             { stat: "96%", label: "adoption rate for major platform transitions" },
           ].map((s, i) => (
-            <FadeIn key={i} delay={i * 80}>
-              <div style={{ background: C.white, borderRadius: 16, padding: "28px 20px", textAlign: "center", border: `1px solid ${C.oceanLight}` }}>
+            <FadeIn key={i} delay={i * 80} style={{ height: "100%" }}>
+              <div
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
+                  e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "translateY(0) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)";
+                }}
+                style={{
+                  background: C.white,
+                  borderRadius: 16,
+                  padding: "28px 20px",
+                  textAlign: "center",
+                  border: `1px solid ${C.oceanLight}`,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  cursor: "default",
+                  boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)"
+                }}>
                 <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 36, color: C.oceanBlue, marginBottom: 8 }}>{s.stat}</div>
                 <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12.5, color: C.body, lineHeight: 1.5, margin: 0 }}>{s.label}</p>
               </div>
