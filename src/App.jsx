@@ -515,19 +515,19 @@ function ServicesPage({ setPage }) {
             { num: "02", title: "the brand experience (full implementation)", price: "starting at $1.5k", body: "the \"do it for me\" option. we start with the audit, then i build your entire backend—client onboarding, workflows, automation, templates, email marketing, the whole thing.", page: "implementation", bg: C.oceanLight },
             { num: "03", title: "fractional consulting", price: "limited spots", body: "ongoing support without the agency retainer. think: a business bestie who actually knows what they're talking about. monthly strategy sessions + async access.", page: "fractional", bg: C.lavenderLight },
           ].map((c, i) => (
-            <FadeIn key={i} delay={i * 100}>
-              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s" }}
+            <FadeIn key={i} delay={i * 100} style={{ height: "100%" }}>
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", height: "100%", display: "flex", flexDirection: "column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                 onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}>
                 <div style={{ background: c.bg, padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
-                <div style={{ padding: "24px 22px 28px" }}>
+                <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>{c.price}</span>
                   <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "12px 0 10px" }}>{c.title}</h3>
                   <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>{c.body}</p>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue }}>learn more →</span>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>learn more →</span>
                 </div>
               </div>
             </FadeIn>
@@ -863,7 +863,7 @@ function ResourcesPage() {
               { t: "the timesplit framework", p: "strategic 20%, operational 60%, ad-hoc 20%. the breakdown that changed how i manage my time.", bg: C.lavenderLight },
               { t: "energy management for women", p: "time management is a myth. energy management is the answer. here's how to protect your capacity.", bg: C.sandLight },
             ].map((b, i) => (
-              <div key={i} style={{ minWidth: 260, maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 18, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s" }}
+              <div key={i} style={{ minWidth: 320, maxWidth: 340, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 18, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s" }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-3px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
                 <div style={{ height: 140, background: b.bg }} />
