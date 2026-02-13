@@ -327,7 +327,7 @@ function HomePage({ setPage }) {
       </section>
 
       {/* ── MARQUEE (PLM pattern) ── */}
-      <Marquee text="feel-good systems" />
+      <Marquee text="feel-good systems · built with intention · revenue expansion · sustainable growth · no hustle culture" />
 
       {/* ── WELCOME / PERMISSION SLIP ── */}
       <SectionWrap bgImage={gridBgSand} py="72px">
@@ -482,7 +482,7 @@ function HomePage({ setPage }) {
         </div>
       </SectionWrap>
 
-      <Marquee text="feel-good systems" bg={C.oceanBlue} color={C.white} />
+      <Marquee text="life-first business · backend that doesn't suck · grow without burnout · real systems for real people" bg={C.oceanBlue} color={C.white} />
     </>
   );
 }
