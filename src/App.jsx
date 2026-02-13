@@ -72,7 +72,7 @@ function FadeIn({ children, delay = 0, y = 28, style = {} }) {
 /* ══════════════════════════════════════════════════════════════
    MARQUEE / INFINITE TICKER (PLM pattern)
    ══════════════════════════════════════════════════════════════ */
-function Marquee({ text, bg = C.charcoal, color = C.sand, speed = 30 }) {
+function Marquee({ text, bg = C.charcoal, color = C.sand, speed = 60 }) {
   const items = Array(8).fill(text);
   return (
     <div style={{ overflow: "hidden", background: bg, padding: "14px 0", whiteSpace: "nowrap", position: "relative" }}>
