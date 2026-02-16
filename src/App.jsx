@@ -42,7 +42,16 @@ const gridBgLavender = `url("data:image/svg+xml,%3Csvg width='40' height='40' xm
 function useScrollY() {
   const [y, setY] = useState(0);
   useEffect(() => {
-    const h = () => setY(window.scrollY);
+    let ticking = false;
+    const h = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
   }, []);
@@ -145,9 +154,11 @@ function HorizontalScroll({ children, gap = 20 }) {
   return (
     <div style={{ position: "relative" }}>
       <div ref={ref} style={{
-        display: "flex", gap, overflowX: "auto", scrollSnapType: "x mandatory",
+        display: "flex", gap, overflowX: "auto", scrollSnapType: "x proximity",
         padding: "8px 0 20px", scrollbarWidth: "thin", scrollbarColor: `${C.sand} transparent`,
         WebkitOverflowScrolling: "touch",
+        scrollBehavior: "smooth",
+        willChange: "scroll-position"
       }}>
         {children}
       </div>
@@ -364,6 +375,51 @@ function Footer({ setPage }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   BACK TO TOP BUTTON
+   ══════════════════════════════════════════════════════════════ */
+function BackToTop({ scrollY }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const visible = scrollY > 500;
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <button
+      onClick={scrollToTop}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        position: "fixed",
+        bottom: 32,
+        right: 32,
+        width: 48,
+        height: 48,
+        borderRadius: "50%",
+        background: C.oceanBlue,
+        border: `2px solid ${C.white}`,
+        color: C.white,
+        fontSize: 20,
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+        opacity: visible ? 1 : 0,
+        transform: visible ? (isHovered ? "translateY(-4px) scale(1.05)" : "translateY(0)") : "translateY(20px)",
+        transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        pointerEvents: visible ? "auto" : "none",
+        zIndex: 999
+      }}
+      aria-label="Back to top"
+    >
+      ↑
+    </button>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
    PAGE: HOME
    ══════════════════════════════════════════════════════════════ */
 function HomePage({ setPage }) {
@@ -371,7 +427,7 @@ function HomePage({ setPage }) {
   const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
 
-  const parallaxY = scrollY * 0.5;
+  const parallaxY = Math.min(scrollY * 0.15, 150);
 
   return (
     <>
@@ -391,7 +447,7 @@ function HomePage({ setPage }) {
           pointerEvents: "none"
         }} />
 
-        <div style={{ maxWidth: 820, position: "relative", zIndex: 1, transform: `translateY(${parallaxY}px)`, transition: "transform 0.1s ease-out" }}>
+        <div style={{ maxWidth: 820, position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }}>
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.15s" }}>
             <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(40px, 7vw, 80px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 28px", textTransform: "lowercase", letterSpacing: "-1.5px" }}>
               your business should fit your life, not hijack it
@@ -1067,8 +1123,12 @@ export default function App() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Rubik:ital,wght@0,400;0,500;0,600;0,700&display=swap');
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-        body { background: ${C.cream}; overflow-x: hidden; }
+        html { -webkit-font-smoothing: antialiased; }
+        body {
+          background: ${C.cream};
+          overflow-x: hidden;
+          -webkit-overflow-scrolling: touch;
+        }
         ::selection { background: ${C.oceanLight}; color: ${C.charcoal}; }
         input::placeholder, textarea::placeholder { font-family: 'Rubik', sans-serif; color: ${C.muted}; }
         button:hover { opacity: 0.93; }
@@ -1108,6 +1168,7 @@ export default function App() {
       <Nav page={page} setPage={setPage} scrollY={scrollY} />
       <main>{pages[page]}</main>
       <Footer setPage={setPage} />
+      <BackToTop scrollY={scrollY} />
     </>
   );
 }
