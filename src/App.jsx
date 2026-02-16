@@ -112,6 +112,66 @@ function AnimatedCounter({ end, duration = 2000, suffix = "" }) {
   return <div ref={ref}>{formatted}{suffix}</div>;
 }
 
+/* ── 3D Card Tilt Hook (premium hover effect) ── */
+function use3DTilt() {
+  const ref = useRef(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = useCallback((e) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+    setTilt({ x: rotateX, y: rotateY });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 });
+  }, []);
+
+  return { ref, tilt, handleMouseMove, handleMouseLeave };
+}
+
+/* ── Text Reveal Animation ── */
+function TextReveal({ children, delay = 0 }) {
+  const [ref, v] = useInView(0.1);
+  return (
+    <div ref={ref} style={{
+      opacity: v ? 1 : 0,
+      transform: v ? "translateY(0)" : "translateY(20px)",
+      transition: `all 0.8s cubic-bezier(.22,.61,.36,1) ${delay}ms`,
+      willChange: "opacity, transform"
+    }}>
+      {children}
+    </div>
+  );
+}
+
+/* ── 3D Tilt Card Component ── */
+function TiltCard({ children, style = {}, onClick }) {
+  const { ref, tilt, handleMouseMove, handleMouseLeave } = use3DTilt();
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        willChange: "transform",
+        ...style
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════
    MARQUEE / INFINITE TICKER (PLM pattern)
    ══════════════════════════════════════════════════════════════ */
@@ -257,6 +317,147 @@ function PullQuote({ quote, author, bg = C.charcoal }) {
   );
 }
 
+/* ── FAQ Accordion ── */
+function FAQItem({ question, answer, isOpen, onClick }) {
+  return (
+    <div style={{ borderBottom: `1px solid ${C.sand}`, padding: "20px 0" }}>
+      <button
+        onClick={onClick}
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 0,
+          textAlign: "left"
+        }}
+      >
+        <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 16, color: C.charcoal, margin: 0 }}>{question}</h3>
+        <span style={{
+          fontFamily: "'Rubik', sans-serif",
+          fontSize: 24,
+          color: C.oceanBlue,
+          transform: isOpen ? "rotate(45deg)" : "rotate(0)",
+          transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
+        }}>+</span>
+      </button>
+      <div style={{
+        maxHeight: isOpen ? "500px" : "0",
+        overflow: "hidden",
+        transition: "max-height 0.5s cubic-bezier(.22,.61,.36,1)"
+      }}>
+        <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.7, marginTop: 16, marginBottom: 0 }}>{answer}</p>
+      </div>
+    </div>
+  );
+}
+
+function FAQ({ items }) {
+  const [openIndex, setOpenIndex] = useState(null);
+  return (
+    <div>
+      {items.map((item, i) => (
+        <FAQItem
+          key={i}
+          question={item.q}
+          answer={item.a}
+          isOpen={openIndex === i}
+          onClick={() => setOpenIndex(openIndex === i ? null : i)}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── Social Proof / Logos ── */
+function SocialProof() {
+  return (
+    <FadeIn>
+      <div style={{ textAlign: "center", padding: "48px 0" }}>
+        <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12, color: C.muted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 24 }}>certified & trusted by</p>
+        <div style={{ display: "flex", justifyContent: "center", gap: 40, flexWrap: "wrap", alignItems: "center" }}>
+          {["Asana Ambassador", "Notion Certified", "4-Day Work Week"].map((badge, i) => (
+            <div key={i} style={{
+              fontFamily: "'Rubik', sans-serif",
+              fontSize: 14,
+              fontWeight: 600,
+              color: C.charcoal,
+              background: C.white,
+              padding: "12px 24px",
+              borderRadius: 50,
+              border: `1.5px solid ${C.sand}`,
+              transition: "all 0.3s",
+              cursor: "default"
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+              {badge}
+            </div>
+          ))}
+        </div>
+      </div>
+    </FadeIn>
+  );
+}
+
+/* ── Testimonial Carousel ── */
+function TestimonialCarousel() {
+  const [current, setCurrent] = useState(0);
+  const testimonials = [
+    { text: "Sam consistently demonstrated excellent communication skills, ensuring both my team and I were fully informed. Her pragmatic approach to decision-making allowed her to make well-considered decisions that balanced immediate needs with long-term strategic goals.", author: "Cross-functional Project Lead, MarTech Transformation" },
+    { text: "Working with Sam transformed how our team approaches projects. The systems she built actually get used, which is more than I can say for previous consultants.", author: "Operations Director, SaaS Company" },
+    { text: "Finally, someone who gets that 'hustle culture' isn't the answer. Sam helped us build sustainable systems that work with how we actually operate.", author: "Founder, Creative Agency" }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % testimonials.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
+
+  return (
+    <div style={{ position: "relative", maxWidth: 800, margin: "0 auto" }}>
+      <div style={{ overflow: "hidden", position: "relative", minHeight: 200 }}>
+        {testimonials.map((t, i) => (
+          <div key={i} style={{
+            position: "absolute",
+            width: "100%",
+            opacity: current === i ? 1 : 0,
+            transform: current === i ? "translateX(0)" : "translateX(20px)",
+            transition: "all 0.6s cubic-bezier(.22,.61,.36,1)",
+            pointerEvents: current === i ? "auto" : "none"
+          }}>
+            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, marginBottom: 16, fontStyle: "italic" }}>"{t.text}"</p>
+            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, color: C.warmTan, margin: 0, fontWeight: 500 }}>— {t.author}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 32 }}>
+        {testimonials.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            style={{
+              width: current === i ? 32 : 8,
+              height: 8,
+              borderRadius: 4,
+              background: current === i ? C.oceanBlue : C.sand,
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+            }}
+            aria-label={`Go to testimonial ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function NewsletterForm({ compact = false }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -302,10 +503,13 @@ function Nav({ page, setPage, scrollY }) {
   return (
     <header style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000,
-      background: scrolled ? "rgba(250,247,242,0.96)" : "transparent",
-      backdropFilter: scrolled ? "blur(14px)" : "none",
-      borderBottom: scrolled ? `1px solid ${C.sand}` : "none",
-      transition: "all 0.4s", padding: "0 clamp(16px, 4vw, 48px)",
+      background: scrolled ? "rgba(250,247,242,0.8)" : "transparent",
+      backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+      WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+      borderBottom: scrolled ? `1px solid rgba(221, 208, 190, 0.3)` : "none",
+      boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.04)" : "none",
+      transition: "all 0.4s cubic-bezier(.22,.61,.36,1)",
+      padding: "0 clamp(16px, 4vw, 48px)",
     }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: scrolled ? 56 : 66, transition: "height 0.3s" }}>
         <button onClick={() => go("home")} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.charcoal, background: "none", border: "none", cursor: "pointer", letterSpacing: "-0.3px" }}>by samantha brown</button>
@@ -315,9 +519,40 @@ function Nav({ page, setPage, scrollY }) {
           <div style={{ position: "relative" }} onMouseEnter={() => setServDrop(true)} onMouseLeave={() => setServDrop(false)}>
             <button style={{ fontFamily: "'Rubik', sans-serif", fontWeight: page.startsWith("serv") || page === "audit" || page === "implementation" || page === "fractional" || page === "corporate" ? 600 : 400, fontSize: 14, color: C.charcoal, background: "none", border: "none", cursor: "pointer", padding: "6px 2px" }}>services ▾</button>
             {servDrop && (
-              <div style={{ position: "absolute", top: "100%", left: -8, background: C.white, border: `1px solid ${C.sand}`, borderRadius: 14, padding: "8px 0", minWidth: 240, boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}>
+              <div style={{
+                position: "absolute",
+                top: "100%",
+                left: -8,
+                background: "rgba(255, 255, 255, 0.9)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                border: `1px solid rgba(221, 208, 190, 0.3)`,
+                borderRadius: 16,
+                padding: "8px 0",
+                minWidth: 240,
+                boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+                marginTop: 8
+              }}>
                 {[["services", "all services"], ["audit", "brand experience audit"], ["implementation", "full implementation"], ["fractional", "fractional consulting"], ["corporate", "workshops & training"]].map(([k, l]) => (
-                  <button key={k} onClick={() => go(k)} style={{ display: "block", width: "100%", textAlign: "left", fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.charcoal, background: "none", border: "none", cursor: "pointer", padding: "10px 20px" }}>{l}</button>
+                  <button
+                    key={k}
+                    onClick={() => go(k)}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(123, 167, 179, 0.08)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "none"}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      textAlign: "left",
+                      fontFamily: "'Rubik', sans-serif",
+                      fontSize: 14,
+                      color: C.charcoal,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "12px 20px",
+                      transition: "all 0.2s"
+                    }}
+                  >{l}</button>
                 ))}
               </div>
             )}
@@ -449,7 +684,21 @@ function HomePage({ setPage }) {
 
         <div style={{ maxWidth: 820, position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }}>
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.15s" }}>
-            <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(40px, 7vw, 80px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 28px", textTransform: "lowercase", letterSpacing: "-1.5px" }}>
+            <h1 style={{
+              fontFamily: "'Rubik', sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(40px, 7vw, 80px)",
+              background: "linear-gradient(135deg, #2D2D2D 0%, #7BA7B3 50%, #9B8B6B 100%)",
+              backgroundSize: "200% 200%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              lineHeight: 1.02,
+              margin: "0 0 28px",
+              textTransform: "lowercase",
+              letterSpacing: "-1.5px",
+              animation: "gradientText 8s ease infinite"
+            }}>
               your business should fit your life, not hijack it
             </h1>
           </div>
@@ -499,17 +748,31 @@ function HomePage({ setPage }) {
             { emoji: "🤝", label: "leadership & teams", title: "for corporate teams & leaders", body: "high-performing teams don't need micromanaging—they need systems that make collaboration easy and leaders who've learned (often the hard way) how to build sustainability into their approach.", cta: "explore workshops →", page: "corporate", bg: C.oceanLight },
             { emoji: "✨", label: "partnerships", title: "for brands & organizations", body: "collaborations for brands who value authenticity over aesthetics. let's create something people actually want to engage with.", cta: "let's collaborate →", page: "contact", bg: C.lavenderLight },
           ].map((c, i) => (
-            <div key={i} style={{ minWidth: 320, maxWidth: 360, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s", cursor: "pointer", display: "flex", flexDirection: "column" }}
-              onMouseEnter={e => e.currentTarget.style.transform = "translateY(-6px)"}
-              onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-              onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}>
+            <TiltCard
+              key={i}
+              onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}
+              style={{
+                minWidth: 320,
+                maxWidth: 360,
+                flexShrink: 0,
+                scrollSnapAlign: "start",
+                background: C.white,
+                borderRadius: 20,
+                overflow: "hidden",
+                border: `1px solid ${C.sand}`,
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "column",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+              }}
+            >
               <PhotoBlock emoji={c.emoji} label={c.label} h={220} bg={c.bg} radius={0} />
               <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
                 <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "0 0 10px", lineHeight: 1.2 }}>{c.title}</h3>
                 <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>{c.body}</p>
                 <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>{c.cta}</span>
               </div>
-            </div>
+            </TiltCard>
           ))}
         </HorizontalScroll>
       </SectionWrap>
@@ -574,22 +837,19 @@ function HomePage({ setPage }) {
         </FadeIn>
       </SectionWrap>
 
-      {/* ── TESTIMONIAL (PLM: full-width featured card) ── */}
+      {/* ── SOCIAL PROOF ── */}
+      <SectionWrap bg={C.white} py="56px">
+        <SocialProof />
+      </SectionWrap>
+
+      {/* ── TESTIMONIALS CAROUSEL ── */}
       <SectionWrap bg={C.cream} py="72px">
         <FadeIn>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 40, alignItems: "center" }}>
-            <PhotoBlock emoji="💼" label="martech transformation" h={340} bg={C.lavenderLight} radius={20} />
-            <div>
-              <ScriptLabel>kind words</ScriptLabel>
-              <div style={{ position: "relative", paddingLeft: 28 }}>
-                <span style={{ fontFamily: "'Caveat', cursive", fontSize: 72, color: C.lavender, position: "absolute", top: -20, left: -4, lineHeight: 1 }}>"</span>
-                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, marginBottom: 16 }}>
-                  Sam consistently demonstrated excellent communication skills, ensuring both my team and I were fully informed. She was particularly adept at identifying and highlighting key areas that required our attention, which was critical to the project's success. Her pragmatic approach to decision-making and remarkable ability to see the big picture allowed her to make well-considered decisions that balanced immediate needs with long-term strategic goals.
-                </p>
-                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, color: C.warmTan, margin: 0, fontWeight: 500 }}>— cross-functional project lead, martech transformation</p>
-              </div>
-            </div>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <ScriptLabel size={22} style={{ textAlign: "center" }}>kind words</ScriptLabel>
+            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 38px)", color: C.charcoal, margin: 0 }}>what people are saying</h2>
           </div>
+          <TestimonialCarousel />
         </FadeIn>
       </SectionWrap>
 
@@ -602,6 +862,25 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: C.charcoal, margin: "0 0 16px" }}>join the cabana club 🏖️</h2>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, marginBottom: 28 }}>bi-weekly insights on building a business that doesn't require you to be a different person. no productivity guilt, no "monetize your mornings" bs. just real talk about systems, revenue expansion, and growing sustainably.</p>
             <div style={{ display: "flex", justifyContent: "center" }}><NewsletterForm /></div>
+          </FadeIn>
+        </div>
+      </SectionWrap>
+
+      {/* ── FAQ SECTION ── */}
+      <SectionWrap bg={C.white} py="72px">
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+          <FadeIn>
+            <div style={{ textAlign: "center", marginBottom: 40 }}>
+              <ScriptLabel size={22} style={{ textAlign: "center" }}>questions?</ScriptLabel>
+              <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 38px)", color: C.charcoal, margin: 0 }}>frequently asked questions</h2>
+            </div>
+            <FAQ items={[
+              { q: "How is this different from other business coaches?", a: "I'm not here to sell you another 5am routine or tell you to 'monetize your mornings.' I build systems that work with how you actually operate, not against it. Plus, I've done the work—leading teams across 8 regions, achieving 94-96% adoption rates, maintaining 8.9+ engagement scores. This isn't theory; it's what actually works." },
+              { q: "Do you work with people who are just getting started?", a: "My services are designed for established creators, service providers, and leaders who already have an audience or team but need better systems. If you're brand new (like first 10 followers), I'd recommend building some foundation first. But if you have a small but mighty community and you're ready to scale? Let's talk." },
+              { q: "What if I'm not sure which service is right for me?", a: "Start with the Brand Experience Audit ($350). It's the most affordable way to get an outside perspective on what's working, what's broken, and where to focus first. After the audit, you'll know exactly whether you need the full implementation, fractional support, or can DIY with my recommendations." },
+              { q: "How long does it take to see results?", a: "The audit takes 1 week. Full implementation is 3-4 weeks. But here's the thing—you'll see immediate relief once systems are in place. No more hunting for that email template. No more forgetting to send the invoice. The ROI comes from getting your time back and not losing clients to a messy backend." },
+              { q: "Do you offer payment plans?", a: "Yes! For services over $1k, I offer payment plans. Reach out via the contact form and we'll figure out what works for your budget." }
+            ]} />
           </FadeIn>
         </div>
       </SectionWrap>
@@ -1142,6 +1421,24 @@ export default function App() {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
+        }
+
+        @keyframes gradientText {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        /* Enhanced Form Inputs */
+        input:focus, textarea:focus, select:focus {
+          outline: none !important;
+          border-color: ${C.oceanBlue} !important;
+          box-shadow: 0 0 0 3px rgba(123, 167, 179, 0.1), 0 4px 12px rgba(123, 167, 179, 0.15) !important;
+          transform: translateY(-1px);
+        }
+
+        input, textarea, select {
+          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
         }
 
         /* Scrollbar styling */
