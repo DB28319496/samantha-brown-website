@@ -69,6 +69,40 @@ function FadeIn({ children, delay = 0, y = 28, style = {} }) {
   );
 }
 
+/* ── Animated Counter (counts up when scrolled into view) ── */
+function AnimatedCounter({ end, duration = 2000, suffix = "" }) {
+  const [ref, v] = useInView(0.1);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!v) return;
+
+    const endValue = parseFloat(end);
+    const startTime = Date.now();
+    const animate = () => {
+      const now = Date.now();
+      const progress = Math.min((now - startTime) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(easeOut * endValue);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    animate();
+  }, [v, end, duration]);
+
+  const formatted = end.toString().includes('+')
+    ? `${Math.floor(count)}+`
+    : end.toString().includes('%')
+    ? `${Math.floor(count)}%`
+    : end.toString().includes('.')
+    ? count.toFixed(1)
+    : Math.floor(count);
+
+  return <div ref={ref}>{formatted}{suffix}</div>;
+}
+
 /* ══════════════════════════════════════════════════════════════
    MARQUEE / INFINITE TICKER (PLM pattern)
    ══════════════════════════════════════════════════════════════ */
@@ -125,7 +159,28 @@ function HorizontalScroll({ children, gap = 20 }) {
    REUSABLE COMPONENTS
    ══════════════════════════════════════════════════════════════ */
 function Btn({ children, variant = "primary", onClick, style = {} }) {
-  const base = { fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, border: "none", borderRadius: 50, padding: "14px 34px", cursor: "pointer", transition: "all 0.3s ease", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", letterSpacing: "0.2px" };
+  const btnRef = useRef(null);
+  const [magnetic, setMagnetic] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = useCallback((e) => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    const distance = Math.sqrt(x * x + y * y);
+    const maxDistance = 80;
+
+    if (distance < maxDistance) {
+      const strength = (1 - distance / maxDistance) * 0.3;
+      setMagnetic({ x: x * strength, y: y * strength });
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setMagnetic({ x: 0, y: 0 });
+  }, []);
+
+  const base = { fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, border: "none", borderRadius: 50, padding: "14px 34px", cursor: "pointer", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", letterSpacing: "0.2px", position: "relative" };
   const v = {
     primary: { ...base, background: C.charcoal, color: C.cream, border: `2px solid ${C.charcoal}` },
     sand: { ...base, background: C.sand, color: C.charcoal, border: `2px solid ${C.sand}` },
@@ -134,7 +189,18 @@ function Btn({ children, variant = "primary", onClick, style = {} }) {
     yellow: { ...base, background: C.yellow, color: C.charcoal, border: `2px solid ${C.charcoal}` },
     white: { ...base, background: C.white, color: C.charcoal, border: `2px solid ${C.charcoal}` },
   };
-  return <button onClick={onClick} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }} style={{ ...v[variant], ...style }}>{children}</button>;
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={e => { e.currentTarget.style.transform = `translate(${magnetic.x}px, ${magnetic.y}px) translateY(-2px)`; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.12)"; }}
+      onMouseLeave={e => { handleMouseLeave(); e.currentTarget.style.transform = "translate(0, 0)"; e.currentTarget.style.boxShadow = "none"; }}
+      style={{ ...v[variant], transform: `translate(${magnetic.x}px, ${magnetic.y}px)`, ...style }}>
+      {children}
+    </button>
+  );
 }
 
 function SectionWrap({ children, bg, bgImage, py = "80px", style = {} }) {
@@ -302,13 +368,30 @@ function Footer({ setPage }) {
    ══════════════════════════════════════════════════════════════ */
 function HomePage({ setPage }) {
   const [loaded, setLoaded] = useState(false);
+  const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
+
+  const parallaxY = scrollY * 0.5;
 
   return (
     <>
       {/* ── HERO (PLM: grid bg, big bold text, centered) ── */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "120px clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative" }}>
-        <div style={{ maxWidth: 820 }}>
+      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "120px clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        {/* Animated gradient background */}
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "linear-gradient(135deg, rgba(123, 167, 179, 0.08) 0%, rgba(213, 206, 227, 0.08) 50%, rgba(245, 230, 220, 0.08) 100%)",
+          backgroundSize: "200% 200%",
+          animation: "gradientShift 15s ease infinite",
+          zIndex: 0,
+          pointerEvents: "none"
+        }} />
+
+        <div style={{ maxWidth: 820, position: "relative", zIndex: 1, transform: `translateY(${parallaxY}px)`, transition: "transform 0.1s ease-out" }}>
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.15s" }}>
             <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(40px, 7vw, 80px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 28px", textTransform: "lowercase", letterSpacing: "-1.5px" }}>
               your business should fit your life, not hijack it
@@ -415,7 +498,9 @@ function HomePage({ setPage }) {
                   cursor: "default",
                   boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)"
                 }}>
-                <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 36, color: C.oceanBlue, marginBottom: 8 }}>{s.stat}</div>
+                <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 36, color: C.oceanBlue, marginBottom: 8 }}>
+                  <AnimatedCounter end={s.stat} duration={2000} />
+                </div>
                 <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12.5, color: C.body, lineHeight: 1.5, margin: 0 }}>{s.label}</p>
               </div>
             </FadeIn>
@@ -991,6 +1076,12 @@ export default function App() {
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-100%); }
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
 
         /* Scrollbar styling */
