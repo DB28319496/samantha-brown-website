@@ -464,14 +464,55 @@ function NewsletterForm({ compact = false }) {
   const [done, setDone] = useState(false);
   const inputS = { fontFamily: "'Rubik', sans-serif", fontSize: 15, border: `1.5px solid ${C.sand}`, borderRadius: 50, padding: "13px 22px", outline: "none", background: C.white, width: "100%", boxSizing: "border-box" };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+
+    const formData = new FormData();
+    formData.append('form-name', 'newsletter');
+    formData.append('name', name);
+    formData.append('email', email);
+
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(formData).toString()
+    })
+      .then(() => setDone(true))
+      .catch(() => alert('Error subscribing. Please try again.'));
+  };
+
   if (done) return <div style={{ textAlign: "center", padding: 16 }}><span style={{ fontSize: 28 }}>🎉</span><p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, marginTop: 8 }}>you're in! check your inbox.</p></div>;
 
   return (
-    <div style={{ display: "flex", flexDirection: compact ? "row" : "column", gap: 12, maxWidth: compact ? 500 : 400, flexWrap: "wrap" }}>
-      {!compact && <input placeholder="first name" value={name} onChange={e => setName(e.target.value)} style={inputS} />}
-      <input type="email" placeholder="email address" value={email} onChange={e => setEmail(e.target.value)} style={{ ...inputS, flex: compact ? 1 : undefined, minWidth: compact ? 200 : undefined }} />
-      <Btn variant="primary" onClick={() => { if (email.includes("@")) setDone(true); }} style={compact ? { whiteSpace: "nowrap" } : {}}>sign me up →</Btn>
-    </div>
+    <form
+      name="newsletter"
+      method="POST"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      onSubmit={handleSubmit}
+      style={{ display: "flex", flexDirection: compact ? "row" : "column", gap: 12, maxWidth: compact ? 500 : 400, flexWrap: "wrap" }}
+    >
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p style={{ display: "none" }}>
+        <label>Don't fill this out: <input name="bot-field" /></label>
+      </p>
+      {!compact && <input name="name" placeholder="first name" value={name} onChange={e => setName(e.target.value)} style={inputS} />}
+      <input name="email" type="email" placeholder="email address" value={email} onChange={e => setEmail(e.target.value)} required style={{ ...inputS, flex: compact ? 1 : undefined, minWidth: compact ? 200 : undefined }} />
+      <button type="submit" style={{
+        fontFamily: "'Rubik', sans-serif",
+        fontWeight: 600,
+        fontSize: 14,
+        background: C.charcoal,
+        color: C.cream,
+        border: `2px solid ${C.charcoal}`,
+        borderRadius: 50,
+        padding: "14px 34px",
+        cursor: "pointer",
+        transition: "all 0.3s",
+        whiteSpace: compact ? "nowrap" : "normal"
+      }}>sign me up →</button>
+    </form>
   );
 }
 
@@ -1315,6 +1356,27 @@ function ContactPage({ setPage }) {
   const inputS = { fontFamily: "'Rubik', sans-serif", fontSize: 15, border: `1.5px solid ${C.sand}`, borderRadius: 12, padding: "13px 18px", outline: "none", background: C.white, width: "100%", boxSizing: "border-box" };
   const labelS = { fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.charcoal, display: "block", marginBottom: 6 };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const netlifyForm = new FormData();
+    netlifyForm.append('form-name', 'contact');
+    netlifyForm.append('interest', form.interest);
+    netlifyForm.append('name', form.name);
+    netlifyForm.append('email', form.email);
+    netlifyForm.append('message', form.message);
+    netlifyForm.append('source', form.source);
+    netlifyForm.append('extra', form.extra);
+
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(netlifyForm).toString()
+    })
+      .then(() => setSent(true))
+      .catch((error) => alert('Error submitting form. Please try again or email sam@bysamanthabrown.com'));
+  };
+
   if (sent) return (
     <section style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", background: gridBgWhite, padding: "120px 20px" }}>
       <div style={{ textAlign: "center", maxWidth: 440 }}>
@@ -1334,11 +1396,23 @@ function ContactPage({ setPage }) {
 
       <SectionWrap bgImage={gridBgSand} py="64px">
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
-          <div style={{ background: C.white, borderRadius: 24, padding: "clamp(24px, 4vw, 44px)", border: `1px solid ${C.sand}` }}>
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            onSubmit={handleSubmit}
+            style={{ background: C.white, borderRadius: 24, padding: "clamp(24px, 4vw, 44px)", border: `1px solid ${C.sand}` }}
+          >
+            <input type="hidden" name="form-name" value="contact" />
+            <p style={{ display: "none" }}>
+              <label>Don't fill this out: <input name="bot-field" /></label>
+            </p>
+
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px 24px" }}>
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={labelS}>what are you interested in?</label>
-                <select value={form.interest} onChange={e => upd("interest", e.target.value)} style={{ ...inputS, appearance: "auto" }}>
+                <select name="interest" value={form.interest} onChange={e => upd("interest", e.target.value)} required style={{ ...inputS, appearance: "auto" }}>
                   <option value="">select one...</option>
                   <option>brand experience audit or consulting (creators/service providers)</option>
                   <option>workshops or leadership consulting (corporate teams)</option>
@@ -1346,17 +1420,33 @@ function ContactPage({ setPage }) {
                   <option>just saying hi / not sure yet</option>
                 </select>
               </div>
-              <div><label style={labelS}>your name</label><input value={form.name} onChange={e => upd("name", e.target.value)} style={inputS} /></div>
-              <div><label style={labelS}>email</label><input type="email" value={form.email} onChange={e => upd("email", e.target.value)} style={inputS} /></div>
+              <div><label style={labelS}>your name</label><input name="name" value={form.name} onChange={e => upd("name", e.target.value)} required style={inputS} /></div>
+              <div><label style={labelS}>email</label><input name="email" type="email" value={form.email} onChange={e => upd("email", e.target.value)} required style={inputS} /></div>
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={labelS}>what's going on?</label>
-                <textarea value={form.message} onChange={e => upd("message", e.target.value)} rows={5} style={{ ...inputS, resize: "vertical", lineHeight: 1.6 }} placeholder='"my client onboarding is chaos" or "our team engagement scores are tanking"' />
+                <textarea name="message" value={form.message} onChange={e => upd("message", e.target.value)} rows={5} required style={{ ...inputS, resize: "vertical", lineHeight: 1.6 }} placeholder='"my client onboarding is chaos" or "our team engagement scores are tanking"' />
               </div>
-              <div><label style={labelS}>how'd you find me?</label><select value={form.source} onChange={e => upd("source", e.target.value)} style={{ ...inputS, appearance: "auto" }}><option value="">select one...</option><option>LinkedIn</option><option>Instagram</option><option>Google</option><option>Referral</option><option>Other</option></select></div>
-              <div><label style={labelS}>anything else?</label><input value={form.extra} onChange={e => upd("extra", e.target.value)} style={inputS} /></div>
-              <div style={{ gridColumn: "1 / -1" }}><Btn variant="primary" onClick={() => setSent(true)}>send it →</Btn></div>
+              <div><label style={labelS}>how'd you find me?</label><select name="source" value={form.source} onChange={e => upd("source", e.target.value)} style={{ ...inputS, appearance: "auto" }}><option value="">select one...</option><option>LinkedIn</option><option>Instagram</option><option>Google</option><option>Referral</option><option>Other</option></select></div>
+              <div><label style={labelS}>anything else?</label><input name="extra" value={form.extra} onChange={e => upd("extra", e.target.value)} style={inputS} /></div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <button type="submit" style={{
+                  fontFamily: "'Rubik', sans-serif",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  background: C.charcoal,
+                  color: C.cream,
+                  border: `2px solid ${C.charcoal}`,
+                  borderRadius: 50,
+                  padding: "14px 34px",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8
+                }}>send it →</button>
+              </div>
             </div>
-          </div>
+          </form>
 
           <div style={{ marginTop: 28, background: C.white, borderRadius: 16, padding: "22px 24px", border: `1px solid ${C.sand}` }}>
             <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.charcoal, margin: "0 0 6px" }}>prefer email?</h3>

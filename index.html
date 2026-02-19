@@ -9,5 +9,20 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Netlify Forms Detection - Hidden -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="interest" />
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+      <input type="text" name="source" />
+      <input type="text" name="extra" />
+    </form>
+
+    <form name="newsletter" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+    </form>
   </body>
 </html>
