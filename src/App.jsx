@@ -9,6 +9,7 @@ import { EditorToolbar } from "./cms/EditorToolbar";
 import { SelectionOverlay } from "./cms/SelectionOverlay";
 import { PropertyPanel } from "./cms/PropertyPanel";
 import { AdminLoginListener, AdminLoginModal } from "./cms/AdminAuth";
+import { AnimatedSiteDemo } from "./components/AnimatedSiteDemo";
 
 /* ══════════════════════════════════════════════════════════════
    DESIGN SYSTEM — Beachy palette from color swatch
@@ -753,7 +754,7 @@ function HomePage({ setPage }) {
       <SectionWrap bgImage={gridBgSand} py="72px">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 48, alignItems: "center" }}>
           <FadeIn>
-            <EditableImage contentKey="image.home.welcome" placeholderEmoji="🏖️" placeholderLabel="your new ops partner" placeholderHeight={400} placeholderBg={C.oceanLight} placeholderRadius={20} />
+            <AnimatedSiteDemo height={400} borderRadius={20} />
           </FadeIn>
           <FadeIn delay={120}>
             <ScriptLabel size={22}><EditableText contentKey="home.welcome.scriptLabel" as="span" /></ScriptLabel>
