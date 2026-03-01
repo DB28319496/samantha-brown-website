@@ -1376,7 +1376,6 @@ function AboutPage({ setPage }) {
    ══════════════════════════════════════════════════════════════ */
 function ResourcesPage() {
   const { getContent } = useCMS();
-  const [interest, setInterest] = useState("");
   return (
     <>
       <section style={{ background: gridBgWhite, padding: "130px clamp(20px, 5vw, 56px) 56px", textAlign: "center" }}>
@@ -1395,30 +1394,6 @@ function ResourcesPage() {
             <ScriptLabel size={24} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="resources.newsletter.scriptLabel" as="span" /></ScriptLabel>
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 38px)", color: C.charcoal, margin: "0 0 16px" }}><EditableText contentKey="resources.newsletter.heading" as="span" /></h2>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, marginBottom: 20 }}><EditableText contentKey="resources.newsletter.body" as="span" /></p>
-            {/* Preferences selector */}
-            <div style={{ marginBottom: 20 }}>
-              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, color: C.body, marginBottom: 10 }}>i'm most interested in:</p>
-              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-                {["systems & ops", "revenue expansion", "leadership", "all of the above"].map(pref => (
-                  <button
-                    key={pref}
-                    onClick={() => setInterest(pref)}
-                    style={{
-                      fontFamily: "'Rubik', sans-serif",
-                      fontSize: 13,
-                      fontWeight: interest === pref ? 600 : 400,
-                      color: interest === pref ? C.white : C.charcoal,
-                      background: interest === pref ? C.oceanBlue : C.white,
-                      border: `1.5px solid ${interest === pref ? C.oceanBlue : C.sand}`,
-                      borderRadius: 50,
-                      padding: "8px 18px",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                  >{pref}</button>
-                ))}
-              </div>
-            </div>
             <div style={{ display: "flex", justifyContent: "center" }}><NewsletterForm /></div>
           </FadeIn>
         </div>
