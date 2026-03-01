@@ -1103,18 +1103,40 @@ function ServicesPage({ setPage }) {
         <FadeIn>
           <ScriptLabel size={22} color={C.sand}><EditableText contentKey="services.corporate.scriptLabel" as="span" /></ScriptLabel>
           <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 38px)", color: C.cream, margin: "0 0 12px" }}><EditableText contentKey="services.corporate.heading" as="span" /></h2>
-          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: `${C.sand}cc`, lineHeight: 1.75, maxWidth: 600, marginBottom: 28 }}><EditableText contentKey="services.corporate.body" as="span" /></p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-            {(getContent("services.corporate.offerings") || []).map((t, i) => (
-              <div key={i} style={{ background: `${C.warmTan}15`, borderRadius: 14, padding: "18px 22px", border: `1px solid ${C.warmTan}25` }}>
-                <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 16, color: C.yellow, margin: 0 }}>
-                  <EditableArrayString contentKey="services.corporate.offerings" index={i} />
-                </h4>
-              </div>
-            ))}
-          </div>
-          <Btn variant="yellow" onClick={() => { setPage("contact"); window.scrollTo({ top: 0 }); }}>get in touch →</Btn>
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: `${C.sand}cc`, lineHeight: 1.75, maxWidth: 680, marginBottom: 36 }}><EditableText contentKey="services.corporate.body" as="span" /></p>
         </FadeIn>
+
+        <EditableCardGroup
+          contentKey="services.corporate.cards"
+          defaultNewItem={{ num: "03", title: "new offering", price: "custom pricing", body: "description here", page: "corporate", bg: "#E8DDD4" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
+          renderCard={(c, i) => {
+            const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
+            return (
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}>
+                <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
+                </div>
+                <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>
+                    <EditableArrayText contentKey="services.corporate.cards" index={i} field="price" as="span" />
+                  </span>
+                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "12px 0 10px" }}>
+                    <EditableArrayText contentKey="services.corporate.cards" index={i} field="title" as="span" />
+                  </h3>
+                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
+                    <EditableArrayText contentKey="services.corporate.cards" index={i} field="body" as="span" />
+                  </p>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>learn more →</span>
+                </div>
+              </div>
+            );
+          }}
+        />
+
       </SectionWrap>
       </EditableSection>
 
@@ -1125,17 +1147,40 @@ function ServicesPage({ setPage }) {
         <FadeIn>
           <ScriptLabel size={22} color={C.oceanBlue}><EditableText contentKey="services.brands.scriptLabel" as="span" /></ScriptLabel>
           <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 38px)", color: C.charcoal, margin: "0 0 12px" }}><EditableText contentKey="services.brands.heading" as="span" /></h2>
-          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, maxWidth: 600, marginBottom: 28 }}><EditableText contentKey="services.brands.body" as="span" /></p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 28 }}>
-            {(getContent("services.brands.types") || []).map((c, i) => (
-              <div key={i} style={{ background: C.white, borderRadius: 16, padding: "24px 20px", textAlign: "center", border: `1px solid ${C.lavender}`, height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}><EditableArrayText contentKey="services.brands.types" index={i} field="icon" as="span" /></span>
-                <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 14, color: C.charcoal, margin: 0 }}><EditableArrayText contentKey="services.brands.types" index={i} field="t" as="span" /></h4>
-              </div>
-            ))}
-          </div>
-          <Btn variant="primary" onClick={() => { setPage("contact"); window.scrollTo({ top: 0 }); }}>let's collaborate →</Btn>
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, maxWidth: 680, marginBottom: 36 }}><EditableText contentKey="services.brands.body" as="span" /></p>
         </FadeIn>
+
+        <EditableCardGroup
+          contentKey="services.brands.cards"
+          defaultNewItem={{ num: "04", title: "new partnership", price: "inquire", body: "description here", page: "contact", bg: "#F5E6DC" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
+          renderCard={(c, i) => {
+            const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
+            return (
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}>
+                <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
+                </div>
+                <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>
+                    <EditableArrayText contentKey="services.brands.cards" index={i} field="price" as="span" />
+                  </span>
+                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "12px 0 10px" }}>
+                    <EditableArrayText contentKey="services.brands.cards" index={i} field="title" as="span" />
+                  </h3>
+                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
+                    <EditableArrayText contentKey="services.brands.cards" index={i} field="body" as="span" />
+                  </p>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>learn more →</span>
+                </div>
+              </div>
+            );
+          }}
+        />
+
       </SectionWrap>
       </EditableSection>
     </>

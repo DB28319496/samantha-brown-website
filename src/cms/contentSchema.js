@@ -137,15 +137,18 @@ export const defaultContent = {
   "services.corporate.scriptLabel": "for the corporate folks",
   "services.corporate.heading": "leadership development that doesn't feel like corporate theater",
   "services.corporate.body": "i'm here to help you build teams that don't need constant hand-holding and systems that actually get adopted—not just rolled out and ignored.",
-  "services.corporate.offerings": ["team engagement workshops", "leadership consulting for managers", "custom training programs"],
+  "services.corporate.cards": [
+    { num: "01", title: "for leaders & executives", price: "custom pricing", body: "strategic leadership development, executive coaching, and organizational systems designed for senior leaders who want to drive real change — without the corporate theater.", page: "corporate", bg: "#E8DDD4" },
+    { num: "02", title: "for corporate professionals", price: "custom pricing", body: "team engagement workshops, productivity systems, and career development frameworks for professionals ready to level up without burning out.", page: "corporate", bg: "#D6E8EC" },
+  ],
 
   "services.brands.scriptLabel": "for brands & organizations",
   "services.brands.heading": "partnerships for people who value authenticity",
   "services.brands.body": "i'm not here to post a perfectly curated flat lay. i'm here to create content that actually converts, partnerships that feel aligned, and collaborations your audience will genuinely care about.",
-  "services.brands.types": [
-    { icon: "🎤", t: "speaking engagements" },
-    { icon: "🤝", t: "brand collaborations" },
-    { icon: "📱", t: "ugc & content creation" },
+  "services.brands.cards": [
+    { num: "01", title: "speaking engagements", price: "inquire", body: "keynotes, panels, and workshops on systems, leadership, sustainable growth, and building businesses that actually work for your life.", page: "contact", bg: "#F5E6DC" },
+    { num: "02", title: "brand collaborations", price: "inquire", body: "authentic partnerships with brands that align with my audience and values. content that converts because it's genuine, not performative.", page: "contact", bg: "#D6E8EC" },
+    { num: "03", title: "ugc & content creation", price: "inquire", body: "user-generated content and social media content creation for brands looking for authentic, relatable content that actually resonates.", page: "contact", bg: "#EDE8F4" },
   ],
   // ─── SERVICE DETAIL: AUDIT ───
   "services.audit.price": "$350",
