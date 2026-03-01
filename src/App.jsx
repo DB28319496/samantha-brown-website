@@ -361,11 +361,43 @@ function SectionWrap({ children, bg, bgImage, py = "80px", style = {} }) {
   );
 }
 
-function ProcessStep({ num, text, accent = C.oceanBlue }) {
+const stepColors = ["#F4B8A8", "#9AABE0", "#A8D5A2", "#E07E6A", "#D4A8E0"];
+const stepDividers = ["#F4B8A8", "#9AABE0", "#A8D5A2", "#E07E6A", "#D4A8E0"];
+const stepRotations = [-8, -6, -10, -7, -9];
+
+function ProcessStep({ num, text, total }) {
+  const idx = (num - 1) % stepColors.length;
+  const color = stepColors[idx];
+  const rotation = stepRotations[idx];
+  const dividerColor = stepDividers[idx];
+  const isLast = num === total;
+
   return (
-    <div style={{ display: "flex", gap: 18, alignItems: "flex-start", padding: "22px 0", borderBottom: `1px solid ${C.sand}` }}>
-      <div style={{ width: 40, height: 40, borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.white, flexShrink: 0 }}>{num}</div>
-      <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, margin: 0 }}>{text}</p>
+    <div style={{ padding: "28px 0 20px", position: "relative" }}>
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+        <div style={{
+          width: 38,
+          height: 38,
+          borderRadius: 8,
+          background: color,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Rubik', sans-serif",
+          fontWeight: 700,
+          fontSize: 14,
+          color: C.white,
+          flexShrink: 0,
+          transform: `rotate(${rotation}deg)`,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        }}>
+          {String(num).padStart(2, "0")}
+        </div>
+        <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, margin: 0 }}>{text}</p>
+      </div>
+      {!isLast && (
+        <div style={{ height: 2, background: dividerColor, opacity: 0.45, marginTop: 24, borderRadius: 2 }} />
+      )}
     </div>
   );
 }
@@ -1229,7 +1261,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
         <FadeIn>
           <div style={{ maxWidth: 700, margin: "0 auto" }}>
             <ScriptLabel>the process</ScriptLabel>
-            {process.map((t, i) => <ProcessStep key={i} num={i + 1} text={<EditableArrayString contentKey={p + ".process"} index={i} />} />)}
+            {process.map((t, i) => <ProcessStep key={i} num={i + 1} total={process.length} text={<EditableArrayString contentKey={p + ".process"} index={i} />} />)}
           </div>
         </FadeIn>
       </SectionWrap>
