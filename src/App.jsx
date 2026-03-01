@@ -4,7 +4,10 @@ import { useContent } from "./cms/useContent";
 import { EditableText, EditableArrayText, EditableArrayString } from "./cms/EditableText";
 import { EditableImage } from "./cms/EditableImage";
 import { EditableSection } from "./cms/EditableSection";
-import { AdminToolbar } from "./cms/AdminToolbar";
+import { EditableCardGroup } from "./cms/EditableCardGroup";
+import { EditorToolbar } from "./cms/EditorToolbar";
+import { SelectionOverlay } from "./cms/SelectionOverlay";
+import { PropertyPanel } from "./cms/PropertyPanel";
 import { AdminLoginListener, AdminLoginModal } from "./cms/AdminAuth";
 
 /* ══════════════════════════════════════════════════════════════
@@ -394,12 +397,16 @@ function PullQuote({ quote, author, bg = C.charcoal }) {
 
 /* ── Social Proof / Logos ── */
 function SocialProof() {
+  const { getContent } = useCMS();
+  const badges = getContent("home.socialProof.badges") || [];
   return (
     <FadeIn>
       <div style={{ textAlign: "center", padding: "48px 0" }}>
-        <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12, color: C.muted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 24 }}>certified & trusted by</p>
+        <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12, color: C.muted, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 24 }}>
+          <EditableText contentKey="home.socialProof.label" as="span" />
+        </p>
         <div style={{ display: "flex", justifyContent: "center", gap: 40, flexWrap: "wrap", alignItems: "center" }}>
-          {["Asana Ambassador", "Notion Certified", "4-Day Work Week"].map((badge, i) => (
+          {badges.map((badge, i) => (
             <div key={i} style={{
               fontFamily: "'Rubik', sans-serif",
               fontSize: 14,
@@ -414,7 +421,7 @@ function SocialProof() {
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-              {badge}
+              <EditableArrayString contentKey="home.socialProof.badges" index={i} />
             </div>
           ))}
         </div>
@@ -425,12 +432,9 @@ function SocialProof() {
 
 /* ── Testimonial Carousel ── */
 function TestimonialCarousel() {
+  const { getContent } = useCMS();
   const [current, setCurrent] = useState(0);
-  const testimonials = [
-    { text: "Sam consistently demonstrated excellent communication skills, ensuring both my team and I were fully informed. Her pragmatic approach to decision-making allowed her to make well-considered decisions that balanced immediate needs with long-term strategic goals.", author: "Cross-functional Project Lead, MarTech Transformation" },
-    { text: "Working with Sam transformed how our team approaches projects. The systems she built actually get used, which is more than I can say for previous consultants.", author: "Operations Director, SaaS Company" },
-    { text: "Finally, someone who gets that 'hustle culture' isn't the answer. Sam helped us build sustainable systems that work with how we actually operate.", author: "Founder, Creative Agency" }
-  ];
+  const testimonials = getContent("home.testimonials") || [];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -670,6 +674,7 @@ function BackToTop({ scrollY }) {
    PAGE: HOME
    ══════════════════════════════════════════════════════════════ */
 function HomePage({ setPage }) {
+  const { getContent } = useCMS();
   const [loaded, setLoaded] = useState(false);
   const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
@@ -697,9 +702,9 @@ function HomePage({ setPage }) {
         <div style={{ maxWidth: 820, position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }}>
           {/* Bubble tags */}
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.1s", display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 24 }}>
-            <BubbleTag emoji="🏖️" text="feel-good systems" />
-            <BubbleTag emoji="☕" text="life-first business" />
-            <BubbleTag emoji="✨" text="built with intention" />
+            {(getContent("home.hero.bubbleTags") || []).map((t, i) => (
+              <BubbleTag key={i} emoji={t.emoji} text={t.text} />
+            ))}
           </div>
 
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.15s" }}>
@@ -768,35 +773,35 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.coreValues.heading" as="span" /></h2>
           </div>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}>
-          {[
-            { emoji: "⚡", title: "energy over hustle", desc: "protect your capacity first. you can't pour from an empty cup — or build from an empty tank." },
-            { emoji: "🧩", title: "systems over stress", desc: "the right systems mean you stop firefighting and start actually running your business." },
-            { emoji: "🌊", title: "life over grind", desc: "success shouldn't cost you your sanity. build something sustainable, not something that owns you." },
-            { emoji: "🌱", title: "progress over perfection", desc: "done is better than perfect. we build, iterate, and improve — not wait for the \"right\" time." },
-          ].map((v, i) => (
-            <FadeIn key={i} delay={i * 100} style={{ display: "flex" }}>
-              <div style={{
-                background: C.cream,
-                borderRadius: 20,
-                padding: "28px 24px",
-                border: `1.5px solid ${C.sand}`,
-                textAlign: "center",
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-start",
-                transition: "transform 0.3s, box-shadow 0.3s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-                <BlinkEmoji emoji={v.emoji} size={32} style={{ marginBottom: 12 }} />
-                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.charcoal, margin: "0 0 8px" }}>{v.title}</h3>
-                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}>{v.desc}</p>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
+        <EditableCardGroup
+          contentKey="home.coreValues.cards"
+          defaultNewItem={{ emoji: "✨", title: "new value", desc: "description here" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}
+          renderCard={(v, i) => (
+            <div style={{
+              background: C.cream,
+              borderRadius: 20,
+              padding: "28px 24px",
+              border: `1.5px solid ${C.sand}`,
+              textAlign: "center",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              transition: "transform 0.3s, box-shadow 0.3s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+              <BlinkEmoji emoji={v.emoji} size={32} style={{ marginBottom: 12 }} />
+              <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.charcoal, margin: "0 0 8px" }}>
+                <EditableArrayText contentKey="home.coreValues.cards" index={i} field="title" as="span" />
+              </h3>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}>
+                <EditableArrayText contentKey="home.coreValues.cards" index={i} field="desc" as="span" />
+              </p>
+            </div>
+          )}
+        />
       </SectionWrap>
 
       {/* ── WHAT GOOD SYSTEMS LOOK LIKE (before/after comparison) ── */}
@@ -813,15 +818,10 @@ function HomePage({ setPage }) {
               <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.coral, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                 <BlinkEmoji emoji="😵‍💫" size={20} /> without systems
               </h3>
-              {[
-                "copying & pasting from 17 google docs",
-                "all income tied to one revenue stream",
-                "forgetting to send invoices & follow-ups",
-                "spending hours on tasks that should take minutes",
-                "feeling like your business owns you",
-              ].map((item, i) => (
+              {(getContent("home.systemsComparison.without") || []).map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}>
-                  <span style={{ color: C.coral, flexShrink: 0 }}>✕</span>{item}
+                  <span style={{ color: C.coral, flexShrink: 0 }}>✕</span>
+                  <EditableArrayString contentKey="home.systemsComparison.without" index={i} />
                 </div>
               ))}
             </div>
@@ -831,15 +831,10 @@ function HomePage({ setPage }) {
               <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.oceanBlue, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                 <BlinkEmoji emoji="✨" size={20} /> with systems
               </h3>
-              {[
-                "clients onboarded automatically & professionally",
-                "multiple revenue streams working in parallel",
-                "workflows that run while you sleep (or do pilates)",
-                "time back to focus on what you actually love",
-                "a business that fits your life, not the other way around",
-              ].map((item, i) => (
+              {(getContent("home.systemsComparison.with") || []).map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}>
-                  <span style={{ color: C.oceanBlue, flexShrink: 0 }}>✦</span>{item}
+                  <span style={{ color: C.oceanBlue, flexShrink: 0 }}>✦</span>
+                  <EditableArrayString contentKey="home.systemsComparison.with" index={i} />
                 </div>
               ))}
             </div>
@@ -856,21 +851,22 @@ function HomePage({ setPage }) {
           </div>
           {/* Audience anchor buttons */}
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
-            <BubbleTag emoji="🏖️" text="i'm a founder" bg={C.pinkSoft} style={{ cursor: "pointer" }} />
-            <BubbleTag emoji="🤝" text="i'm corporate" bg={C.oceanLight} style={{ cursor: "pointer" }} />
-            <BubbleTag emoji="✨" text="i'm a brand" bg={C.lavenderLight} style={{ cursor: "pointer" }} />
+            {(getContent("home.pathCards.anchorButtons") || []).map((t, i) => (
+              <BubbleTag key={i} emoji={t.emoji} text={t.text} bg={[C.pinkSoft, C.oceanLight, C.lavenderLight][i] || C.cream} style={{ cursor: "pointer" }} />
+            ))}
           </div>
         </FadeIn>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, alignItems: "stretch" }}>
-          {[
-            { title: "for founders & service providers", body: "backend systems, revenue expansion & client experience — built for how you actually work.", cta: "explore services →", page: "services", bg: C.pinkSoft, accent: C.coral },
-            { title: "for corporate teams & leaders", body: "team engagement, leadership development & systems that actually get adopted — not just rolled out.", cta: "get in touch →", page: "contact", bg: C.oceanLight, accent: C.oceanBlue },
-            { title: "for brand partnerships", body: "authentic collaborations, speaking engagements & content that actually converts.", cta: "let's collaborate →", page: "contact", bg: C.lavenderLight, accent: C.lavender },
-          ].map((c, i) => (
-            <FadeIn key={i} delay={i * 100} style={{ display: "flex" }}>
+        <EditableCardGroup
+          contentKey="home.pathCards"
+          defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, alignItems: "stretch" }}
+          renderCard={(c, i) => {
+            const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
+            const accents = [C.coral, C.oceanBlue, C.lavender];
+            return (
               <div
-                onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}
+                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}
                 style={{
                   background: C.white,
                   borderRadius: 20,
@@ -885,17 +881,23 @@ function HomePage({ setPage }) {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
               >
-                <div style={{ background: c.bg, padding: "32px 24px 28px", borderBottom: `3px solid ${c.accent}` }}>
-                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>{c.title}</h3>
+                <div style={{ background: bgColors[i % 3], padding: "32px 24px 28px", borderBottom: `3px solid ${accents[i % 3]}` }}>
+                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>
+                    <EditableArrayText contentKey="home.pathCards" index={i} field="title" as="span" />
+                  </h3>
                 </div>
                 <div style={{ padding: "24px 24px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
-                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>{c.body}</p>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>{c.cta}</span>
+                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
+                    <EditableArrayText contentKey="home.pathCards" index={i} field="body" as="span" />
+                  </p>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>
+                    <EditableArrayText contentKey="home.pathCards" index={i} field="cta" as="span" />
+                  </span>
                 </div>
               </div>
-            </FadeIn>
-          ))}
-        </div>
+            );
+          }}
+        />
       </SectionWrap>
 
       {/* ── PROOF / STATS (PLM: grid of stat cards) ── */}
@@ -907,51 +909,50 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 42px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.stats.heading" as="span" /></h2>
           </div>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 36, alignItems: "stretch" }}>
-          {[
-            { stat: "6+", label: "years building & leading high-performing teams across 8 global regions" },
-            { stat: "8.9+", label: "/10 team engagement scores (consistently, not just once)" },
-            { stat: "15+", label: "hires onboarded & trained, 5 now in leadership roles" },
-            { stat: "94%", label: "adoption rate for Asana across distributed teams" },
-            { stat: "96%", label: "adoption rate for major platform transitions" },
-          ].map((s, i) => (
-            <FadeIn key={i} delay={i * 80} style={{ display: "flex" }}>
-              <div
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
-                  e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0) scale(1)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)";
-                }}
-                style={{
-                  background: C.white,
-                  borderRadius: 16,
-                  padding: "28px 20px",
-                  textAlign: "center",
-                  border: `1px solid ${C.oceanLight}`,
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  cursor: "default",
-                  boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)"
-                }}>
-                <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 36, color: C.oceanBlue, marginBottom: 8 }}>
-                  <AnimatedCounter end={s.stat} duration={2000} />
-                </div>
-                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12.5, color: C.body, lineHeight: 1.5, margin: 0 }}>{s.label}</p>
+        <EditableCardGroup
+          contentKey="home.stats"
+          defaultNewItem={{ stat: "0+", label: "new stat description" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 36, alignItems: "stretch" }}
+          renderCard={(s, i) => (
+            <div
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
+                e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)";
+              }}
+              style={{
+                background: C.white,
+                borderRadius: 16,
+                padding: "28px 20px",
+                textAlign: "center",
+                border: `1px solid ${C.oceanLight}`,
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                cursor: "default",
+                boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)"
+              }}>
+              <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 36, color: C.oceanBlue, marginBottom: 8 }}>
+                <AnimatedCounter end={s.stat} duration={2000} />
               </div>
-            </FadeIn>
-          ))}
-        </div>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12.5, color: C.body, lineHeight: 1.5, margin: 0 }}>
+                <EditableArrayText contentKey="home.stats" index={i} field="label" as="span" />
+              </p>
+            </div>
+          )}
+        />
         <FadeIn delay={400}>
           <div style={{ textAlign: "center" }}>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 18, flexWrap: "wrap" }}>
-              {["certified asana ambassador", "notion certified", "4-day corporate week"].map(t => (
-                <span key={t} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 11, color: C.charcoal, background: C.yellow, padding: "5px 16px", borderRadius: 50, letterSpacing: "0.3px" }}>{t}</span>
+              {(getContent("home.stats.badges") || []).map((t, i) => (
+                <span key={i} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 11, color: C.charcoal, background: C.yellow, padding: "5px 16px", borderRadius: 50, letterSpacing: "0.3px" }}>
+                  <EditableArrayString contentKey="home.stats.badges" index={i} />
+                </span>
               ))}
             </div>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, maxWidth: 580, margin: "0 auto" }}><EditableText contentKey="home.stats.footnote" as="span" /></p>
@@ -1026,6 +1027,7 @@ function HomePage({ setPage }) {
    PAGE: SERVICES HUB
    ══════════════════════════════════════════════════════════════ */
 function ServicesPage({ setPage }) {
+  const { getContent } = useCMS();
   const foundersRef = useRef(null);
   const corporateRef = useRef(null);
   const brandsRef = useRef(null);
@@ -1060,30 +1062,36 @@ function ServicesPage({ setPage }) {
           <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, maxWidth: 680, marginBottom: 36 }}><EditableText contentKey="services.creators.body" as="span" /></p>
         </FadeIn>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}>
-          {[
-            { num: "01", title: "the brand experience audit", price: "$350", body: "an unbiased look at your current client journey, backend systems, revenue streams, and where things are breaking down. detailed action plan + priority recommendations.", page: "audit", bg: C.pinkSoft },
-            { num: "02", title: "the brand experience (full implementation)", price: "starting at $1.5k", body: "the \"do it for me\" option. we start with the audit, then i build your entire backend—client onboarding, workflows, automation, templates, email marketing, the whole thing.", page: "implementation", bg: C.oceanLight },
-            { num: "03", title: "fractional consulting", price: "limited spots", body: "ongoing support without the agency retainer. think: a business bestie who actually knows what they're talking about. monthly strategy sessions + async access.", page: "fractional", bg: C.lavenderLight },
-          ].map((c, i) => (
-            <FadeIn key={i} delay={i * 100} style={{ display: "flex" }}>
+        <EditableCardGroup
+          contentKey="services.creators.cards"
+          defaultNewItem={{ num: "04", title: "new service", price: "TBD", body: "description here", page: "contact", bg: "#F5E6DC" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
+          renderCard={(c, i) => {
+            const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
+            return (
               <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}>
-                <div style={{ background: c.bg, padding: "32px 24px 24px" }}>
+                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}>
+                <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
                 <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>{c.price}</span>
-                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "12px 0 10px" }}>{c.title}</h3>
-                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>{c.body}</p>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>
+                    <EditableArrayText contentKey="services.creators.cards" index={i} field="price" as="span" />
+                  </span>
+                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "12px 0 10px" }}>
+                    <EditableArrayText contentKey="services.creators.cards" index={i} field="title" as="span" />
+                  </h3>
+                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
+                    <EditableArrayText contentKey="services.creators.cards" index={i} field="body" as="span" />
+                  </p>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>learn more →</span>
                 </div>
               </div>
-            </FadeIn>
-          ))}
-        </div>
+            );
+          }}
+        />
 
       </SectionWrap>
       </EditableSection>
@@ -1097,9 +1105,11 @@ function ServicesPage({ setPage }) {
           <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 38px)", color: C.cream, margin: "0 0 12px" }}><EditableText contentKey="services.corporate.heading" as="span" /></h2>
           <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: `${C.sand}cc`, lineHeight: 1.75, maxWidth: 600, marginBottom: 28 }}><EditableText contentKey="services.corporate.body" as="span" /></p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
-            {["team engagement workshops", "leadership consulting for managers", "custom training programs"].map(t => (
-              <div key={t} style={{ background: `${C.warmTan}15`, borderRadius: 14, padding: "18px 22px", border: `1px solid ${C.warmTan}25` }}>
-                <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 16, color: C.yellow, margin: 0 }}>{t}</h4>
+            {(getContent("services.corporate.offerings") || []).map((t, i) => (
+              <div key={i} style={{ background: `${C.warmTan}15`, borderRadius: 14, padding: "18px 22px", border: `1px solid ${C.warmTan}25` }}>
+                <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 16, color: C.yellow, margin: 0 }}>
+                  <EditableArrayString contentKey="services.corporate.offerings" index={i} />
+                </h4>
               </div>
             ))}
           </div>
@@ -1117,10 +1127,10 @@ function ServicesPage({ setPage }) {
           <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 38px)", color: C.charcoal, margin: "0 0 12px" }}><EditableText contentKey="services.brands.heading" as="span" /></h2>
           <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, maxWidth: 600, marginBottom: 28 }}><EditableText contentKey="services.brands.body" as="span" /></p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 28 }}>
-            {[{ icon: "🎤", t: "speaking engagements" }, { icon: "🤝", t: "brand collaborations" }, { icon: "📱", t: "ugc & content creation" }].map(c => (
-              <div key={c.t} style={{ background: C.white, borderRadius: 16, padding: "24px 20px", textAlign: "center", border: `1px solid ${C.lavender}`, height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}>{c.icon}</span>
-                <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 14, color: C.charcoal, margin: 0 }}>{c.t}</h4>
+            {(getContent("services.brands.types") || []).map((c, i) => (
+              <div key={i} style={{ background: C.white, borderRadius: 16, padding: "24px 20px", textAlign: "center", border: `1px solid ${C.lavender}`, height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                <span style={{ fontSize: 32, display: "block", marginBottom: 8 }}><EditableArrayText contentKey="services.brands.types" index={i} field="icon" as="span" /></span>
+                <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 14, color: C.charcoal, margin: 0 }}><EditableArrayText contentKey="services.brands.types" index={i} field="t" as="span" /></h4>
               </div>
             ))}
           </div>
@@ -1235,6 +1245,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
    PAGE: ABOUT
    ══════════════════════════════════════════════════════════════ */
 function AboutPage({ setPage }) {
+  const { getContent } = useCMS();
   return (
     <>
       {/* THE CHARACTER — Hero with typewriter traits */}
@@ -1277,15 +1288,10 @@ function AboutPage({ setPage }) {
           <div style={{ maxWidth: 720, margin: "0 auto" }}>
             <ScriptLabel size={22} color={C.sand}><EditableText contentKey="about.beliefs.scriptLabel" as="span" /></ScriptLabel>
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: C.cream, margin: "0 0 24px" }}><EditableText contentKey="about.beliefs.heading" as="span" /></h2>
-            {[
-              { b: "energy management > time management", d: "you can't calendar your way out of exhaustion. sustainable business starts with protecting your capacity." },
-              { b: "the best system is the one you'll actually use", d: "beautiful templates mean nothing if they don't match how your brain works." },
-              { b: "sustainable growth beats hustle culture", d: "building something that lasts without burning out — that's the real flex." },
-              { b: "you don't need to be \"always on\"", d: "building a consulting business while working corporate 4 days a week. proof of concept." },
-            ].map((c, i) => (
-              <div key={i} style={{ borderBottom: i < 3 ? `1px solid ${C.warmTan}22` : "none", padding: "22px 0" }}>
-                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.yellow, margin: "0 0 8px" }}>{c.b}</h3>
-                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14.5, color: `${C.sand}cc`, lineHeight: 1.65, margin: 0 }}>{c.d}</p>
+            {(getContent("about.beliefs") || []).map((c, i, arr) => (
+              <div key={i} style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.warmTan}22` : "none", padding: "22px 0" }}>
+                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.yellow, margin: "0 0 8px" }}><EditableArrayText contentKey="about.beliefs" index={i} field="b" as="span" /></h3>
+                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14.5, color: `${C.sand}cc`, lineHeight: 1.65, margin: 0 }}><EditableArrayText contentKey="about.beliefs" index={i} field="d" as="span" /></p>
               </div>
             ))}
           </div>
@@ -1300,13 +1306,7 @@ function AboutPage({ setPage }) {
           <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
             <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}>when i'm not consulting</ScriptLabel>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
-              {[
-                { emoji: "☕", text: "iced lattes in cloud cups" },
-                { emoji: "🏖️", text: "san diego beach walks" },
-                { emoji: "🧘‍♀️", text: "pilates over grinding" },
-                { emoji: "🐕", text: "bentley, my coworker" },
-                { emoji: "✈️", text: "planning the next trip" },
-              ].map((t, i) => (
+              {(getContent("about.lifestyle") || []).map((t, i) => (
                 <BubbleTag key={i} emoji={t.emoji} text={t.text} bg={C.white} />
               ))}
             </div>
@@ -1340,6 +1340,7 @@ function AboutPage({ setPage }) {
    PAGE: RESOURCES
    ══════════════════════════════════════════════════════════════ */
 function ResourcesPage() {
+  const { getContent } = useCMS();
   const [interest, setInterest] = useState("");
   return (
     <>
@@ -1398,22 +1399,17 @@ function ResourcesPage() {
           <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, textAlign: "center", marginBottom: 36 }}><EditableText contentKey="resources.tools.subheading" as="span" /></p>
         </FadeIn>
         <HorizontalScroll gap={20}>
-          {[
-            { emoji: "📋", title: "Asana", desc: "the project management tool that actually gets adopted. how i hit 94% adoption across distributed teams.", bg: C.pinkSoft },
-            { emoji: "📝", title: "Notion", desc: "my second brain. templates, databases, and systems that work the way your brain does.", bg: C.oceanLight },
-            { emoji: "💼", title: "Dubsado", desc: "client management that handles contracts, invoicing, workflows, and onboarding — so you don't have to.", bg: C.lavenderLight },
-            { emoji: "💌", title: "Flodesk", desc: "beautiful email marketing without the learning curve. design emails people actually want to open.", bg: C.sandLight },
-          ].map((tool, i) => (
+          {(getContent("resources.tools.items") || []).map((tool, i) => (
             <FadeIn key={i} delay={i * 80}>
               <div style={{ minWidth: 260, maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s", cursor: "pointer" }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
-                <div style={{ background: tool.bg, padding: "28px 24px", textAlign: "center" }}>
-                  <span style={{ fontSize: 40 }}>{tool.emoji}</span>
+                <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center" }}>
+                  <span style={{ fontSize: 40 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="emoji" as="span" /></span>
                 </div>
                 <div style={{ padding: "20px 20px 24px" }}>
-                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.charcoal, margin: "0 0 8px" }}>{tool.title}</h3>
-                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}>{tool.desc}</p>
+                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.charcoal, margin: "0 0 8px" }}><EditableArrayText contentKey="resources.tools.items" index={i} field="title" as="span" /></h3>
+                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="desc" as="span" /></p>
                 </div>
               </div>
             </FadeIn>
@@ -1591,9 +1587,14 @@ export default function App() {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: ${C.sand}; border-radius: 10px; }
 
+        .core-values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; align-items: stretch; }
         @media (max-width: 768px) {
+          .core-values-grid { grid-template-columns: repeat(2, 1fr); }
           .dsk-nav { display: none !important; }
           .mob-toggle { display: block !important; }
+        }
+        @media (max-width: 480px) {
+          .core-values-grid { grid-template-columns: 1fr; }
         }
         @media (min-width: 769px) {
           .mob-toggle { display: none !important; }
@@ -1613,7 +1614,9 @@ export default function App() {
       <main>{pages[page]}</main>
       <Footer setPage={setPage} />
       <BackToTop scrollY={scrollY} />
-      <AdminToolbar />
+      <EditorToolbar />
+      <SelectionOverlay />
+      <PropertyPanel />
     </>
   );
 }

@@ -20,6 +20,11 @@ export const defaultContent = {
   "home.hero.ctaPrimary": "work with me",
   "home.hero.ctaSecondary": "brand partnerships",
   "home.hero.typewriterPhrases": ["systems that scale", "revenue that grows", "a life you actually enjoy", "boundaries that stick", "growth without burnout"],
+  "home.hero.bubbleTags": [
+    { emoji: "🏖️", text: "feel-good systems" },
+    { emoji: "☕", text: "life-first business" },
+    { emoji: "✨", text: "built with intention" },
+  ],
 
   // ─── HOME: MARQUEES ───
   "global.marquee1": "feel-good systems · built with intention · sustainable growth",
@@ -37,9 +42,14 @@ export const defaultContent = {
   "home.pathCards.scriptLabel": "how we'll work together",
   "home.pathCards.heading": "choose your path",
   "home.pathCards": [
-    { emoji: "🏖️", label: "systems & strategy", title: "for creators & service providers", body: "your backend shouldn't feel like a full-time job. and your income shouldn't rely on just one thing. let's build something that scales without burning you out—whether that's finally launching that email list, planning your first in-person event, or creating new income streams that actually fit your life.", cta: "explore services →", page: "services" },
-    { emoji: "🤝", label: "leadership & teams", title: "for corporate teams & leaders", body: "high-performing teams don't need micromanaging—they need systems that make collaboration easy and leaders who've learned (often the hard way) how to build sustainability into their approach.", cta: "explore workshops →", page: "corporate" },
-    { emoji: "✨", label: "partnerships", title: "for brands & organizations", body: "collaborations for brands who value authenticity over aesthetics. let's create something people actually want to engage with.", cta: "let's collaborate →", page: "contact" },
+    { title: "for founders & service providers", body: "backend systems, revenue expansion & client experience — built for how you actually work.", cta: "explore services →", page: "services" },
+    { title: "for corporate teams & leaders", body: "team engagement, leadership development & systems that actually get adopted — not just rolled out.", cta: "get in touch →", page: "contact" },
+    { title: "for brand partnerships", body: "authentic collaborations, speaking engagements & content that actually converts.", cta: "let's collaborate →", page: "contact" },
+  ],
+  "home.pathCards.anchorButtons": [
+    { emoji: "🏖️", text: "i'm a founder" },
+    { emoji: "🤝", text: "i'm corporate" },
+    { emoji: "✨", text: "i'm a brand" },
   ],
 
   // ─── HOME: STATS ───
@@ -76,10 +86,30 @@ export const defaultContent = {
   // ─── HOME: CORE VALUES ───
   "home.coreValues.scriptLabel": "what we stand for",
   "home.coreValues.heading": "the non-negotiables",
+  "home.coreValues.cards": [
+    { emoji: "⚡", title: "energy over hustle", desc: "protect your capacity first. you can't pour from an empty cup — or build from an empty tank." },
+    { emoji: "🧩", title: "systems over stress", desc: "the right systems mean you stop firefighting and start actually running your business." },
+    { emoji: "🌊", title: "life over grind", desc: "success shouldn't cost you your sanity. build something sustainable, not something that owns you." },
+    { emoji: "🌱", title: "progress over perfection", desc: "done is better than perfect. we build, iterate, and improve — not wait for the \"right\" time." },
+  ],
 
   // ─── HOME: SYSTEMS COMPARISON ───
   "home.systemsComparison.scriptLabel": "the difference",
   "home.systemsComparison.heading": "what good systems look like",
+  "home.systemsComparison.without": [
+    "copying & pasting from 17 google docs",
+    "all income tied to one revenue stream",
+    "forgetting to send invoices & follow-ups",
+    "spending hours on tasks that should take minutes",
+    "feeling like your business owns you",
+  ],
+  "home.systemsComparison.with": [
+    "clients onboarded automatically & professionally",
+    "multiple revenue streams working in parallel",
+    "workflows that run while you sleep (or do pilates)",
+    "time back to focus on what you actually love",
+    "a business that fits your life, not the other way around",
+  ],
 
   // ─── HOME: CLOSING ───
   "home.closing.heading": "ready to build something that actually works?",
@@ -97,9 +127,9 @@ export const defaultContent = {
   "services.creators.heading": "systems that don't require you to be a different person",
   "services.creators.body": "you didn't start your business to spend hours wrestling with dubsado, notion, or whatever \"game-changing\" tool someone sold you on. you started it because you're really good at what you do. but now your backend is held together with duct tape and desperate energy. that's where i come in.",
   "services.creators.cards": [
-    { num: "01", title: "the brand experience audit", price: "$350", body: "an unbiased look at your current client journey, backend systems, revenue streams, and where things are breaking down. detailed action plan + priority recommendations.", page: "audit" },
-    { num: "02", title: "the brand experience (full implementation)", price: "starting at $1.5k", body: "the \"do it for me\" option. we start with the audit, then i build your entire backend—client onboarding, workflows, automation, templates, email marketing, the whole thing.", page: "implementation" },
-    { num: "03", title: "fractional consulting", price: "limited spots", body: "ongoing support without the agency retainer. think: a business bestie who actually knows what they're talking about. monthly strategy sessions + async access.", page: "fractional" },
+    { num: "01", title: "the brand experience audit", price: "$350", body: "an unbiased look at your current client journey, backend systems, revenue streams, and where things are breaking down. detailed action plan + priority recommendations.", page: "audit", bg: "#F5E6DC" },
+    { num: "02", title: "the brand experience (full implementation)", price: "starting at $1.5k", body: "the \"do it for me\" option. we start with the audit, then i build your entire backend—client onboarding, workflows, automation, templates, email marketing, the whole thing.", page: "implementation", bg: "#D6E8EC" },
+    { num: "03", title: "fractional consulting", price: "limited spots", body: "ongoing support without the agency retainer. think: a business bestie who actually knows what they're talking about. monthly strategy sessions + async access.", page: "fractional", bg: "#EDE8F4" },
   ],
   "services.creators.fit.perfect": ["have an established community (even if it's small but mighty)", "are ready to expand beyond your current revenue streams", "want to build an email list that actually converts", "need backend systems that can handle growth", "value strategic support over just \"here's another template\""],
   "services.creators.fit.notFit": ["are just getting started (like, first 10 followers started)", "want someone to tell you exactly what to do without collaboration", "aren't ready to invest in your business infrastructure"],
@@ -289,12 +319,12 @@ export const defaultContent = {
 
   "about.lifestyle.scriptLabel": "when i'm not consulting",
   "about.lifestyle": [
-    "☕ getting iced oat lattes in ridiculous cloud cups",
-    "🏖️ walking the beach in san diego",
-    "🧘‍♀️ at pilates (moving my body >> grinding)",
-    "💅 getting polka dot nails (it's a vibe)",
-    "🐕 hanging with bentley (my coworker)",
-    "✈️ planning trips (30th birthday in italy & spain!)",
+    { emoji: "☕", text: "getting iced oat lattes in ridiculous cloud cups" },
+    { emoji: "🏖️", text: "walking the beach in san diego" },
+    { emoji: "🧘‍♀️", text: "at pilates (moving my body >> grinding)" },
+    { emoji: "💅", text: "getting polka dot nails (it's a vibe)" },
+    { emoji: "🐕", text: "hanging with bentley (my coworker)" },
+    { emoji: "✈️", text: "planning trips (30th birthday in italy & spain!)" },
   ],
 
   "about.beliefs.heading": "the non-negotiables",
@@ -314,6 +344,12 @@ export const defaultContent = {
   "resources.tools.scriptLabel": "the toolkit",
   "resources.tools.heading": "tools & favorites",
   "resources.tools.subheading": "the tools i use and recommend to every client",
+  "resources.tools.items": [
+    { emoji: "📋", title: "Asana", desc: "the project management tool that actually gets adopted. how i hit 94% adoption across distributed teams." },
+    { emoji: "📝", title: "Notion", desc: "my second brain. templates, databases, and systems that work the way your brain does." },
+    { emoji: "💼", title: "Dubsado", desc: "client management that handles contracts, invoicing, workflows, and onboarding — so you don't have to." },
+    { emoji: "💌", title: "Flodesk", desc: "beautiful email marketing without the learning curve. design emails people actually want to open." },
+  ],
   "resources.newsletter.preferences": ["systems & ops", "revenue expansion", "leadership", "all of the above"],
 
   // ─── CONTACT PAGE ───

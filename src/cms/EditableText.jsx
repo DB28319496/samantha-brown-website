@@ -46,9 +46,9 @@ export function EditableText({
   const editStyle = {
     ...style,
     outline: isFocused
-      ? "2px solid #7BA7B3"
+      ? "2px solid #3B82F6"
       : isHovered
-        ? "2px dashed rgba(123, 167, 179, 0.5)"
+        ? "2px dashed rgba(59, 130, 246, 0.4)"
         : "2px solid transparent",
     outlineOffset: "4px",
     cursor: "text",
@@ -120,9 +120,9 @@ export function EditableArrayText({
   const editStyle = {
     ...style,
     outline: isFocused
-      ? "2px solid #7BA7B3"
+      ? "2px solid #3B82F6"
       : isHovered
-        ? "2px dashed rgba(123, 167, 179, 0.5)"
+        ? "2px dashed rgba(59, 130, 246, 0.4)"
         : "2px solid transparent",
     outlineOffset: "4px",
     cursor: "text",
@@ -193,9 +193,9 @@ export function EditableArrayString({
   const editStyle = {
     ...style,
     outline: isFocused
-      ? "2px solid #7BA7B3"
+      ? "2px solid #3B82F6"
       : isHovered
-        ? "2px dashed rgba(123, 167, 179, 0.5)"
+        ? "2px dashed rgba(59, 130, 246, 0.4)"
         : "2px solid transparent",
     outlineOffset: "4px",
     cursor: "text",
