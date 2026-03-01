@@ -1,5 +1,6 @@
-import { useRef, useState, useCallback, useEffect } from "react";
-import { useContent } from "./useContent";
+import { useRef, useState, useCallback, useEffect, useContext } from "react";
+import { useContent, useCMS } from "./useContent";
+import { useSelection } from "./SelectionContext";
 
 export function EditableText({
   contentKey,
@@ -9,11 +10,21 @@ export function EditableText({
   ...rest
 }) {
   const { value, update, isEditing } = useContent(contentKey);
+  const { getContent } = useCMS();
+  const { select } = useSelection();
   const ref = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   const displayValue = value ?? children ?? "";
+
+  // Read style overrides
+  const fontSizeOverride = getContent(`style.${contentKey}.fontSize`);
+  const colorOverride = getContent(`style.${contentKey}.color`);
+  const overrideStyle = {
+    ...(fontSizeOverride ? { fontSize: fontSizeOverride } : {}),
+    ...(colorOverride ? { color: colorOverride } : {}),
+  };
 
   // Sync contentEditable with external value changes
   useEffect(() => {
@@ -37,14 +48,15 @@ export function EditableText({
     document.execCommand("insertText", false, text);
   }, []);
 
-  // Visitor mode — render plain tag
+  // Visitor mode — render plain tag with style overrides
   if (!isEditing) {
-    return <Tag style={style} {...rest}>{displayValue}</Tag>;
+    return <Tag style={{ ...style, ...overrideStyle }} {...rest}>{displayValue}</Tag>;
   }
 
   // Admin editing mode
   const editStyle = {
     ...style,
+    ...overrideStyle,
     outline: isFocused
       ? "2px solid #3B82F6"
       : isHovered
@@ -67,6 +79,7 @@ export function EditableText({
       onPaste={handlePaste}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => select({ contentKey, type: "text" })}
       {...rest}
     >
       {displayValue}

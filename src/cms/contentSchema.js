@@ -373,6 +373,19 @@ export const defaultContent = {
   "image.home.pathCard2": null,
   "image.about.hero": null,
 
+  // ─── CONTENT BLOCKS (dynamic headings, paragraphs, spacers) ───
+  "blocks.home.welcome": [],
+  "blocks.home.coreValues": [],
+  "blocks.home.pathCards": [],
+  "blocks.home.stats": [],
+  "blocks.home.closing": [],
+  "blocks.services.creators": [],
+  "blocks.services.corporate": [],
+  "blocks.services.brands": [],
+  "blocks.about.backstory": [],
+  "blocks.about.beliefs": [],
+  "blocks.resources.newsletter": [],
+
   // ─── SECTION VISIBILITY ───
   "visibility.home.socialProof": true,
   "visibility.home.stats": true,

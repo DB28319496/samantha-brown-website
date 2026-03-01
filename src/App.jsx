@@ -5,6 +5,7 @@ import { EditableText, EditableArrayText, EditableArrayString } from "./cms/Edit
 import { EditableImage } from "./cms/EditableImage";
 import { EditableSection } from "./cms/EditableSection";
 import { EditableCardGroup } from "./cms/EditableCardGroup";
+import { EditableBlockList } from "./cms/EditableBlockList";
 import { EditorToolbar } from "./cms/EditorToolbar";
 import { SelectionOverlay } from "./cms/SelectionOverlay";
 import { PropertyPanel } from "./cms/PropertyPanel";
@@ -547,14 +548,14 @@ function NewsletterForm({ compact = false }) {
 /* ══════════════════════════════════════════════════════════════
    NAVIGATION
    ══════════════════════════════════════════════════════════════ */
-function Nav({ page, setPage, scrollY }) {
+function Nav({ page, setPage, scrollY, isEditing }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const scrolled = scrollY > 50;
 
   const isServicesPage = page === "services" || page === "audit" || page === "implementation" || page === "fractional" || page === "corporate";
-  const go = (p) => { setPage(p); setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const go = (p) => { if (isEditing) return; setPage(p); setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const navBtn = (label, target) => (
-    <button onClick={() => go(target)} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: (target === "services" ? isServicesPage : page === target) ? 600 : 400, fontSize: 14, color: C.charcoal, background: "none", border: "none", cursor: "pointer", padding: "6px 2px", borderBottom: (target === "services" ? isServicesPage : page === target) ? `2px solid ${C.oceanBlue}` : "2px solid transparent", transition: "all 0.3s", letterSpacing: "0.2px" }}>{label}</button>
+    <button onClick={() => go(target)} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: (target === "services" ? isServicesPage : page === target) ? 600 : 400, fontSize: 14, color: C.charcoal, background: "none", border: "none", cursor: isEditing ? "default" : "pointer", padding: "6px 2px", borderBottom: (target === "services" ? isServicesPage : page === target) ? `2px solid ${C.oceanBlue}` : "2px solid transparent", transition: "all 0.3s", letterSpacing: "0.2px", opacity: isEditing ? 0.5 : 1 }}>{label}</button>
   );
 
   return (
@@ -596,8 +597,8 @@ function Nav({ page, setPage, scrollY }) {
 /* ══════════════════════════════════════════════════════════════
    FOOTER
    ══════════════════════════════════════════════════════════════ */
-function Footer({ setPage }) {
-  const go = (p) => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); };
+function Footer({ setPage, isEditing }) {
+  const go = (p) => { if (isEditing) return; setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); };
   return (
     <footer style={{ background: C.charcoal, padding: "56px clamp(20px, 5vw, 48px) 28px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 32, marginBottom: 40 }}>
@@ -674,7 +675,8 @@ function BackToTop({ scrollY }) {
    PAGE: HOME
    ══════════════════════════════════════════════════════════════ */
 function HomePage({ setPage }) {
-  const { getContent } = useCMS();
+  const { getContent, isEditing } = useCMS();
+  const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   const [loaded, setLoaded] = useState(false);
   const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
@@ -740,8 +742,8 @@ function HomePage({ setPage }) {
             </p>
           </div>
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(20px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.55s", display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <Btn variant="primary" onClick={() => { setPage("services"); window.scrollTo({ top: 0 }); }}><EditableText contentKey="home.hero.ctaPrimary" as="span" /></Btn>
-            <Btn variant="outline" onClick={() => { setPage("contact"); window.scrollTo({ top: 0 }); }}><EditableText contentKey="home.hero.ctaSecondary" as="span" /></Btn>
+            <Btn variant="primary" onClick={() => nav("services")}><EditableText contentKey="home.hero.ctaPrimary" as="span" /></Btn>
+            <Btn variant="outline" onClick={() => nav("contact")}><EditableText contentKey="home.hero.ctaSecondary" as="span" /></Btn>
           </div>
         </div>
       </section>
@@ -764,6 +766,8 @@ function HomePage({ setPage }) {
           </FadeIn>
         </div>
       </SectionWrap>
+
+      <EditableBlockList contentKey="blocks.home.welcome" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
 
       {/* ── CORE VALUES ── */}
       <SectionWrap bg={C.white} py="72px">
@@ -803,6 +807,8 @@ function HomePage({ setPage }) {
           )}
         />
       </SectionWrap>
+
+      <EditableBlockList contentKey="blocks.home.coreValues" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
 
       {/* ── WHAT GOOD SYSTEMS LOOK LIKE (before/after comparison) ── */}
       <SectionWrap bgImage={gridBgOcean} py="72px">
@@ -866,20 +872,20 @@ function HomePage({ setPage }) {
             const accents = [C.coral, C.oceanBlue, C.lavender];
             return (
               <div
-                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}
+                onClick={() => nav(c.page || "contact")}
                 style={{
                   background: C.white,
                   borderRadius: 20,
                   overflow: "hidden",
                   border: `1px solid ${C.sand}`,
-                  cursor: "pointer",
+                  cursor: isEditing ? "default" : "pointer",
                   display: "flex",
                   flexDirection: "column",
                   flex: 1,
                   transition: "transform 0.3s, box-shadow 0.3s",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
+                onMouseLeave={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
               >
                 <div style={{ background: bgColors[i % 3], padding: "32px 24px 28px", borderBottom: `3px solid ${accents[i % 3]}` }}>
                   <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>
@@ -899,6 +905,8 @@ function HomePage({ setPage }) {
           }}
         />
       </SectionWrap>
+
+      <EditableBlockList contentKey="blocks.home.pathCards" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
 
       {/* ── PROOF / STATS (PLM: grid of stat cards) ── */}
       <EditableSection contentKey="visibility.home.stats">
@@ -996,6 +1004,8 @@ function HomePage({ setPage }) {
       </SectionWrap>
       </EditableSection>
 
+      <EditableBlockList contentKey="blocks.home.stats" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+
       {/* ── CLOSING CTA ── */}
       <EditableSection contentKey="visibility.home.closing">
       <SectionWrap bg={C.charcoal} py="80px">
@@ -1010,8 +1020,8 @@ function HomePage({ setPage }) {
             </p>
             <p style={{ fontFamily: "'Caveat', cursive", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-              <Btn variant="ocean" onClick={() => { setPage("services"); window.scrollTo({ top: 0 }); }}><EditableText contentKey="home.closing.cta" as="span" /></Btn>
-              <Btn variant="outline" onClick={() => { setPage("contact"); window.scrollTo({ top: 0 }); }} style={{ borderColor: C.sand, color: C.sand }}>book a discovery call →</Btn>
+              <Btn variant="ocean" onClick={() => nav("services")}><EditableText contentKey="home.closing.cta" as="span" /></Btn>
+              <Btn variant="outline" onClick={() => nav("contact")} style={{ borderColor: C.sand, color: C.sand }}>book a discovery call →</Btn>
             </div>
           </div>
         </FadeIn>
@@ -1027,7 +1037,8 @@ function HomePage({ setPage }) {
    PAGE: SERVICES HUB
    ══════════════════════════════════════════════════════════════ */
 function ServicesPage({ setPage }) {
-  const { getContent } = useCMS();
+  const { getContent, isEditing } = useCMS();
+  const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   const foundersRef = useRef(null);
   const corporateRef = useRef(null);
   const brandsRef = useRef(null);
@@ -1072,7 +1083,7 @@ function ServicesPage({ setPage }) {
               <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}>
+                onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
@@ -1096,6 +1107,8 @@ function ServicesPage({ setPage }) {
       </SectionWrap>
       </EditableSection>
 
+      <EditableBlockList contentKey="blocks.services.creators" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+
       {/* CORPORATE */}
       <EditableSection contentKey="visibility.services.corporate">
       <div ref={corporateRef} style={{ scrollMarginTop: 80 }} />
@@ -1116,7 +1129,7 @@ function ServicesPage({ setPage }) {
               <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}>
+                onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
@@ -1140,6 +1153,8 @@ function ServicesPage({ setPage }) {
       </SectionWrap>
       </EditableSection>
 
+      <EditableBlockList contentKey="blocks.services.corporate" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+
       {/* BRANDS */}
       <EditableSection contentKey="visibility.services.brands">
       <div ref={brandsRef} style={{ scrollMarginTop: 80 }} />
@@ -1160,7 +1175,7 @@ function ServicesPage({ setPage }) {
               <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                onClick={() => { setPage(c.page || "contact"); window.scrollTo({ top: 0 }); }}>
+                onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
@@ -1183,6 +1198,8 @@ function ServicesPage({ setPage }) {
 
       </SectionWrap>
       </EditableSection>
+
+      <EditableBlockList contentKey="blocks.services.brands" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
     </>
   );
 }
@@ -1191,7 +1208,8 @@ function ServicesPage({ setPage }) {
    SERVICE DETAIL PAGES (Audit, Implementation, Fractional, Corporate)
    ══════════════════════════════════════════════════════════════ */
 function ServiceDetailPage({ setPage, serviceKey }) {
-  const { getContent } = useCMS();
+  const { getContent, isEditing } = useCMS();
+  const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   const p = serviceKey === "corporate" ? "services.corporate.detail" : `services.${serviceKey}`;
 
   const includes = getContent(p + ".includes") || [];
@@ -1278,7 +1296,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
       )}
 
       <SectionWrap bg={C.cream} py="48px">
-        <div style={{ textAlign: "center" }}><Btn variant="primary" onClick={() => { setPage("contact"); window.scrollTo({ top: 0 }); }}><EditableText contentKey={p + ".cta"} as="span" /></Btn></div>
+        <div style={{ textAlign: "center" }}><Btn variant="primary" onClick={() => nav("contact")}><EditableText contentKey={p + ".cta"} as="span" /></Btn></div>
       </SectionWrap>
     </>
   );
@@ -1290,7 +1308,8 @@ function ServiceDetailPage({ setPage, serviceKey }) {
    PAGE: ABOUT
    ══════════════════════════════════════════════════════════════ */
 function AboutPage({ setPage }) {
-  const { getContent } = useCMS();
+  const { getContent, isEditing } = useCMS();
+  const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   return (
     <>
       {/* THE CHARACTER — Hero with typewriter traits */}
@@ -1326,6 +1345,8 @@ function AboutPage({ setPage }) {
       </SectionWrap>
       </EditableSection>
 
+      <EditableBlockList contentKey="blocks.about.backstory" style={{ maxWidth: 720, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+
       {/* THE GUIDE — Credentials & beliefs */}
       <EditableSection contentKey="visibility.about.beliefs">
       <SectionWrap bg={C.charcoal} py="72px">
@@ -1343,6 +1364,8 @@ function AboutPage({ setPage }) {
         </FadeIn>
       </SectionWrap>
       </EditableSection>
+
+      <EditableBlockList contentKey="blocks.about.beliefs" style={{ maxWidth: 720, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
 
       {/* THE PERSON — Lifestyle (tightened) */}
       <EditableSection contentKey="visibility.about.lifestyle">
@@ -1371,8 +1394,8 @@ function AboutPage({ setPage }) {
               <EditableText contentKey="about.cta.script" as="span" />
             </p>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-              <Btn variant="ocean" onClick={() => { setPage("services"); window.scrollTo({ top: 0 }); }}>work with me →</Btn>
-              <Btn variant="outline" onClick={() => { setPage("resources"); window.scrollTo({ top: 0 }); }} style={{ borderColor: C.sand, color: C.sand }}>join the cabana club →</Btn>
+              <Btn variant="ocean" onClick={() => nav("services")}>work with me →</Btn>
+              <Btn variant="outline" onClick={() => nav("resources")} style={{ borderColor: C.sand, color: C.sand }}>join the cabana club →</Btn>
             </div>
           </div>
         </FadeIn>
@@ -1544,13 +1567,15 @@ export default function App() {
 
   const [page, setPageState] = useState(getPageFromHash);
   const scrollY = useScrollY();
+  const { isEditing } = useCMS();
 
-  // Wrap setPage to push browser history
+  // Wrap setPage to push browser history — blocked during edit mode
   const setPage = useCallback((newPage) => {
+    if (isEditing) return;
     setPageState(newPage);
     const hash = newPage === "home" ? "" : `#${newPage}`;
     window.history.pushState({ page: newPage }, "", `/${hash}`);
-  }, []);
+  }, [isEditing]);
 
   // Listen for browser back/forward buttons
   useEffect(() => {
@@ -1655,9 +1680,9 @@ export default function App() {
 
       <AdminLoginListener />
       <AdminLoginModal />
-      <Nav page={page} setPage={setPage} scrollY={scrollY} />
+      <Nav page={page} setPage={setPage} scrollY={scrollY} isEditing={isEditing} />
       <main>{pages[page]}</main>
-      <Footer setPage={setPage} />
+      <Footer setPage={setPage} isEditing={isEditing} />
       <BackToTop scrollY={scrollY} />
       <EditorToolbar />
       <SelectionOverlay />

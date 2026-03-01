@@ -14,3 +14,12 @@ export function useContent(key) {
 export function useCMS() {
   return useContext(ContentContext);
 }
+
+export function useContentStyle(contentKey) {
+  const ctx = useContext(ContentContext);
+  return {
+    fontSize: ctx.getContent(`style.${contentKey}.fontSize`),
+    color: ctx.getContent(`style.${contentKey}.color`),
+    updateStyle: (prop, value) => ctx.updateContent(`style.${contentKey}.${prop}`, value),
+  };
+}
