@@ -1495,8 +1495,31 @@ function ContactPage() {
    MAIN APP
    ══════════════════════════════════════════════════════════════ */
 export default function App() {
-  const [page, setPage] = useState("home");
+  // URL-aware routing: read initial page from hash, sync with browser history
+  const getPageFromHash = () => {
+    const hash = window.location.hash.replace("#", "");
+    return hash || "home";
+  };
+
+  const [page, setPageState] = useState(getPageFromHash);
   const scrollY = useScrollY();
+
+  // Wrap setPage to push browser history
+  const setPage = useCallback((newPage) => {
+    setPageState(newPage);
+    const hash = newPage === "home" ? "" : `#${newPage}`;
+    window.history.pushState({ page: newPage }, "", `/${hash}`);
+  }, []);
+
+  // Listen for browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setPageState(getPageFromHash());
+      window.scrollTo({ top: 0 });
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const pages = {
     home: <HomePage setPage={setPage} />,
