@@ -358,7 +358,7 @@ export const defaultContent = {
   // ─── CONTACT PAGE ───
   "contact.hero.heading": "let's chat 💬",
   "contact.hero.subheading": "not sure where to start? tell me what's going on and we'll figure it out together",
-  "contact.dubsado.embedUrl": "",
+  "contact.dubsado.embedUrl": "https://hello.dubsado.com/public/form/view/69a496d4ed3322ac99c1a730",
   "contact.dubsado.placeholder": "once you add your dubsado form URL via the admin editor, your discovery call booking form will appear here.",
   "contact.emailAlt.heading": "prefer email?",
   "contact.emailAlt.body": "for brand partnerships, speaking inquiries, or collabs:",

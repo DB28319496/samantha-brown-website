@@ -483,66 +483,33 @@ function TestimonialCarousel() {
   );
 }
 
-function NewsletterForm({ compact = false }) {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [done, setDone] = useState(false);
-  const inputS = { fontFamily: "'Rubik', sans-serif", fontSize: 15, border: `1.5px solid ${C.sand}`, borderRadius: 50, padding: "13px 22px", outline: "none", background: C.white, width: "100%", boxSizing: "border-box" };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email.includes("@")) return;
-
-    const formData = new FormData(e.target);
-
-    try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setDone(true);
-        setEmail("");
-        setName("");
-      } else {
-        alert('Error subscribing. Please try again.');
-      }
-    } catch (error) {
-      alert('Error subscribing. Please try again.');
+function NewsletterForm() {
+  useEffect(() => {
+    const existingScript = document.querySelector('script[src*="flodesk"]');
+    if (!existingScript) {
+      (function(w, d, t, h, s, n) {
+        w.FlodeskObject = n;
+        var fn = function() { (w[n].q = w[n].q || []).push(arguments); };
+        w[n] = w[n] || fn;
+        var f = d.getElementsByTagName(t)[0];
+        var v = '?v=' + Math.floor(new Date().getTime() / (120 * 1000)) * 60;
+        var sm = d.createElement(t);
+        sm.async = true; sm.type = 'module';
+        sm.src = h + s + '.mjs' + v;
+        f.parentNode.insertBefore(sm, f);
+        var sn = d.createElement(t);
+        sn.async = true; sn.noModule = true;
+        sn.src = h + s + '.js' + v;
+        f.parentNode.insertBefore(sn, f);
+      })(window, document, 'script', 'https://assets.flodesk.com', '/universal', 'fd');
     }
-  };
+    window.fd('form', {
+      formId: '69a492cf680779e5364b6ffe',
+      containerEl: '#fd-form-69a492cf680779e5364b6ffe'
+    });
+  }, []);
 
-  if (done) return <div style={{ textAlign: "center", padding: 16 }}><span style={{ fontSize: 28 }}>🎉</span><p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, marginTop: 8 }}>you're in! check your inbox.</p></div>;
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: "flex", flexDirection: compact ? "row" : "column", gap: 12, maxWidth: compact ? 500 : 400, flexWrap: "wrap" }}
-    >
-      <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
-      <input type="hidden" name="subject" value="New Newsletter Signup - Cabana Club" />
-      <input type="hidden" name="from_name" value="Newsletter Signup" />
-      <input type="checkbox" name="botcheck" style={{ display: "none" }} />
-      {!compact && <input name="name" placeholder="first name" value={name} onChange={e => setName(e.target.value)} style={inputS} />}
-      <input name="email" type="email" placeholder="email address" value={email} onChange={e => setEmail(e.target.value)} required style={{ ...inputS, flex: compact ? 1 : undefined, minWidth: compact ? 200 : undefined }} />
-      <button type="submit" style={{
-        fontFamily: "'Rubik', sans-serif",
-        fontWeight: 600,
-        fontSize: 14,
-        background: C.charcoal,
-        color: C.cream,
-        border: `2px solid ${C.charcoal}`,
-        borderRadius: 50,
-        padding: "14px 34px",
-        cursor: "pointer",
-        transition: "all 0.3s",
-        whiteSpace: compact ? "nowrap" : "normal"
-      }}>sign me up →</button>
-    </form>
-  );
+  return <div id="fd-form-69a492cf680779e5364b6ffe" />;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1495,6 +1462,27 @@ function ResourcesPage() {
 function ContactPage() {
   const { getContent } = useCMS();
   const dubsadoUrl = getContent("contact.dubsado.embedUrl");
+  const iframeRef = useRef(null);
+
+  // Load iframe-resizer script and apply to Dubsado iframe
+  useEffect(() => {
+    if (!dubsadoUrl) return;
+    const existingScript = document.querySelector('script[src*="iframeResizer"]');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.14/iframeResizer.min.js";
+      script.onload = () => {
+        if (iframeRef.current && window.iFrameResize) {
+          window.iFrameResize({ checkOrigin: false, heightCalculationMethod: "taggedElement" }, iframeRef.current);
+        }
+      };
+      document.head.appendChild(script);
+    } else if (window.iFrameResize && iframeRef.current) {
+      setTimeout(() => {
+        window.iFrameResize({ checkOrigin: false, heightCalculationMethod: "taggedElement" }, iframeRef.current);
+      }, 30);
+    }
+  }, [dubsadoUrl]);
 
   return (
     <>
@@ -1512,13 +1500,14 @@ function ContactPage() {
               borderRadius: 24,
               overflow: "hidden",
               border: `1px solid ${C.sand}`,
-              minHeight: 600,
             }}>
               <iframe
+                ref={iframeRef}
                 src={dubsadoUrl}
+                frameBorder="0"
                 style={{
-                  width: "100%",
-                  minHeight: 600,
+                  width: "1px",
+                  minWidth: "100%",
                   border: "none",
                   display: "block",
                 }}
