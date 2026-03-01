@@ -1,6 +1,7 @@
 import { supabase } from "./config";
 
 export async function uploadImage(file, contentKey) {
+  if (!supabase) throw new Error("Supabase not configured");
   const path = `${contentKey}/${Date.now()}_${file.name}`;
   const { error } = await supabase.storage
     .from("cms-images")
@@ -16,6 +17,7 @@ export async function uploadImage(file, contentKey) {
 }
 
 export async function deleteImage(path) {
+  if (!supabase) throw new Error("Supabase not configured");
   const { error } = await supabase.storage
     .from("cms-images")
     .remove([path]);

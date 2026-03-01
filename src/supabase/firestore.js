@@ -4,6 +4,7 @@ import { supabase } from "./config";
 // Two rows: "live" and "draft"
 
 export async function fetchContent(docId) {
+  if (!supabase) return {};
   const { data, error } = await supabase
     .from("content")
     .select("data")
@@ -18,6 +19,7 @@ export async function fetchContent(docId) {
 }
 
 export async function saveContent(docId, content) {
+  if (!supabase) throw new Error("Supabase not configured");
   const { error } = await supabase
     .from("content")
     .upsert({ id: docId, data: content, updated_at: new Date().toISOString() });
