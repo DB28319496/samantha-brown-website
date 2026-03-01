@@ -768,21 +768,21 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.coreValues.heading" as="span" /></h2>
           </div>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}>
           {[
             { emoji: "⚡", title: "energy over hustle", desc: "protect your capacity first. you can't pour from an empty cup — or build from an empty tank." },
             { emoji: "🧩", title: "systems over stress", desc: "the right systems mean you stop firefighting and start actually running your business." },
             { emoji: "🌊", title: "life over grind", desc: "success shouldn't cost you your sanity. build something sustainable, not something that owns you." },
             { emoji: "🌱", title: "progress over perfection", desc: "done is better than perfect. we build, iterate, and improve — not wait for the \"right\" time." },
           ].map((v, i) => (
-            <FadeIn key={i} delay={i * 100} style={{ height: "100%" }}>
+            <FadeIn key={i} delay={i * 100} style={{ display: "flex" }}>
               <div style={{
                 background: C.cream,
                 borderRadius: 20,
                 padding: "28px 24px",
                 border: `1.5px solid ${C.sand}`,
                 textAlign: "center",
-                height: "100%",
+                flex: 1,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-start",
@@ -807,9 +807,9 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.systemsComparison.heading" as="span" /></h2>
           </div>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, maxWidth: 800, margin: "0 auto" }}>
-          <FadeIn delay={0} style={{ height: "100%" }}>
-            <div style={{ background: `${C.coral}15`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.coral}30`, height: "100%", display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, maxWidth: 800, margin: "0 auto", alignItems: "stretch" }}>
+          <FadeIn delay={0} style={{ display: "flex" }}>
+            <div style={{ background: `${C.coral}15`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.coral}30`, flex: 1, display: "flex", flexDirection: "column" }}>
               <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.coral, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                 <BlinkEmoji emoji="😵‍💫" size={20} /> without systems
               </h3>
@@ -826,8 +826,8 @@ function HomePage({ setPage }) {
               ))}
             </div>
           </FadeIn>
-          <FadeIn delay={150} style={{ height: "100%" }}>
-            <div style={{ background: `${C.oceanBlue}12`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.oceanBlue}30`, height: "100%", display: "flex", flexDirection: "column" }}>
+          <FadeIn delay={150} style={{ display: "flex" }}>
+            <div style={{ background: `${C.oceanBlue}12`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.oceanBlue}30`, flex: 1, display: "flex", flexDirection: "column" }}>
               <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.oceanBlue, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                 <BlinkEmoji emoji="✨" size={20} /> with systems
               </h3>
@@ -862,13 +862,13 @@ function HomePage({ setPage }) {
           </div>
         </FadeIn>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, alignItems: "stretch" }}>
           {[
             { title: "for founders & service providers", body: "backend systems, revenue expansion & client experience — built for how you actually work.", cta: "explore services →", page: "services", bg: C.pinkSoft, accent: C.coral },
             { title: "for corporate teams & leaders", body: "team engagement, leadership development & systems that actually get adopted — not just rolled out.", cta: "get in touch →", page: "contact", bg: C.oceanLight, accent: C.oceanBlue },
             { title: "for brand partnerships", body: "authentic collaborations, speaking engagements & content that actually converts.", cta: "let's collaborate →", page: "contact", bg: C.lavenderLight, accent: C.lavender },
           ].map((c, i) => (
-            <FadeIn key={i} delay={i * 100} style={{ height: "100%" }}>
+            <FadeIn key={i} delay={i * 100} style={{ display: "flex" }}>
               <div
                 onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}
                 style={{
@@ -879,7 +879,7 @@ function HomePage({ setPage }) {
                   cursor: "pointer",
                   display: "flex",
                   flexDirection: "column",
-                  height: "100%",
+                  flex: 1,
                   transition: "transform 0.3s, box-shadow 0.3s",
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
@@ -907,7 +907,7 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 42px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.stats.heading" as="span" /></h2>
           </div>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 36 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 36, alignItems: "stretch" }}>
           {[
             { stat: "6+", label: "years building & leading high-performing teams across 8 global regions" },
             { stat: "8.9+", label: "/10 team engagement scores (consistently, not just once)" },
@@ -915,7 +915,7 @@ function HomePage({ setPage }) {
             { stat: "94%", label: "adoption rate for Asana across distributed teams" },
             { stat: "96%", label: "adoption rate for major platform transitions" },
           ].map((s, i) => (
-            <FadeIn key={i} delay={i * 80} style={{ height: "100%" }}>
+            <FadeIn key={i} delay={i * 80} style={{ display: "flex" }}>
               <div
                 onMouseEnter={e => {
                   e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
@@ -931,7 +931,7 @@ function HomePage({ setPage }) {
                   padding: "28px 20px",
                   textAlign: "center",
                   border: `1px solid ${C.oceanLight}`,
-                  height: "100%",
+                  flex: 1,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
@@ -1060,14 +1060,14 @@ function ServicesPage({ setPage }) {
           <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, maxWidth: 680, marginBottom: 36 }}><EditableText contentKey="services.creators.body" as="span" /></p>
         </FadeIn>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}>
           {[
             { num: "01", title: "the brand experience audit", price: "$350", body: "an unbiased look at your current client journey, backend systems, revenue streams, and where things are breaking down. detailed action plan + priority recommendations.", page: "audit", bg: C.pinkSoft },
             { num: "02", title: "the brand experience (full implementation)", price: "starting at $1.5k", body: "the \"do it for me\" option. we start with the audit, then i build your entire backend—client onboarding, workflows, automation, templates, email marketing, the whole thing.", page: "implementation", bg: C.oceanLight },
             { num: "03", title: "fractional consulting", price: "limited spots", body: "ongoing support without the agency retainer. think: a business bestie who actually knows what they're talking about. monthly strategy sessions + async access.", page: "fractional", bg: C.lavenderLight },
           ].map((c, i) => (
-            <FadeIn key={i} delay={i * 100} style={{ height: "100%" }}>
-              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", height: "100%", display: "flex", flexDirection: "column" }}
+            <FadeIn key={i} delay={i * 100} style={{ display: "flex" }}>
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                 onClick={() => { setPage(c.page); window.scrollTo({ top: 0 }); }}>
