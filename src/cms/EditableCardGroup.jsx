@@ -99,6 +99,7 @@ export function EditableCardGroup({
           style={{
             position: "relative",
             display: "flex",
+            flexDirection: "column",
             ...(isEditing ? {
               outline: isSelected(i) ? `2px solid ${EDITOR.selectColor}` : dropIndex === i ? `2px dashed ${EDITOR.selectColor}` : "2px solid transparent",
               outlineOffset: 2,
