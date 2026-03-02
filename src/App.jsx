@@ -187,30 +187,32 @@ function TiltCard({ children, style = {}, onClick }) {
 function TypewriterText({ phrases = [], speed = 80, deleteSpeed = 40, pauseDuration = 2000, style = {} }) {
   const [text, setText] = useState("");
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [phase, setPhase] = useState("typing"); // typing | pausing | deleting
 
   useEffect(() => {
     if (!phrases.length) return;
     const current = phrases[phraseIndex];
 
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        setText(current.slice(0, text.length + 1));
-        if (text.length + 1 === current.length) {
-          setTimeout(() => setIsDeleting(true), pauseDuration);
-          return;
-        }
-      } else {
-        setText(current.slice(0, text.length - 1));
-        if (text.length === 0) {
-          setIsDeleting(false);
-          setPhraseIndex((phraseIndex + 1) % phrases.length);
-        }
+    if (phase === "typing") {
+      if (text.length < current.length) {
+        const t = setTimeout(() => setText(current.slice(0, text.length + 1)), speed);
+        return () => clearTimeout(t);
       }
-    }, isDeleting ? deleteSpeed : speed);
+      // Fully typed — pause before deleting
+      const t = setTimeout(() => setPhase("deleting"), pauseDuration);
+      return () => clearTimeout(t);
+    }
 
-    return () => clearTimeout(timeout);
-  }, [text, phraseIndex, isDeleting, phrases, speed, deleteSpeed, pauseDuration]);
+    if (phase === "deleting") {
+      if (text.length > 0) {
+        const t = setTimeout(() => setText(text.slice(0, -1)), deleteSpeed);
+        return () => clearTimeout(t);
+      }
+      // Fully deleted — move to next phrase
+      setPhraseIndex((phraseIndex + 1) % phrases.length);
+      setPhase("typing");
+    }
+  }, [text, phraseIndex, phase, phrases, speed, deleteSpeed, pauseDuration]);
 
   return (
     <span style={{ ...style }}>
