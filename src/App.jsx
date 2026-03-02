@@ -1413,19 +1413,71 @@ function AboutPage({ setPage }) {
 
       {/* THE GUIDE — Credentials & beliefs */}
       <EditableSection contentKey="visibility.about.beliefs">
-      <SectionWrap bg={C.charcoal} py="72px">
-        <FadeIn>
-          <div style={{ maxWidth: 720, margin: "0 auto" }}>
-            <ScriptLabel size={22} color={C.sand}><EditableText contentKey="about.beliefs.scriptLabel" as="span" /></ScriptLabel>
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: C.cream, margin: "0 0 24px" }}><EditableText contentKey="about.beliefs.heading" as="span" /></h2>
-            {(getContent("about.beliefs") || []).map((c, i, arr) => (
-              <div key={i} style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.warmTan}22` : "none", padding: "22px 0" }}>
-                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.yellow, margin: "0 0 8px" }}><EditableArrayText contentKey="about.beliefs" index={i} field="b" as="span" /></h3>
-                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14.5, color: `${C.sand}cc`, lineHeight: 1.65, margin: 0 }}><EditableArrayText contentKey="about.beliefs" index={i} field="d" as="span" /></p>
-              </div>
-            ))}
-          </div>
-        </FadeIn>
+      <SectionWrap bg={C.cream} py="80px">
+        <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "center" }}>
+          <FadeIn>
+            <ScriptLabel size={22} color={C.oceanBlue}><EditableText contentKey="about.beliefs.scriptLabel" as="span" /></ScriptLabel>
+            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 800, fontSize: "clamp(16px, 2.2vw, 20px)", color: C.charcoal, margin: "0 0 56px", textTransform: "uppercase", letterSpacing: "2px", lineHeight: 1.5 }}>
+              <EditableText contentKey="about.beliefs.heading" as="span" />
+            </h2>
+          </FadeIn>
+
+          {(getContent("about.beliefs") || []).map((c, i) => {
+            const colors = ["#E8A8A0", "#9AB07A", "#E07E6A", "#7BA0D4"];
+            const headingColors = [`${colors[i % 4]}90`, `${colors[i % 4]}80`, `${colors[i % 4]}90`, `${colors[i % 4]}80`];
+            const rotations = [-10, 8, -7, 12];
+            const badgeAligns = ["flex-start", "flex-end", "flex-start", "flex-end"];
+            return (
+              <FadeIn key={i}>
+                <div style={{ marginBottom: i < 3 ? 64 : 0, position: "relative" }}>
+                  {/* Tilted badge */}
+                  <div style={{ display: "flex", justifyContent: badgeAligns[i % 4], marginBottom: -8, paddingLeft: badgeAligns[i % 4] === "flex-start" ? "5%" : 0, paddingRight: badgeAligns[i % 4] === "flex-end" ? "5%" : 0 }}>
+                    <span style={{
+                      display: "inline-block",
+                      fontFamily: "'Caveat', cursive",
+                      fontSize: 15,
+                      color: "#fff",
+                      background: colors[i % 4],
+                      padding: "8px 18px",
+                      borderRadius: 8,
+                      transform: `rotate(${rotations[i % 4]}deg)`,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      whiteSpace: "nowrap",
+                    }}>
+                      <EditableArrayText contentKey="about.beliefs" index={i} field="tag" as="span" />
+                    </span>
+                  </div>
+
+                  {/* Large pastel heading */}
+                  <h3 style={{
+                    fontFamily: "'Rubik', sans-serif",
+                    fontWeight: 800,
+                    fontSize: "clamp(32px, 5vw, 52px)",
+                    color: headingColors[i % 4],
+                    margin: "0 0 16px",
+                    lineHeight: 1.1,
+                    textTransform: "uppercase",
+                    letterSpacing: "-0.5px",
+                  }}>
+                    <EditableArrayText contentKey="about.beliefs" index={i} field="b" as="span" />
+                  </h3>
+
+                  {/* Description */}
+                  <p style={{
+                    fontFamily: "'Rubik', sans-serif",
+                    fontSize: 15,
+                    color: C.body,
+                    lineHeight: 1.7,
+                    margin: "0 auto",
+                    maxWidth: 600,
+                  }}>
+                    <EditableArrayText contentKey="about.beliefs" index={i} field="d" as="span" />
+                  </p>
+                </div>
+              </FadeIn>
+            );
+          })}
+        </div>
       </SectionWrap>
       </EditableSection>
 

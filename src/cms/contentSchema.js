@@ -342,10 +342,10 @@ export const defaultContent = {
 
   "about.beliefs.scriptLabel": "what i believe",
   "about.beliefs": [
-    { b: "energy management > time management", d: "you can't calendar your way out of exhaustion. sustainable business is about protecting your capacity, not squeezing more into your day." },
-    { b: "the best system is the one you'll actually use", d: "i don't care how beautiful someone's notion template is—if it doesn't match your brain, you won't use it." },
-    { b: "sustainable growth beats hustle culture every time", d: "quick wins are fun. building something that lasts without burning out? that's the real flex." },
-    { b: "you don't need to be \"always on\" to be successful", d: "i'm literally building a consulting business while working corporate 4 days a week. proof of concept, baby." },
+    { b: "energy management > time management", d: "you can't calendar your way out of exhaustion. sustainable business is about protecting your capacity, not squeezing more into your day.", tag: "protect your energy" },
+    { b: "the best system is the one you'll actually use", d: "i don't care how beautiful someone's notion template is—if it doesn't match your brain, you won't use it.", tag: "built for your brain" },
+    { b: "sustainable growth beats hustle culture every time", d: "quick wins are fun. building something that lasts without burning out? that's the real flex.", tag: "the long game wins" },
+    { b: "you don't need to be \"always on\" to be successful", d: "i'm literally building a consulting business while working corporate 4 days a week. proof of concept, baby.", tag: "proof of concept" },
   ],
 
   "about.lifestyle.scriptLabel": "when i'm not consulting",
