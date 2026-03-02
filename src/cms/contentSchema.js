@@ -184,6 +184,13 @@ export const defaultContent = {
     "are looking for a \"quick fix\" without putting in any work",
   ],
   "services.audit.cta": "let's do this →",
+  "services.audit.faqs": [
+    { q: "How long does the audit take?", a: "From intake form to final delivery, about one week. You'll receive a detailed Loom walkthrough plus a written action plan, followed by a 30-minute debrief call." },
+    { q: "Do I need to prepare anything?", a: "Just fill out the intake form honestly — tell me what's going on, what you've tried, and where you're stuck. The more context you give me, the better the audit." },
+    { q: "What if I want to implement the changes myself?", a: "That's totally fine! The audit gives you a clear, prioritized roadmap you can DIY. If you get stuck, you can always upgrade to the full implementation later." },
+    { q: "Is this just for Dubsado or Notion users?", a: "Nope. I audit your entire backend — whatever tools you're using. The recommendations are platform-agnostic, though I can make specific tool suggestions based on your needs." },
+    { q: "What's the difference between the audit and the full implementation?", a: "The audit tells you what's broken and how to fix it. The full implementation is where I actually build it all for you. Think of the audit as the blueprint and the implementation as the construction." },
+  ],
 
   // ─── SERVICE DETAIL: IMPLEMENTATION ───
   "services.implementation.price": "starting at $1.5k",
@@ -225,6 +232,13 @@ export const defaultContent = {
   ],
   "services.implementation.different": "i'm not handing you a template and calling it custom. i'm building something that works with your brain (not against it), doesn't require you to change who you are, your clients will feel (in the best way), you can maintain without hiring a VA, and supports multiple income streams without multiplying your workload. the goal isn't to make your business look good. it's to make it feel sustainable.",
   "services.implementation.cta": "let's start with the audit →",
+  "services.implementation.faqs": [
+    { q: "Do I really need the audit first?", a: "Yes — always. I need to understand what's working, what's broken, and what's missing before I build anything. It's like a contractor doing a site assessment before construction. The audit is included in the implementation price." },
+    { q: "How long does the full buildout take?", a: "Typically 3-4 weeks from kickoff. You'll get async updates throughout, and I'll ask clarifying questions as needed — but mostly you get to live your life while I build." },
+    { q: "What platforms do you build on?", a: "I work with Dubsado, Notion, Asana, Flodesk, and most major business tools. I'll recommend what fits your brain and workflow — not just what's trendy." },
+    { q: "What if I need changes after delivery?", a: "You get 2 weeks of post-launch support for questions and tweaks. After that, you can add on fractional consulting for ongoing support, or handle things yourself with the training I provide." },
+    { q: "Can you help with revenue expansion too?", a: "Absolutely. Revenue stream planning is baked into the implementation. We'll map out opportunities for diversifying your income and build systems that support multiple streams without multiplying your workload." },
+  ],
 
   // ─── SERVICE DETAIL: FRACTIONAL ───
   "services.fractional.price": "$2,200/month · 3 clients/quarter max",
@@ -264,6 +278,13 @@ export const defaultContent = {
   "services.fractional.quote.text": "Taking on a client is easy. Taking on the right client is an investment.",
   "services.fractional.quote.author": "seth godin",
   "services.fractional.cta": "apply now →",
+  "services.fractional.faqs": [
+    { q: "What does 'async access' actually mean?", a: "You can send me questions via Slack or email anytime. I respond within 48 business hours. Think of it like having a strategic advisor on speed dial — without the agency retainer." },
+    { q: "Why is there a 3-month minimum?", a: "Real change doesn't happen in one session. The first month is about understanding your business, the second is building momentum, and the third is where things really click. Most clients stay much longer." },
+    { q: "How is this different from hiring a coach?", a: "Coaches ask you questions. I give you answers, strategy, and systems. This is hands-on consulting — I'll help you build frameworks, troubleshoot problems, and make decisions. Not just hold space." },
+    { q: "Can I pause my retainer?", a: "Life happens. If you need to pause, we can discuss it — but the 3-month minimum is a commitment to the process. After that, month-to-month is flexible." },
+    { q: "What kind of things do clients bring to sessions?", a: "Everything from 'how do I price this new offer' to 'my team is falling apart' to 'I want to launch an event but don't know where to start.' If it touches your business, it's fair game." },
+  ],
 
   // ─── SERVICE DETAIL: CORPORATE ───
   "services.corporate.detail.price": "custom pricing",
@@ -298,6 +319,13 @@ export const defaultContent = {
   ],
   "services.corporate.detail.different": "i'm currently leading teams across 8 global regions while building a fractional consulting business on a 4-day work week. but i didn't start here. i started checking teams at 10pm, working weekends, and thinking that's just what good leaders do. i burned out. then i rebuilt everything. this isn't theory. this is what actually works.",
   "services.corporate.detail.cta": "let's talk →",
+  "services.corporate.detail.faqs": [
+    { q: "What size teams do you work with?", a: "I've led and trained teams from 5 to 50+ across 8 global regions. Whether you're a startup leadership team or a distributed enterprise group, the principles scale." },
+    { q: "Do you offer one-off workshops or ongoing programs?", a: "Both. Some clients need a single workshop to kickstart change. Others benefit from an ongoing consulting relationship. We'll figure out what makes sense during the discovery call." },
+    { q: "How do you measure success?", a: "We set clear metrics upfront — engagement scores, adoption rates, retention numbers, whatever matters to your team. I've consistently hit 8.9+/10 engagement and 94-96% platform adoption." },
+    { q: "Is this only for in-person teams?", a: "Not at all. Most of my experience is with distributed and remote teams. Workshops can be delivered virtually, in-person, or hybrid — whatever works for your setup." },
+    { q: "What makes your approach different from typical corporate training?", a: "I'm not a consultant who's only read about leadership. I'm currently doing it — leading global teams on a 4-day work week. Everything I teach comes from actual experience, not a textbook." },
+  ],
 
   // ─── ABOUT PAGE ───
   "about.hero.scriptLabel": "a little about me",

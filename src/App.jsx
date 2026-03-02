@@ -402,6 +402,57 @@ function ProcessStep({ num, text, total }) {
   );
 }
 
+function FAQAccordion({ faqs, contentKey }) {
+  const [openIndex, setOpenIndex] = useState(null);
+  return (
+    <div>
+      {faqs.map((faq, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div key={i} style={{ borderBottom: `1px solid ${C.sand}` }}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 16,
+                padding: "20px 0",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 15, color: C.charcoal, lineHeight: 1.4 }}>
+                {contentKey ? <EditableArrayText contentKey={contentKey} index={i} field="q" as="span" /> : faq.q}
+              </span>
+              <span style={{
+                fontFamily: "system-ui",
+                fontSize: 20,
+                color: C.oceanBlue,
+                flexShrink: 0,
+                transition: "transform 0.3s",
+                transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+              }}>+</span>
+            </button>
+            <div style={{
+              maxHeight: isOpen ? 300 : 0,
+              overflow: "hidden",
+              transition: "max-height 0.35s ease",
+            }}>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.7, margin: "0 0 20px", paddingRight: 40 }}>
+                {contentKey ? <EditableArrayText contentKey={contentKey} index={i} field="a" as="span" /> : faq.a}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function TwoColFit({ perfect, notFit }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
@@ -1217,6 +1268,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
   const fitPerfect = getContent(p + ".fit.perfect") || [];
   const fitNotFit = getContent(p + ".fit.notFit") || [];
   const hasFit = fitPerfect.length > 0 || fitNotFit.length > 0;
+  const faqs = getContent(p + ".faqs") || [];
   const quoteText = getContent(p + ".quote.text");
   const quoteAuthor = getContent(p + ".quote.author");
   const price = getContent(p + ".price");
@@ -1272,6 +1324,17 @@ function ServiceDetailPage({ setPage, serviceKey }) {
             <div style={{ maxWidth: 700, margin: "0 auto" }}>
               <ScriptLabel>who this is for</ScriptLabel>
               <TwoColFit perfect={fitPerfect} notFit={fitNotFit} />
+            </div>
+          </FadeIn>
+        </SectionWrap>
+      )}
+
+      {faqs.length > 0 && (
+        <SectionWrap bgImage={gridBgWhite} py="64px">
+          <FadeIn>
+            <div style={{ maxWidth: 700, margin: "0 auto" }}>
+              <ScriptLabel>frequently asked</ScriptLabel>
+              <FAQAccordion faqs={faqs} contentKey={p + ".faqs"} />
             </div>
           </FadeIn>
         </SectionWrap>
