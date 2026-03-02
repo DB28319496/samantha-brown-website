@@ -733,12 +733,13 @@ function HomePage({ setPage }) {
   const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
 
-  const parallaxY = Math.min(scrollY * 0.15, 150);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const parallaxY = isMobile ? 0 : Math.min(scrollY * 0.15, 150);
 
   return (
     <>
       {/* ── HERO (PLM: grid bg, big bold text, centered) ── */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden", zIndex: 1 }}>
+      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden", zIndex: 2 }}>
         {/* Animated gradient background */}
         <div style={{
           position: "absolute",
