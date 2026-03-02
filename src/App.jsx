@@ -535,11 +535,13 @@ function TestimonialCarousel() {
 
   const arrowBtn = (direction, onClick) => (
     <button onClick={onClick} style={{
-      width: 52, height: 80, borderRadius: 28, background: bubbleBg, border: "none",
-      cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#fff", fontSize: 22, transition: "background 0.3s",
-    }} onMouseEnter={(e) => e.currentTarget.style.background = "#d4896e"}
-       onMouseLeave={(e) => e.currentTarget.style.background = bubbleBg}
+      width: 48, height: 48, borderRadius: "50%", background: C.oceanBlue,
+      border: `2px solid ${C.white}`, cursor: "pointer", display: "flex",
+      alignItems: "center", justifyContent: "center", color: C.white, fontSize: 20,
+      boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+      transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+    }} onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px) scale(1.05)"; }}
+       onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0) scale(1)"; }}
        aria-label={direction === "up" ? "Previous testimonial" : "Next testimonial"}>
       {direction === "up" ? "↑" : "↓"}
     </button>
@@ -591,12 +593,18 @@ function TestimonialCarousel() {
       {/* Mobile: horizontal arrows below bubble — shown via CSS */}
       <div className="testimonial-arrows-mobile" style={{ display: "none", justifyContent: "center", gap: 16, marginTop: 20 }}>
         <button onClick={goPrev} style={{
-          width: 80, height: 52, borderRadius: 28, background: bubbleBg, border: "none",
-          cursor: "pointer", color: "#fff", fontSize: 22, transition: "background 0.3s",
+          width: 48, height: 48, borderRadius: "50%", background: C.oceanBlue,
+          border: `2px solid ${C.white}`, cursor: "pointer", display: "flex",
+          alignItems: "center", justifyContent: "center", color: C.white, fontSize: 20,
+          boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+          transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
         }} aria-label="Previous testimonial">←</button>
         <button onClick={goNext} style={{
-          width: 80, height: 52, borderRadius: 28, background: bubbleBg, border: "none",
-          cursor: "pointer", color: "#fff", fontSize: 22, transition: "background 0.3s",
+          width: 48, height: 48, borderRadius: "50%", background: C.oceanBlue,
+          border: `2px solid ${C.white}`, cursor: "pointer", display: "flex",
+          alignItems: "center", justifyContent: "center", color: C.white, fontSize: 20,
+          boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+          transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
         }} aria-label="Next testimonial">→</button>
       </div>
     </div>
