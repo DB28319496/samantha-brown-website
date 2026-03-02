@@ -70,7 +70,8 @@ export const defaultContent = {
   "home.socialProof.badges": ["Asana Ambassador", "Notion Certified", "4-Day Work Week"],
 
   // ─── HOME: TESTIMONIALS ───
-  "home.testimonials.scriptLabel": "kind words",
+  "image.home.testimonials.bg": null,
+  "home.testimonials.scriptLabel": "as told by my fave people (clients)",
   "home.testimonials.heading": "what people are saying",
   "home.testimonials": [
     { text: "Sam consistently demonstrated excellent communication skills, ensuring both my team and I were fully informed. Her pragmatic approach to decision-making allowed her to make well-considered decisions that balanced immediate needs with long-term strategic goals.", author: "Cross-functional Project Lead, MarTech Transformation" },

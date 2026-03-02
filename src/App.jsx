@@ -516,11 +516,12 @@ function SocialProof() {
   );
 }
 
-/* ── Testimonial Carousel ── */
+/* ── Testimonial Carousel (bubble card + vertical arrows) ── */
 function TestimonialCarousel() {
   const { getContent } = useCMS();
   const [current, setCurrent] = useState(0);
   const testimonials = getContent("home.testimonials") || [];
+  const bubbleBg = "#E0977A";
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -529,42 +530,135 @@ function TestimonialCarousel() {
     return () => clearInterval(timer);
   }, [testimonials.length]);
 
+  const goPrev = () => setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  const goNext = () => setCurrent((prev) => (prev + 1) % testimonials.length);
+
+  const arrowBtn = (direction, onClick) => (
+    <button onClick={onClick} style={{
+      width: 52, height: 80, borderRadius: 28, background: bubbleBg, border: "none",
+      cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+      color: "#fff", fontSize: 22, transition: "background 0.3s",
+    }} onMouseEnter={(e) => e.currentTarget.style.background = "#d4896e"}
+       onMouseLeave={(e) => e.currentTarget.style.background = bubbleBg}
+       aria-label={direction === "up" ? "Previous testimonial" : "Next testimonial"}>
+      {direction === "up" ? "↑" : "↓"}
+    </button>
+  );
+
   return (
-    <div style={{ position: "relative", maxWidth: 800, margin: "0 auto" }}>
-      <div style={{ overflow: "hidden", position: "relative", minHeight: 200 }}>
-        {testimonials.map((t, i) => (
-          <div key={i} style={{
-            position: "absolute",
-            width: "100%",
-            opacity: current === i ? 1 : 0,
-            transform: current === i ? "translateX(0)" : "translateX(20px)",
-            transition: "all 0.6s cubic-bezier(.22,.61,.36,1)",
-            pointerEvents: current === i ? "auto" : "none"
-          }}>
-            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, marginBottom: 16, fontStyle: "italic" }}>"{t.text}"</p>
-            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, color: C.warmTan, margin: 0, fontWeight: 500 }}>— {t.author}</p>
+    <div style={{ maxWidth: 960, margin: "0 auto" }}>
+      {/* Desktop: arrows left, bubble right */}
+      <div className="testimonial-bubble-layout" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        {/* Vertical arrow column — hidden on mobile via CSS */}
+        <div className="testimonial-arrows-desktop" style={{ display: "flex", flexDirection: "column", gap: 16, flexShrink: 0 }}>
+          {arrowBtn("up", goPrev)}
+          {arrowBtn("down", goNext)}
+        </div>
+
+        {/* Bubble card */}
+        <div style={{
+          flex: 1, background: bubbleBg, borderRadius: 28,
+          padding: "clamp(32px, 5vw, 48px) clamp(28px, 5vw, 48px)",
+          position: "relative", overflow: "hidden", minHeight: 240,
+        }}>
+          {/* Heading + subtitle */}
+          <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 36px)", color: "#fff", margin: "0 0 6px", lineHeight: 1.15, textTransform: "lowercase" }}>
+            <EditableText contentKey="home.testimonials.heading" as="span" style={{ color: "inherit" }} />
+          </h3>
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13, color: "rgba(255,255,255,0.85)", textTransform: "uppercase", letterSpacing: "0.8px", margin: "0 0 28px" }}>
+            <EditableText contentKey="home.testimonials.scriptLabel" as="span" style={{ color: "inherit" }} />
+          </p>
+
+          {/* Testimonial slides */}
+          <div style={{ position: "relative", minHeight: 120 }}>
+            {testimonials.map((t, i) => (
+              <div key={i} style={{
+                position: i === 0 ? "relative" : "absolute",
+                top: 0, left: 0, width: "100%",
+                opacity: current === i ? 1 : 0,
+                transform: current === i ? "translateY(0)" : "translateY(16px)",
+                transition: "all 0.6s cubic-bezier(.22,.61,.36,1)",
+                pointerEvents: current === i ? "auto" : "none",
+              }}>
+                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: "clamp(14px, 1.6vw, 16px)", color: "#fff", lineHeight: 1.75, margin: "0 0 20px" }}>{t.text}</p>
+                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: "#fff", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", margin: 0 }}>{t.author}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-      <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 32 }}>
-        {testimonials.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            style={{
-              width: current === i ? 32 : 8,
-              height: 8,
-              borderRadius: 4,
-              background: current === i ? C.oceanBlue : C.sand,
-              border: "none",
-              cursor: "pointer",
-              transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
-            }}
-            aria-label={`Go to testimonial ${i + 1}`}
-          />
-        ))}
+
+      {/* Mobile: horizontal arrows below bubble — shown via CSS */}
+      <div className="testimonial-arrows-mobile" style={{ display: "none", justifyContent: "center", gap: 16, marginTop: 20 }}>
+        <button onClick={goPrev} style={{
+          width: 80, height: 52, borderRadius: 28, background: bubbleBg, border: "none",
+          cursor: "pointer", color: "#fff", fontSize: 22, transition: "background 0.3s",
+        }} aria-label="Previous testimonial">←</button>
+        <button onClick={goNext} style={{
+          width: 80, height: 52, borderRadius: 28, background: bubbleBg, border: "none",
+          cursor: "pointer", color: "#fff", fontSize: 22, transition: "background 0.3s",
+        }} aria-label="Next testimonial">→</button>
       </div>
     </div>
+  );
+}
+
+/* ── Testimonial Section (parallax background + bubble carousel) ── */
+function TestimonialSection({ scrollY }) {
+  const { getContent, isEditing } = useCMS();
+  const sectionRef = useRef(null);
+  const bgUrl = getContent("image.home.testimonials.bg");
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  // Calculate parallax offset relative to the section
+  let parallaxOffset = 0;
+  if (!isMobile && sectionRef.current) {
+    const rect = sectionRef.current.getBoundingClientRect();
+    const viewH = window.innerHeight;
+    // When section is in view, shift background at a slower rate
+    if (rect.top < viewH && rect.bottom > 0) {
+      parallaxOffset = (viewH - rect.top) * 0.08;
+    }
+  }
+
+  return (
+    <section ref={sectionRef} style={{
+      position: "relative", overflow: "hidden",
+      padding: "clamp(56px, 8vw, 80px) clamp(20px, 5vw, 56px)",
+      background: bgUrl ? C.cream : gridBgSand,
+    }}>
+      {/* Parallax background image */}
+      {bgUrl && (
+        <>
+          <div style={{
+            position: "absolute", inset: "-40px 0", zIndex: 0,
+            backgroundImage: `url(${bgUrl})`,
+            backgroundSize: "cover", backgroundPosition: "center",
+            transform: isMobile ? "none" : `translateY(${parallaxOffset}px)`,
+            willChange: isMobile ? "auto" : "transform",
+          }} />
+          {/* Overlay for readability */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 0,
+            background: "rgba(250,247,242,0.82)",
+          }} />
+        </>
+      )}
+
+      {/* CMS: background image upload */}
+      {isEditing && (
+        <div style={{ position: "relative", zIndex: 2, marginBottom: 16 }}>
+          <EditableImage contentKey="image.home.testimonials.bg" placeholderEmoji="🖼️" placeholderLabel="upload parallax background" placeholderHeight={80} placeholderBg="rgba(221,208,190,0.5)" placeholderRadius={12} />
+        </div>
+      )}
+
+      {/* Content */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <FadeIn>
+          <TestimonialCarousel />
+        </FadeIn>
+      </div>
+    </section>
   );
 }
 
@@ -1030,17 +1124,9 @@ function HomePage({ setPage }) {
       </SectionWrap>
       </EditableSection>
 
-      {/* ── TESTIMONIALS CAROUSEL ── */}
+      {/* ── TESTIMONIALS CAROUSEL (parallax bg + bubble card) ── */}
       <EditableSection contentKey="visibility.home.testimonials">
-      <SectionWrap bg={C.cream} py="72px">
-        <FadeIn>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <ScriptLabel size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.testimonials.scriptLabel" as="span" /></ScriptLabel>
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 38px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.testimonials.heading" as="span" /></h2>
-          </div>
-          <TestimonialCarousel />
-        </FadeIn>
-      </SectionWrap>
+      <TestimonialSection scrollY={scrollY} />
       </EditableSection>
 
       {/* ── NEWSLETTER / CABANA CLUB (PLM: branded signup section) ── */}
@@ -1777,6 +1863,8 @@ export default function App() {
           .core-values-grid { grid-template-columns: repeat(2, 1fr); }
           .dsk-nav { display: none !important; }
           .mob-toggle { display: block !important; }
+          .testimonial-arrows-desktop { display: none !important; }
+          .testimonial-arrows-mobile { display: flex !important; }
         }
         @media (max-width: 480px) {
           .core-values-grid { grid-template-columns: 1fr; }
