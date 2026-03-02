@@ -259,7 +259,7 @@ function BubbleTag({ emoji, text, bg = C.white, color = C.charcoal, style = {} }
 function Marquee({ text, bg = C.charcoal, color = C.sand, speed = 60 }) {
   const items = Array(8).fill(text);
   return (
-    <div style={{ overflow: "hidden", background: bg, padding: "14px 0", whiteSpace: "nowrap", position: "relative" }}>
+    <div style={{ overflow: "hidden", background: bg, padding: "14px 0", whiteSpace: "nowrap", position: "relative", zIndex: 0 }}>
       <div style={{ display: "inline-flex", animation: `marquee ${speed}s linear infinite` }}>
         {items.map((t, i) => (
           <span key={i} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 500, fontSize: 14, color, letterSpacing: "0.5px", textTransform: "lowercase", padding: "0 32px", display: "inline-flex", alignItems: "center", gap: 32 }}>
@@ -738,7 +738,7 @@ function HomePage({ setPage }) {
   return (
     <>
       {/* ── HERO (PLM: grid bg, big bold text, centered) ── */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden", zIndex: 1 }}>
         {/* Animated gradient background */}
         <div style={{
           position: "absolute",
