@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback, useContext } from "react";
+import { createContext, useState, useCallback, useContext, useRef } from "react";
 
 const SelectionContext = createContext();
 
@@ -7,6 +7,10 @@ export function SelectionProvider({ children }) {
   // selectedElement shape: { contentKey, type, index, rect, ref, groupKey }
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
+  const undoRef = useRef(undoStack);
+  const redoRef = useRef(redoStack);
+  undoRef.current = undoStack;
+  redoRef.current = redoStack;
 
   const select = useCallback((info) => {
     setSelectedElement(info);
@@ -23,20 +27,22 @@ export function SelectionProvider({ children }) {
   }, []);
 
   const undo = useCallback((getContent, updateContent) => {
-    if (undoStack.length === 0) return;
-    const action = undoStack[undoStack.length - 1];
+    const stack = undoRef.current;
+    if (stack.length === 0) return;
+    const action = stack[stack.length - 1];
     setUndoStack(prev => prev.slice(0, -1));
     setRedoStack(prev => [...prev, { ...action, oldValue: action.newValue, newValue: action.oldValue }]);
     updateContent(action.contentKey, action.oldValue);
-  }, [undoStack]);
+  }, []);
 
   const redo = useCallback((getContent, updateContent) => {
-    if (redoStack.length === 0) return;
-    const action = redoStack[redoStack.length - 1];
+    const stack = redoRef.current;
+    if (stack.length === 0) return;
+    const action = stack[stack.length - 1];
     setRedoStack(prev => prev.slice(0, -1));
     setUndoStack(prev => [...prev, { ...action, oldValue: action.newValue, newValue: action.oldValue }]);
     updateContent(action.contentKey, action.newValue);
-  }, [redoStack]);
+  }, []);
 
   return (
     <SelectionContext.Provider value={{

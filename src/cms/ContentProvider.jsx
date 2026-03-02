@@ -103,11 +103,14 @@ export function ContentProvider({ children }) {
     setPendingChanges({});
   }, [liveContent, draftContent, pendingChanges]);
 
-  const discardChanges = useCallback(() => {
+  const discardChanges = useCallback(async () => {
+    clearTimeout(autoSaveTimer.current);
     setPendingChanges({});
+    setDraftContent({});
+    try { await saveContent("draft", {}); } catch (err) { console.error("Discard draft failed:", err); }
   }, []);
 
-  const hasPendingChanges = Object.keys(pendingChanges).length > 0;
+  const hasPendingChanges = Object.keys(pendingChanges).length > 0 || Object.keys(draftContent).length > 0;
 
   return (
     <ContentContext.Provider value={{
