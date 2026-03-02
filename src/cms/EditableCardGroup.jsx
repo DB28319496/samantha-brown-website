@@ -8,6 +8,7 @@ export function EditableCardGroup({
   renderCard,
   defaultNewItem = {},
   gridStyle = {},
+  gridClassName,
   minCards = 1,
   maxCards = 12,
   cardStyle = {},
@@ -92,7 +93,7 @@ export function EditableCardGroup({
     selectedElement?.contentKey === contentKey && selectedElement?.index === index;
 
   return (
-    <div ref={gridRef} style={{ ...gridStyle, position: "relative" }}>
+    <div ref={gridRef} className={gridClassName} style={{ ...gridStyle, position: "relative" }}>
       {arr.map((item, i) => (
         <div
           key={i}

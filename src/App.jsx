@@ -357,7 +357,7 @@ function Btn({ children, variant = "primary", onClick, style = {} }) {
 
 function SectionWrap({ children, bg, bgImage, py = "80px", style = {} }) {
   return (
-    <section style={{ background: bgImage || bg || C.cream, padding: `${py} clamp(20px, 5vw, 56px)`, ...style }}>
+    <section style={{ background: bgImage || bg || C.cream, padding: `${py} clamp(20px, 5vw, 56px)`, overflowX: "hidden", ...style }}>
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>{children}</div>
     </section>
   );
@@ -457,7 +457,7 @@ function FAQAccordion({ faqs, contentKey }) {
 
 function TwoColFit({ perfect, notFit }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 20 }}>
       <div style={{ background: C.white, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%" }}>
         <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.charcoal, margin: "0 0 16px" }}>perfect if you:</h4>
         {perfect.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}><span style={{ color: C.oceanBlue, flexShrink: 0 }}>✦</span>{p}</div>)}
@@ -738,7 +738,7 @@ function HomePage({ setPage }) {
   return (
     <>
       {/* ── HERO (PLM: grid bg, big bold text, centered) ── */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "120px clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         {/* Animated gradient background */}
         <div style={{
           position: "absolute",
@@ -805,7 +805,7 @@ function HomePage({ setPage }) {
 
       {/* ── WELCOME / PERMISSION SLIP ── */}
       <SectionWrap bgImage={gridBgSand} py="72px">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 48, alignItems: "center" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: "clamp(24px, 5vw, 48px)", alignItems: "center" }}>
           <FadeIn>
             <EditableImage contentKey="image.home.welcome" placeholderEmoji="🏖️" placeholderLabel="your new ops partner" placeholderHeight={400} placeholderBg={C.oceanLight} placeholderRadius={20} />
           </FadeIn>
@@ -832,7 +832,8 @@ function HomePage({ setPage }) {
         <EditableCardGroup
           contentKey="home.coreValues.cards"
           defaultNewItem={{ emoji: "✨", title: "new value", desc: "description here" }}
-          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}
+          gridStyle={{ maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}
+          gridClassName="core-values-grid"
           renderCard={(v, i) => (
             <div style={{
               background: C.cream,
@@ -870,7 +871,7 @@ function HomePage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.systemsComparison.heading" as="span" /></h2>
           </div>
         </FadeIn>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, maxWidth: 800, margin: "0 auto", alignItems: "stretch" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, maxWidth: 800, margin: "0 auto", alignItems: "stretch" }}>
           <FadeIn delay={0} style={{ display: "flex" }}>
             <div style={{ background: `${C.coral}15`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.coral}30`, flex: 1, display: "flex", flexDirection: "column" }}>
               <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.coral, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
@@ -918,7 +919,7 @@ function HomePage({ setPage }) {
         <EditableCardGroup
           contentKey="home.pathCards"
           defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
-          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, alignItems: "stretch" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, alignItems: "stretch" }}
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             const accents = [C.coral, C.oceanBlue, C.lavender];
@@ -997,7 +998,7 @@ function HomePage({ setPage }) {
                 cursor: "default",
                 boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)"
               }}>
-              <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 36, color: C.oceanBlue, marginBottom: 8 }}>
+              <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 7vw, 36px)", color: C.oceanBlue, marginBottom: 8 }}>
                 <AnimatedCounter end={s.stat} duration={2000} />
               </div>
               <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12.5, color: C.body, lineHeight: 1.5, margin: 0 }}>
@@ -1101,7 +1102,7 @@ function ServicesPage({ setPage }) {
 
   return (
     <>
-      <section style={{ background: gridBgWhite, padding: "130px clamp(20px, 5vw, 56px) 36px", textAlign: "center" }}>
+      <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) 36px", textAlign: "center" }}>
         <ScriptLabel size={22} style={{ textAlign: "center" }}><EditableText contentKey="services.hero.scriptLabel" as="span" /></ScriptLabel>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(38px, 6vw, 64px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="services.hero.heading" as="span" /></h1>
         <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: C.body, maxWidth: 460, margin: "0 auto 28px" }}><EditableText contentKey="services.hero.subheading" as="span" /></p>
@@ -1128,7 +1129,7 @@ function ServicesPage({ setPage }) {
         <EditableCardGroup
           contentKey="services.creators.cards"
           defaultNewItem={{ num: "04", title: "new service", price: "TBD", body: "description here", page: "contact", bg: "#F5E6DC" }}
-          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             return (
@@ -1137,7 +1138,7 @@ function ServicesPage({ setPage }) {
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                 onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
                 <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>
@@ -1174,7 +1175,7 @@ function ServicesPage({ setPage }) {
         <EditableCardGroup
           contentKey="services.corporate.cards"
           defaultNewItem={{ num: "03", title: "new offering", price: "custom pricing", body: "description here", page: "corporate", bg: "#E8DDD4" }}
-          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             return (
@@ -1183,7 +1184,7 @@ function ServicesPage({ setPage }) {
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                 onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
                 <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>
@@ -1220,7 +1221,7 @@ function ServicesPage({ setPage }) {
         <EditableCardGroup
           contentKey="services.brands.cards"
           defaultNewItem={{ num: "04", title: "new partnership", price: "inquire", body: "description here", page: "contact", bg: "#F5E6DC" }}
-          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
+          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 20, marginBottom: 40, alignItems: "stretch" }}
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             return (
@@ -1229,7 +1230,7 @@ function ServicesPage({ setPage }) {
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                 onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 48, color: `${C.charcoal}20` }}>{c.num}</span>
+                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{c.num}</span>
                 </div>
                 <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, color: C.oceanBlue, background: C.oceanLight, padding: "4px 14px", borderRadius: 50 }}>
@@ -1278,7 +1279,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
 
   return (
     <>
-      <section style={{ background: gridBgWhite, padding: "130px clamp(20px, 5vw, 56px) 56px", textAlign: "center" }}>
+      <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)", textAlign: "center" }}>
         {price && <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 13, color: C.white, background: C.oceanBlue, padding: "6px 20px", borderRadius: 50, display: "inline-block", marginBottom: 16 }}>{price}</span>}
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(30px, 5vw, 52px)", color: C.charcoal, lineHeight: 1.05, margin: "0 0 8px", letterSpacing: "-0.8px" }}><EditableText contentKey={p + ".title"} as="span" /></h1>
         <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.warmTan }}><EditableText contentKey={p + ".subtitle"} as="span" /></p>
@@ -1377,8 +1378,8 @@ function AboutPage({ setPage }) {
   return (
     <>
       {/* THE CHARACTER — Hero with typewriter traits */}
-      <section style={{ background: gridBgWhite, padding: "130px clamp(20px, 5vw, 56px) 56px" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 48, alignItems: "center" }}>
+      <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "clamp(24px, 5vw, 48px)", alignItems: "center" }}>
           <EditableImage contentKey="image.about.hero" placeholderEmoji="👋" placeholderLabel="hi, i'm sam" placeholderHeight={440} placeholderBg={C.pinkSoft} placeholderRadius={20} />
           <div>
             <ScriptLabel size={22}><EditableText contentKey="about.hero.scriptLabel" as="span" /></ScriptLabel>
@@ -1429,7 +1430,7 @@ function AboutPage({ setPage }) {
             const badgeAligns = ["flex-start", "flex-end", "flex-start", "flex-end"];
             return (
               <FadeIn key={i}>
-                <div style={{ marginBottom: i < 3 ? 64 : 0, position: "relative" }}>
+                <div style={{ marginBottom: i < 3 ? "clamp(32px, 8vw, 64px)" : 0, position: "relative", overflow: "hidden" }}>
                   {/* Tilted badge */}
                   <div style={{ display: "flex", justifyContent: badgeAligns[i % 4], marginBottom: -8, paddingLeft: badgeAligns[i % 4] === "flex-start" ? "5%" : 0, paddingRight: badgeAligns[i % 4] === "flex-end" ? "5%" : 0 }}>
                     <span style={{
@@ -1442,7 +1443,7 @@ function AboutPage({ setPage }) {
                       borderRadius: 8,
                       transform: `rotate(${rotations[i % 4]}deg)`,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      whiteSpace: "nowrap",
+                      whiteSpace: "normal",
                     }}>
                       <EditableArrayText contentKey="about.beliefs" index={i} field="tag" as="span" />
                     </span>
@@ -1527,7 +1528,7 @@ function ResourcesPage() {
   const { getContent } = useCMS();
   return (
     <>
-      <section style={{ background: gridBgWhite, padding: "130px clamp(20px, 5vw, 56px) 56px", textAlign: "center" }}>
+      <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(36px, 6vw, 60px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="resources.hero.heading" as="span" /></h1>
         <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.warmTan }}><EditableText contentKey="resources.hero.subheading" as="span" /></p>
       </section>
@@ -1560,7 +1561,7 @@ function ResourcesPage() {
         <HorizontalScroll gap={20}>
           {(getContent("resources.tools.items") || []).map((tool, i) => (
             <FadeIn key={i} delay={i * 80}>
-              <div style={{ minWidth: 260, maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s", cursor: "pointer" }}
+              <div style={{ minWidth: "min(260px, 75vw)", maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s", cursor: "pointer" }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
                 <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center" }}>
@@ -1610,7 +1611,7 @@ function ContactPage() {
 
   return (
     <>
-      <section style={{ background: gridBgWhite, padding: "130px clamp(20px, 5vw, 56px) 36px", textAlign: "center" }}>
+      <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) 36px", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(38px, 6vw, 60px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="contact.hero.heading" as="span" /></h1>
         <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.warmTan }}><EditableText contentKey="contact.hero.subheading" as="span" /></p>
       </section>
@@ -1717,7 +1718,7 @@ export default function App() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Rubik:ital,wght@0,400;0,500;0,600;0,700&display=swap');
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { -webkit-font-smoothing: antialiased; }
+        html { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
         body {
           background: ${C.cream};
           overflow-x: hidden;
