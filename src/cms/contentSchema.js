@@ -415,6 +415,9 @@ export const defaultContent = {
   "blocks.about.beliefs": [],
   "blocks.resources.newsletter": [],
 
+  // ─── SECTION ORDER ───
+  "home.sectionOrder": ["hero", "marquee", "welcome", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"],
+
   // ─── SECTION VISIBILITY ───
   "visibility.home.socialProof": true,
   "visibility.home.stats": true,

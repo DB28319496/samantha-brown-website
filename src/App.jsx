@@ -829,7 +829,7 @@ function BackToTop({ scrollY }) {
    PAGE: HOME
    ══════════════════════════════════════════════════════════════ */
 function HomePage({ setPage }) {
-  const { getContent, isEditing } = useCMS();
+  const { getContent, updateContent, isEditing } = useCMS();
   const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   const [loaded, setLoaded] = useState(false);
   const scrollY = useScrollY();
@@ -838,59 +838,43 @@ function HomePage({ setPage }) {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const parallaxY = isMobile ? 0 : Math.min(scrollY * 0.15, 150);
 
-  return (
-    <>
-      {/* ── HERO (PLM: grid bg, big bold text, centered) ── */}
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden", zIndex: 2 }}>
-        {/* Animated gradient background */}
-        <div style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "linear-gradient(135deg, rgba(123, 167, 179, 0.08) 0%, rgba(213, 206, 227, 0.08) 50%, rgba(245, 230, 220, 0.08) 100%)",
-          backgroundSize: "200% 200%",
-          animation: "gradientShift 15s ease infinite",
-          zIndex: 0,
-          pointerEvents: "none"
-        }} />
+  const defaultOrder = ["hero", "marquee", "welcome", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
+  const sectionOrder = getContent("home.sectionOrder") || defaultOrder;
 
+  const moveSection = (from, to) => {
+    if (to < 0 || to >= sectionOrder.length) return;
+    const next = [...sectionOrder];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    updateContent("home.sectionOrder", next);
+  };
+
+  const sectionLabels = {
+    hero: "Hero", marquee: "Marquee", welcome: "Welcome", coreValues: "Core Values",
+    systems: "Systems", pathCards: "Path Cards", stats: "Stats", socialProof: "Social Proof",
+    testimonials: "Testimonials", newsletter: "Newsletter", closing: "Closing CTA", closingMarquee: "Marquee",
+  };
+
+  const sectionDefs = {
+    hero: () => (
+      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", background: gridBgWhite, padding: "clamp(80px, 15vw, 120px) clamp(20px, 5vw, 56px) 40px", textAlign: "center", position: "relative", overflow: "hidden", zIndex: 2 }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(135deg, rgba(123, 167, 179, 0.08) 0%, rgba(213, 206, 227, 0.08) 50%, rgba(245, 230, 220, 0.08) 100%)", backgroundSize: "200% 200%", animation: "gradientShift 15s ease infinite", zIndex: 0, pointerEvents: "none" }} />
         <div style={{ maxWidth: 820, position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }}>
-          {/* Bubble tags */}
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.1s", display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 24 }}>
             {(getContent("home.hero.bubbleTags") || []).map((t, i) => (
               <BubbleTag key={i} emoji={t.emoji} text={t.text} />
             ))}
           </div>
-
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(36px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.15s" }}>
-            <h1 style={{
-              fontFamily: "'Rubik', sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(40px, 7vw, 80px)",
-              background: "linear-gradient(135deg, #2D2D2D 0%, #7BA7B3 50%, #9B8B6B 100%)",
-              backgroundSize: "200% 200%",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              lineHeight: 1.02,
-              margin: "0 0 20px",
-              textTransform: "lowercase",
-              letterSpacing: "-1.5px",
-              animation: "gradientText 8s ease infinite"
-            }}>
+            <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(40px, 7vw, 80px)", background: "linear-gradient(135deg, #2D2D2D 0%, #7BA7B3 50%, #9B8B6B 100%)", backgroundSize: "200% 200%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.02, margin: "0 0 20px", textTransform: "lowercase", letterSpacing: "-1.5px", animation: "gradientText 8s ease infinite" }}>
               <EditableText contentKey="home.hero.heading" as="span" style={{ background: "inherit", WebkitBackgroundClip: "inherit", WebkitTextFillColor: "inherit", backgroundClip: "inherit" }} />
             </h1>
           </div>
-
-          {/* Typewriter animation */}
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(28px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.3s", marginBottom: 20 }}>
             <p style={{ fontFamily: "'Caveat', cursive", fontSize: "clamp(20px, 2.5vw, 28px)", color: C.oceanBlue, minHeight: 36 }}>
               <TypewriterText phrases={["systems that scale", "revenue that grows", "a life you actually enjoy", "boundaries that stick", "growth without burnout"]} speed={70} deleteSpeed={35} pauseDuration={2200} />
             </p>
           </div>
-
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(28px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.35s" }}>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 400, fontSize: "clamp(15px, 1.8vw, 18px)", color: C.body, lineHeight: 1.65, maxWidth: 620, margin: "0 auto 36px" }}>
               <EditableText contentKey="home.hero.subheading" as="span" />
@@ -902,71 +886,66 @@ function HomePage({ setPage }) {
           </div>
         </div>
       </section>
+    ),
 
-      {/* ── MARQUEE (PLM pattern) ── */}
+    marquee: () => (
       <Marquee text="feel-good systems · built with intention · sustainable growth" />
+    ),
 
-      {/* ── WELCOME / PERMISSION SLIP ── */}
-      <SectionWrap bgImage={gridBgSand} py="72px">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: "clamp(24px, 5vw, 48px)", alignItems: "center" }}>
-          <FadeIn>
-            <EditableImage contentKey="image.home.welcome" placeholderEmoji="🏖️" placeholderLabel="your new ops partner" placeholderHeight={400} placeholderBg={C.oceanLight} placeholderRadius={20} />
-          </FadeIn>
-          <FadeIn delay={120}>
-            <ScriptLabel size={22}><EditableText contentKey="home.welcome.scriptLabel" as="span" /></ScriptLabel>
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 40px)", color: C.charcoal, lineHeight: 1.1, margin: "0 0 20px" }}><EditableText contentKey="home.welcome.heading" as="span" /></h2>
-            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, marginBottom: 20 }}><EditableText contentKey="home.welcome.body1" as="span" /></p>
-            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: C.oceanBlue, fontWeight: 600, marginBottom: 16 }}><EditableText contentKey="home.welcome.highlight" as="span" /></p>
-            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.7 }}><EditableText contentKey="home.welcome.body2" as="span" /></p>
-          </FadeIn>
-        </div>
-      </SectionWrap>
-
-      <EditableBlockList contentKey="blocks.home.welcome" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
-
-      {/* ── CORE VALUES ── */}
-      <SectionWrap bg={C.white} py="72px">
-        <FadeIn>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="home.coreValues.scriptLabel" as="span" /></ScriptLabel>
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.coreValues.heading" as="span" /></h2>
+    welcome: () => (
+      <>
+        <SectionWrap bgImage={gridBgSand} py="72px">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: "clamp(24px, 5vw, 48px)", alignItems: "center" }}>
+            <FadeIn>
+              <EditableImage contentKey="image.home.welcome" placeholderEmoji="🏖️" placeholderLabel="your new ops partner" placeholderHeight={400} placeholderBg={C.oceanLight} placeholderRadius={20} />
+            </FadeIn>
+            <FadeIn delay={120}>
+              <ScriptLabel size={22}><EditableText contentKey="home.welcome.scriptLabel" as="span" /></ScriptLabel>
+              <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 40px)", color: C.charcoal, lineHeight: 1.1, margin: "0 0 20px" }}><EditableText contentKey="home.welcome.heading" as="span" /></h2>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, marginBottom: 20 }}><EditableText contentKey="home.welcome.body1" as="span" /></p>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: C.oceanBlue, fontWeight: 600, marginBottom: 16 }}><EditableText contentKey="home.welcome.highlight" as="span" /></p>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.7 }}><EditableText contentKey="home.welcome.body2" as="span" /></p>
+            </FadeIn>
           </div>
-        </FadeIn>
-        <EditableCardGroup
-          contentKey="home.coreValues.cards"
-          defaultNewItem={{ emoji: "✨", title: "new value", desc: "description here" }}
-          gridStyle={{ maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}
-          gridClassName="core-values-grid"
-          renderCard={(v, i) => (
-            <div style={{
-              background: C.cream,
-              borderRadius: 20,
-              padding: "28px 24px",
-              border: `1.5px solid ${C.sand}`,
-              textAlign: "center",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              transition: "transform 0.3s, box-shadow 0.3s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-              <BlinkEmoji emoji={v.emoji} size={32} style={{ marginBottom: 12 }} />
-              <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.charcoal, margin: "0 0 8px" }}>
-                <EditableArrayText contentKey="home.coreValues.cards" index={i} field="title" as="span" />
-              </h3>
-              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}>
-                <EditableArrayText contentKey="home.coreValues.cards" index={i} field="desc" as="span" />
-              </p>
+        </SectionWrap>
+        <EditableBlockList contentKey="blocks.home.welcome" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+      </>
+    ),
+
+    coreValues: () => (
+      <>
+        <SectionWrap bg={C.white} py="72px">
+          <FadeIn>
+            <div style={{ textAlign: "center", marginBottom: 40 }}>
+              <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="home.coreValues.scriptLabel" as="span" /></ScriptLabel>
+              <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: C.charcoal, margin: 0 }}><EditableText contentKey="home.coreValues.heading" as="span" /></h2>
             </div>
-          )}
-        />
-      </SectionWrap>
+          </FadeIn>
+          <EditableCardGroup
+            contentKey="home.coreValues.cards"
+            defaultNewItem={{ emoji: "✨", title: "new value", desc: "description here" }}
+            gridStyle={{ maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}
+            gridClassName="core-values-grid"
+            renderCard={(v, i) => (
+              <div style={{ background: C.cream, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.sand}`, textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", transition: "transform 0.3s, box-shadow 0.3s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+                <BlinkEmoji emoji={v.emoji} size={32} style={{ marginBottom: 12 }} />
+                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.charcoal, margin: "0 0 8px" }}>
+                  <EditableArrayText contentKey="home.coreValues.cards" index={i} field="title" as="span" />
+                </h3>
+                <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}>
+                  <EditableArrayText contentKey="home.coreValues.cards" index={i} field="desc" as="span" />
+                </p>
+              </div>
+            )}
+          />
+        </SectionWrap>
+        <EditableBlockList contentKey="blocks.home.coreValues" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+      </>
+    ),
 
-      <EditableBlockList contentKey="blocks.home.coreValues" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
-
-      {/* ── WHAT GOOD SYSTEMS LOOK LIKE (before/after comparison) ── */}
+    systems: () => (
       <SectionWrap bgImage={gridBgOcean} py="72px">
         <FadeIn>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
@@ -1003,68 +982,56 @@ function HomePage({ setPage }) {
           </FadeIn>
         </div>
       </SectionWrap>
+    ),
 
-      {/* ── CHOOSE YOUR PATH (audience cards) ── */}
-      <SectionWrap bg={C.cream} py="80px">
-        <FadeIn>
-          <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <ScriptLabel size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.pathCards.scriptLabel" as="span" /></ScriptLabel>
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: C.charcoal, margin: "0 0 20px", lineHeight: 1.1 }}><EditableText contentKey="home.pathCards.heading" as="span" /></h2>
-          </div>
-          {/* Audience anchor buttons */}
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
-            {(getContent("home.pathCards.anchorButtons") || []).map((t, i) => (
-              <BubbleTag key={i} emoji={t.emoji} text={t.text} bg={[C.pinkSoft, C.oceanLight, C.lavenderLight][i] || C.cream} style={{ cursor: "pointer" }} />
-            ))}
-          </div>
-        </FadeIn>
-
-        <EditableCardGroup
-          contentKey="home.pathCards"
-          defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
-          gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, alignItems: "stretch" }}
-          renderCard={(c, i) => {
-            const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
-            const accents = [C.coral, C.oceanBlue, C.lavender];
-            return (
-              <div
-                onClick={() => nav(c.page || "contact")}
-                style={{
-                  background: C.white,
-                  borderRadius: 20,
-                  overflow: "hidden",
-                  border: `1px solid ${C.sand}`,
-                  cursor: isEditing ? "default" : "pointer",
-                  display: "flex",
-                  flexDirection: "column",
-                  flex: 1,
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                }}
-                onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
-                onMouseLeave={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-              >
-                <div style={{ background: bgColors[i % 3], padding: "32px 24px 28px", borderBottom: `3px solid ${accents[i % 3]}` }}>
-                  <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>
-                    <EditableArrayText contentKey="home.pathCards" index={i} field="title" as="span" />
-                  </h3>
+    pathCards: () => (
+      <>
+        <SectionWrap bg={C.cream} py="80px">
+          <FadeIn>
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <ScriptLabel size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.pathCards.scriptLabel" as="span" /></ScriptLabel>
+              <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: C.charcoal, margin: "0 0 20px", lineHeight: 1.1 }}><EditableText contentKey="home.pathCards.heading" as="span" /></h2>
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
+              {(getContent("home.pathCards.anchorButtons") || []).map((t, i) => (
+                <BubbleTag key={i} emoji={t.emoji} text={t.text} bg={[C.pinkSoft, C.oceanLight, C.lavenderLight][i] || C.cream} style={{ cursor: "pointer" }} />
+              ))}
+            </div>
+          </FadeIn>
+          <EditableCardGroup
+            contentKey="home.pathCards"
+            defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
+            gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, alignItems: "stretch" }}
+            renderCard={(c, i) => {
+              const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
+              const accents = [C.coral, C.oceanBlue, C.lavender];
+              return (
+                <div onClick={() => nav(c.page || "contact")} style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: isEditing ? "default" : "pointer", display: "flex", flexDirection: "column", flex: 1, transition: "transform 0.3s, box-shadow 0.3s" }}
+                  onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+                  <div style={{ background: bgColors[i % 3], padding: "32px 24px 28px", borderBottom: `3px solid ${accents[i % 3]}` }}>
+                    <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>
+                      <EditableArrayText contentKey="home.pathCards" index={i} field="title" as="span" />
+                    </h3>
+                  </div>
+                  <div style={{ padding: "24px 24px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
+                    <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
+                      <EditableArrayText contentKey="home.pathCards" index={i} field="body" as="span" />
+                    </p>
+                    <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>
+                      <EditableArrayText contentKey="home.pathCards" index={i} field="cta" as="span" />
+                    </span>
+                  </div>
                 </div>
-                <div style={{ padding: "24px 24px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
-                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
-                    <EditableArrayText contentKey="home.pathCards" index={i} field="body" as="span" />
-                  </p>
-                  <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>
-                    <EditableArrayText contentKey="home.pathCards" index={i} field="cta" as="span" />
-                  </span>
-                </div>
-              </div>
-            );
-          }}
-        />
-      </SectionWrap>
+              );
+            }}
+          />
+        </SectionWrap>
+        <EditableBlockList contentKey="blocks.home.pathCards" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+      </>
+    ),
 
-      <EditableBlockList contentKey="blocks.home.pathCards" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
-
-      {/* ── PROOF / STATS (PLM: grid of stat cards) ── */}
+    stats: () => (
       <EditableSection contentKey="visibility.home.stats">
       <SectionWrap bgImage={gridBgOcean} py="80px">
         <FadeIn>
@@ -1079,28 +1046,9 @@ function HomePage({ setPage }) {
           gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 36, alignItems: "stretch" }}
           renderCard={(s, i) => (
             <div
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
-                e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = "translateY(0) scale(1)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)";
-              }}
-              style={{
-                background: C.white,
-                borderRadius: 16,
-                padding: "28px 20px",
-                textAlign: "center",
-                border: `1px solid ${C.oceanLight}`,
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                cursor: "default",
-                boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)"
-              }}>
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px) scale(1.02)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)"; }}
+              style={{ background: C.white, borderRadius: 16, padding: "28px 20px", textAlign: "center", border: `1px solid ${C.oceanLight}`, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", cursor: "default", boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)" }}>
               <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 7vw, 36px)", color: C.oceanBlue, marginBottom: 8 }}>
                 <AnimatedCounter end={s.stat} duration={2000} />
               </div>
@@ -1124,20 +1072,23 @@ function HomePage({ setPage }) {
         </FadeIn>
       </SectionWrap>
       </EditableSection>
+    ),
 
-      {/* ── SOCIAL PROOF ── */}
+    socialProof: () => (
       <EditableSection contentKey="visibility.home.socialProof">
       <SectionWrap bg={C.white} py="56px">
         <SocialProof />
       </SectionWrap>
       </EditableSection>
+    ),
 
-      {/* ── TESTIMONIALS CAROUSEL (parallax bg + bubble card) ── */}
+    testimonials: () => (
       <EditableSection contentKey="visibility.home.testimonials">
       <TestimonialSection scrollY={scrollY} />
       </EditableSection>
+    ),
 
-      {/* ── NEWSLETTER / CABANA CLUB (PLM: branded signup section) ── */}
+    newsletter: () => (
       <EditableSection contentKey="visibility.home.newsletter">
       <SectionWrap bgImage={gridBgLavender} py="72px">
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
@@ -1151,32 +1102,78 @@ function HomePage({ setPage }) {
         </div>
       </SectionWrap>
       </EditableSection>
+    ),
 
-      <EditableBlockList contentKey="blocks.home.stats" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
-
-      {/* ── CLOSING CTA ── */}
-      <EditableSection contentKey="visibility.home.closing">
-      <SectionWrap bg={C.charcoal} py="80px">
-        <FadeIn>
-          <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
-            <BlinkEmoji emoji="✨" size={36} style={{ marginBottom: 16 }} />
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 42px)", color: C.cream, lineHeight: 1.1, margin: "0 0 16px" }}>
-              <EditableText contentKey="home.closing.heading" as="span" />
-            </h2>
-            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: `${C.sand}cc`, lineHeight: 1.7, marginBottom: 12 }}>
-              <EditableText contentKey="home.closing.body" as="span" />
-            </p>
-            <p style={{ fontFamily: "'Caveat', cursive", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
-            <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-              <Btn variant="ocean" onClick={() => nav("services")}><EditableText contentKey="home.closing.cta" as="span" /></Btn>
-              <Btn variant="outline" onClick={() => nav("contact")} style={{ borderColor: C.sand, color: C.sand }}>book a discovery call →</Btn>
+    closing: () => (
+      <>
+        <EditableBlockList contentKey="blocks.home.stats" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+        <EditableSection contentKey="visibility.home.closing">
+        <SectionWrap bg={C.charcoal} py="80px">
+          <FadeIn>
+            <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
+              <BlinkEmoji emoji="✨" size={36} style={{ marginBottom: 16 }} />
+              <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 42px)", color: C.cream, lineHeight: 1.1, margin: "0 0 16px" }}>
+                <EditableText contentKey="home.closing.heading" as="span" />
+              </h2>
+              <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: `${C.sand}cc`, lineHeight: 1.7, marginBottom: 12 }}>
+                <EditableText contentKey="home.closing.body" as="span" />
+              </p>
+              <p style={{ fontFamily: "'Caveat', cursive", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
+              <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+                <Btn variant="ocean" onClick={() => nav("services")}><EditableText contentKey="home.closing.cta" as="span" /></Btn>
+                <Btn variant="outline" onClick={() => nav("contact")} style={{ borderColor: C.sand, color: C.sand }}>book a discovery call →</Btn>
+              </div>
             </div>
-          </div>
-        </FadeIn>
-      </SectionWrap>
-      </EditableSection>
+          </FadeIn>
+        </SectionWrap>
+        </EditableSection>
+      </>
+    ),
 
+    closingMarquee: () => (
       <Marquee text="life-first business · grow without burnout · real systems for real people" bg={C.oceanBlue} color={C.white} />
+    ),
+  };
+
+  const sectionMoveBtn = (direction, onClick, disabled) => (
+    <button onClick={onClick} disabled={disabled} style={{
+      width: 36, height: 36, borderRadius: "50%", background: C.oceanBlue,
+      border: `2px solid ${C.white}`, cursor: disabled ? "default" : "pointer",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      color: C.white, fontSize: 16,
+      boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+      opacity: disabled ? 0.3 : 1,
+      transition: "all 0.3s",
+    }} aria-label={direction === "up" ? "Move section up" : "Move section down"}>
+      {direction === "up" ? "↑" : "↓"}
+    </button>
+  );
+
+  return (
+    <>
+      {sectionOrder.map((id, i) => {
+        const renderFn = sectionDefs[id];
+        if (!renderFn) return null;
+        return (
+          <div key={id} style={{ position: "relative" }}>
+            {isEditing && (
+              <div style={{
+                position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 6, zIndex: 100,
+              }}>
+                {sectionMoveBtn("up", () => moveSection(i, i - 1), i === 0)}
+                <span style={{
+                  fontFamily: "'Rubik', sans-serif", fontSize: 9, fontWeight: 700,
+                  color: "#fff", background: "rgba(45,45,45,0.85)", borderRadius: 6,
+                  padding: "3px 8px", whiteSpace: "nowrap", letterSpacing: "0.3px",
+                }}>{sectionLabels[id] || id}</span>
+                {sectionMoveBtn("down", () => moveSection(i, i + 1), i === sectionOrder.length - 1)}
+              </div>
+            )}
+            {renderFn()}
+          </div>
+        );
+      })}
     </>
   );
 }
