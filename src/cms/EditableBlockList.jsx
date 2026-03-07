@@ -165,17 +165,31 @@ function BlockContent({ block, isEditing, onTextChange }) {
   const ref = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
 
+  // Use innerText on blur to preserve line breaks as \n
   const handleBlur = useCallback(() => {
     setIsFocused(false);
     if (!ref.current) return;
-    const newText = ref.current.textContent;
-    if (newText !== block.text) onTextChange(newText);
+    // innerText preserves newlines; trim trailing newline added by contentEditable
+    const newText = ref.current.innerText.replace(/\n$/, "");
+    if (newText !== (block.text || "")) onTextChange(newText);
   }, [block.text, onTextChange]);
 
   const handlePaste = useCallback((e) => {
     e.preventDefault();
     document.execCommand("insertText", false, e.clipboardData.getData("text/plain"));
   }, []);
+
+  // Sync text into element when not focused
+  const syncRef = useCallback((el) => {
+    if (el && !isFocused) {
+      ref.current = el;
+      if (el.innerText !== (block.text || "")) {
+        el.innerText = block.text || "";
+      }
+    } else {
+      ref.current = el;
+    }
+  }, [block.text, isFocused]);
 
   const editOutline = isEditing ? {
     outline: isFocused ? `2px solid ${EDITOR.selectColor}` : "2px solid transparent",
@@ -186,10 +200,9 @@ function BlockContent({ block, isEditing, onTextChange }) {
   } : {};
 
   if (block.type === "heading") {
-    const Tag = isEditing ? "h3" : "h3";
     return (
-      <Tag
-        ref={isEditing ? ref : undefined}
+      <h3
+        ref={isEditing ? syncRef : undefined}
         contentEditable={isEditing}
         suppressContentEditableWarning
         onBlur={isEditing ? handleBlur : undefined}
@@ -202,18 +215,19 @@ function BlockContent({ block, isEditing, onTextChange }) {
           color: block.style?.color || "#2D2D2D",
           margin: "16px 0 8px",
           lineHeight: 1.2,
+          whiteSpace: "pre-wrap",
           ...editOutline,
         }}
       >
-        {block.text}
-      </Tag>
+        {!isEditing ? block.text : undefined}
+      </h3>
     );
   }
 
   if (block.type === "paragraph") {
     return (
       <p
-        ref={isEditing ? ref : undefined}
+        ref={isEditing ? syncRef : undefined}
         contentEditable={isEditing}
         suppressContentEditableWarning
         onBlur={isEditing ? handleBlur : undefined}
@@ -225,10 +239,11 @@ function BlockContent({ block, isEditing, onTextChange }) {
           color: block.style?.color || "#555550",
           lineHeight: 1.75,
           margin: "8px 0",
+          whiteSpace: "pre-wrap",
           ...editOutline,
         }}
       >
-        {block.text}
+        {!isEditing ? block.text : undefined}
       </p>
     );
   }
