@@ -130,6 +130,18 @@ export const defaultContent = {
   "home.closing.body": "whether you're a founder scaling your first business, a corporate leader transforming your team, or a brand looking for authentic partnerships — there's a path for you here.",
   "home.closing.script": "grab an iced latte, pull up a chair, and let's figure this out together. ☕",
   "home.closing.cta": "explore services →",
+  "home.closing.cta.label": "explore services →",
+  "home.closing.cta.link": "services",
+  "home.closing.ctaSecondary.label": "book a discovery call →",
+  "home.closing.ctaSecondary.link": "contact",
+  "home.hero.ctaPrimary.label": "work with me",
+  "home.hero.ctaPrimary.link": "services",
+  "home.hero.ctaSecondary.label": "brand partnerships",
+  "home.hero.ctaSecondary.link": "contact",
+  "about.closing.cta.label": "work with me →",
+  "about.closing.cta.link": "services",
+  "about.closing.ctaSecondary.label": "join the cabana club →",
+  "about.closing.ctaSecondary.link": "resources",
 
   // ─── SERVICES PAGE ───
   "services.hero.scriptLabel": "find your fit",
@@ -198,6 +210,8 @@ export const defaultContent = {
     "are looking for a \"quick fix\" without putting in any work",
   ],
   "services.audit.cta": "let's do this →",
+  "services.audit.cta.label": "let's do this →",
+  "services.audit.cta.link": "contact",
   "services.audit.faqs": [
     { q: "How long does the audit take?", a: "From intake form to final delivery, about one week. You'll receive a detailed Loom walkthrough plus a written action plan, followed by a 30-minute debrief call." },
     { q: "Do I need to prepare anything?", a: "Just fill out the intake form honestly — tell me what's going on, what you've tried, and where you're stuck. The more context you give me, the better the audit." },
@@ -246,6 +260,8 @@ export const defaultContent = {
   ],
   "services.implementation.different": "i'm not handing you a template and calling it custom. i'm building something that works with your brain (not against it), doesn't require you to change who you are, your clients will feel (in the best way), you can maintain without hiring a VA, and supports multiple income streams without multiplying your workload. the goal isn't to make your business look good. it's to make it feel sustainable.",
   "services.implementation.cta": "let's start with the audit →",
+  "services.implementation.cta.label": "let's start with the audit →",
+  "services.implementation.cta.link": "contact",
   "services.implementation.faqs": [
     { q: "Do I really need the audit first?", a: "Yes — always. I need to understand what's working, what's broken, and what's missing before I build anything. It's like a contractor doing a site assessment before construction. The audit is included in the implementation price." },
     { q: "How long does the full buildout take?", a: "Typically 3-4 weeks from kickoff. You'll get async updates throughout, and I'll ask clarifying questions as needed — but mostly you get to live your life while I build." },
@@ -292,6 +308,8 @@ export const defaultContent = {
   "services.fractional.quote.text": "Taking on a client is easy. Taking on the right client is an investment.",
   "services.fractional.quote.author": "seth godin",
   "services.fractional.cta": "apply now →",
+  "services.fractional.cta.label": "apply now →",
+  "services.fractional.cta.link": "contact",
   "services.fractional.faqs": [
     { q: "What does 'async access' actually mean?", a: "You can send me questions via Slack or email anytime. I respond within 48 business hours. Think of it like having a strategic advisor on speed dial — without the agency retainer." },
     { q: "Why is there a 3-month minimum?", a: "Real change doesn't happen in one session. The first month is about understanding your business, the second is building momentum, and the third is where things really click. Most clients stay much longer." },
@@ -333,6 +351,8 @@ export const defaultContent = {
   ],
   "services.corporate.detail.different": "i'm currently leading teams across 8 global regions while building a fractional consulting business on a 4-day work week. but i didn't start here. i started checking teams at 10pm, working weekends, and thinking that's just what good leaders do. i burned out. then i rebuilt everything. this isn't theory. this is what actually works.",
   "services.corporate.detail.cta": "let's talk →",
+  "services.corporate.detail.cta.label": "let's talk →",
+  "services.corporate.detail.cta.link": "contact",
   "services.corporate.detail.faqs": [
     { q: "What size teams do you work with?", a: "I've led and trained teams from 5 to 50+ across 8 global regions. Whether you're a startup leadership team or a distributed enterprise group, the principles scale." },
     { q: "Do you offer one-off workshops or ongoing programs?", a: "Both. Some clients need a single workshop to kickstart change. Others benefit from an ongoing consulting relationship. We'll figure out what makes sense during the discovery call." },

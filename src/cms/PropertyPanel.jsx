@@ -94,7 +94,6 @@ const colorPalette = {
   sand:        "#E2DDD4",
   olive:       "#555407",
   butter:      "#F2E84B",
-  coral:       "#E8A87C",
   motherEarth: "#7A5C4E",
   skyBlue:     "#D8EBF9",
   white:       "#FFFFFF",
@@ -210,7 +209,7 @@ function LineHeightField({ value, onChange }) {
       <label style={labelStyle}>Line Height</label>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <button
-          onClick={() => onChange((Math.max(0.8, numVal - 0.1)).toFixed(1))}
+          onClick={() => onChange((numVal - 0.1).toFixed(1))}
           style={stepBtnStyle}
         >−</button>
         <input
@@ -221,7 +220,7 @@ function LineHeightField({ value, onChange }) {
           style={{ ...inputStyle, flex: 1, textAlign: "center" }}
         />
         <button
-          onClick={() => onChange((Math.min(3.0, numVal + 0.1)).toFixed(1))}
+          onClick={() => onChange((numVal + 0.1).toFixed(1))}
           style={stepBtnStyle}
         >+</button>
       </div>

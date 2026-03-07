@@ -561,7 +561,6 @@ function SectionWrap({ children, bg, bgImage, py = "80px", style = {}, sectionKe
     { label: "sand", value: C.sand },
     { label: "olive", value: C.olive },
     { label: "butter", value: C.butter },
-    { label: "coral", value: C.coral },
     { label: "blue", value: C.somethingBlue },
     { label: "earth", value: C.motherEarth },
   ];
@@ -674,8 +673,8 @@ function SectionBgControl({ sectionKey, bgType, bgValue, bgOverlayOpacity, solid
 }
 
 // Process step brand colors (alternating angles: odd = left tilt, even = right tilt)
-const stepBrandColors = [C.butter, C.coral, C.somethingBlue, C.motherEarth, C.olive];
-const stepTextColors = [C.charcoal, C.charcoal, C.charcoal, C.white, C.white];
+const stepBrandColors = [C.butter, C.motherEarth, C.somethingBlue, C.olive, C.butter];
+const stepTextColors = [C.charcoal, C.white, C.charcoal, C.white, C.charcoal];
 const stepRotations = [-8, 6, -10, 7, -9]; // alternating left / right
 
 // Brand star SVG (4-pointed, filled) used as bullet/icon across all pages
@@ -786,8 +785,8 @@ function FAQAccordion({ faqs, contentKey }) {
                 onClick={(e) => { e.stopPropagation(); if (window.confirm("Delete this FAQ?")) deleteFaq(i); }}
                 style={{
                   position: "absolute", top: 18, right: 40,
-                  background: `${C.coral}18`, border: `1px solid ${C.coral}40`,
-                  color: C.coral, fontSize: 11, fontWeight: 600,
+                  background: `${C.charcoal}18`, border: `1px solid ${C.charcoal}40`,
+                  color: C.charcoal, fontSize: 11, fontWeight: 600,
                   fontFamily: "'Rubik', sans-serif", padding: "3px 10px",
                   borderRadius: 20, cursor: "pointer",
                 }}
@@ -872,7 +871,7 @@ function TwoColFit({ perfect, notFit }) {
       </div>
       <div style={{ background: C.cream, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%" }}>
         <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.charcoal, margin: "0 0 16px" }}>not a fit if you:</h4>
-        {notFit.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.warmTan, lineHeight: 1.55 }}><span style={{ flexShrink: 0, color: C.coral }}>—</span>{p}</div>)}
+        {notFit.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.warmTan, lineHeight: 1.55 }}><span style={{ flexShrink: 0, color: C.warmTan }}>—</span>{p}</div>)}
       </div>
     </div>
   );
@@ -967,7 +966,7 @@ function SocialProof() {
                     style={{
                       position: "absolute", top: -8, right: -8,
                       width: 22, height: 22, borderRadius: "50%",
-                      background: C.coral, border: "none",
+                      background: C.charcoal, border: "none",
                       color: C.white, fontSize: 12, cursor: "pointer",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontFamily: "'Rubik', sans-serif", fontWeight: 700,
@@ -1015,7 +1014,7 @@ function SocialProof() {
         {/* Text badges */}
         <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
           {badges.map((badge, i) => {
-            const badgeBgs = [C.butter, C.somethingBlue, `${C.coral}30`, `${C.motherEarth}20`, C.sand];
+            const badgeBgs = [C.butter, C.somethingBlue, `${C.motherEarth}30`, `${C.motherEarth}20`, C.sand];
             return (
               <div key={i} style={{
                 fontFamily: "'Rubik', sans-serif", fontSize: 14, fontWeight: 700,
@@ -1044,7 +1043,7 @@ function TestimonialCarousel() {
   const { getContent } = useCMS();
   const [current, setCurrent] = useState(0);
   const testimonials = getContent("home.testimonials") || [];
-  const bubbleBg = C.coral;
+  const bubbleBg = C.motherEarth;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1410,7 +1409,7 @@ function HomePage({ setPage }) {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const parallaxY = isMobile ? 0 : Math.min(scrollY * 0.15, 150);
 
-  const defaultOrder = ["hero", "marquee", "welcome", "coreValues", "problem", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
+  const defaultOrder = ["hero", "marquee", "welcome", "problem", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
   const sectionOrder = getContent("home.sectionOrder") || defaultOrder;
 
   const moveSection = (from, to) => {
@@ -1447,13 +1446,16 @@ function HomePage({ setPage }) {
               </div>
 
               {/* Floating tags — angled, hanging off image edges */}
-              <div style={{ position: "absolute", top: "10%", left: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
+              {/* index 0: feel-good systems — middle left */}
+              <div style={{ position: "absolute", top: "42%", left: -20, transform: "rotate(-5deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={0} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
-              <div style={{ position: "absolute", top: "42%", right: -28, transform: "rotate(5deg)", zIndex: 10 }}>
+              {/* index 1: life-first business — top right */}
+              <div style={{ position: "absolute", top: "10%", right: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={1} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
-              <div style={{ position: "absolute", bottom: "12%", left: -20, transform: "rotate(-4deg)", zIndex: 10 }}>
+              {/* index 2: built with intention — lower center-left of image */}
+              <div style={{ position: "absolute", bottom: "18%", left: "20%", transform: "rotate(-4deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={2} field="text" style={{ background: C.butter, boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
             </div>
@@ -1485,8 +1487,8 @@ function HomePage({ setPage }) {
                 </p>
               </div>
               <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(16px)", transition: "all 0.7s cubic-bezier(.22,.61,.36,1) 0.55s", display: "flex", gap: 14, flexWrap: "wrap" }}>
-                <Btn variant="primary" onClick={() => nav("services")}><EditableText contentKey="home.hero.ctaPrimary" as="span" /></Btn>
-                <Btn variant="outline" onClick={() => nav("contact")}><EditableText contentKey="home.hero.ctaSecondary" as="span" /></Btn>
+                <EditableBtn contentKey="home.hero.ctaPrimary" variant="primary" defaultLabel="work with me" defaultLink="services" nav={nav} />
+                <EditableBtn contentKey="home.hero.ctaSecondary" variant="outline" defaultLabel="brand partnerships" defaultLink="contact" nav={nav} />
               </div>
 
               {/* Ombre toggle — admin only */}
@@ -1579,12 +1581,12 @@ function HomePage({ setPage }) {
       <SectionWrap bg={C.charcoal} py="72px">
         <FadeIn>
           <div style={{ maxWidth: 800, margin: "0 auto" }}>
-            <ScriptLabel color={C.coral} size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.problem.scriptLabel" as="span" /></ScriptLabel>
+            <ScriptLabel color={C.butter} size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.problem.scriptLabel" as="span" /></ScriptLabel>
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 42px)", color: C.cream, margin: "0 0 28px", textAlign: "center", lineHeight: 1.1 }}><EditableText contentKey="home.problem.heading" as="span" /></h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
               {(getContent("home.problem.points") || []).map((point, i) => (
                 <div key={i} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 16, padding: "20px 22px", border: `1px solid rgba(255,255,255,0.1)` }}>
-                  <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13, color: C.coral, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13, color: C.butter, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     {String(i + 1).padStart(2, "0")}
                   </div>
                   <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: `${C.sand}cc`, lineHeight: 1.65, margin: 0 }}>
@@ -1615,13 +1617,13 @@ function HomePage({ setPage }) {
           </FadeIn>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, maxWidth: 800, margin: "0 auto", alignItems: "stretch" }}>
             <FadeIn delay={0} style={{ display: "flex" }}>
-              <div style={{ background: `${C.coral}18`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.coral}40`, flex: 1, display: "flex", flexDirection: "column" }}>
-                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.coral, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ background: `${C.motherEarth}18`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.motherEarth}40`, flex: 1, display: "flex", flexDirection: "column" }}>
+                <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.motherEarth, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                   <BlinkEmoji emoji="😵‍💫" size={20} /> without systems
                 </h3>
                 {(getContent("home.systemsComparison.without") || []).map((item, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}>
-                    <span style={{ color: C.coral, flexShrink: 0 }}>✕</span>
+                    <span style={{ color: C.motherEarth, flexShrink: 0 }}>✕</span>
                     <EditableArrayString contentKey="home.systemsComparison.without" index={i} />
                   </div>
                 ))}
@@ -1664,8 +1666,8 @@ function HomePage({ setPage }) {
             defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
             gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, alignItems: "stretch" }}
             renderCard={(c, i) => {
-              const bgColors = [`${C.coral}25`, `${C.somethingBlue}`, `${C.butter}40`];
-              const accents = [C.coral, C.olive, C.motherEarth];
+              const bgColors = [`${C.motherEarth}20`, `${C.somethingBlue}`, `${C.butter}40`];
+              const accents = [C.motherEarth, C.olive, C.motherEarth];
               return (
                 <div onClick={() => nav(c.page || "contact")} style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: isEditing ? "default" : "pointer", display: "flex", flexDirection: "column", flex: 1, transition: "transform 0.3s, box-shadow 0.3s" }}
                   onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
@@ -1781,8 +1783,8 @@ function HomePage({ setPage }) {
               </p>
               <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
               <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-                <Btn variant="ocean" onClick={() => nav("services")}><EditableText contentKey="home.closing.cta" as="span" /></Btn>
-                <Btn variant="outline" onClick={() => nav("contact")} style={{ borderColor: C.sand, color: C.sand }}>book a discovery call →</Btn>
+                <EditableBtn contentKey="home.closing.cta" variant="ocean" defaultLabel="explore services →" defaultLink="services" nav={nav} />
+                <EditableBtn contentKey="home.closing.ctaSecondary" variant="outline" defaultLabel="book a discovery call →" defaultLink="contact" nav={nav} style={{ borderColor: C.sand, color: C.sand }} />
               </div>
             </div>
           </FadeIn>
@@ -2112,7 +2114,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
       )}
 
       <SectionWrap bg={C.cream} py="48px">
-        <div style={{ textAlign: "center" }}><Btn variant="primary" onClick={() => nav("contact")}><EditableText contentKey={p + ".cta"} as="span" /></Btn></div>
+        <div style={{ textAlign: "center" }}><EditableBtn contentKey={p + ".cta"} variant="primary" defaultLabel="work with me →" defaultLink="contact" nav={nav} /></div>
       </SectionWrap>
     </>
   );
@@ -2175,13 +2177,13 @@ function AboutPage({ setPage }) {
           </FadeIn>
 
           {(getContent("about.beliefs") || []).map((c, i) => {
-            const colors = [C.coral, C.butter, C.motherEarth, C.somethingBlue];
-            const headingColors = [`${C.coral}70`, `${C.olive}50`, `${C.motherEarth}80`, `${C.somethingBlue}`];
+            const colors = [C.motherEarth, C.butter, C.olive, C.somethingBlue];
+            const headingColors = [`${C.motherEarth}70`, `${C.olive}50`, `${C.olive}80`, `${C.somethingBlue}`];
             const rotations = [-10, 8, -7, 12];
             const badgeAligns = ["flex-start", "flex-end", "flex-start", "flex-end"];
             return (
               <FadeIn key={i}>
-                <div style={{ marginBottom: i < 3 ? "clamp(32px, 8vw, 64px)" : 0, position: "relative", overflow: "hidden" }}>
+                <div style={{ marginBottom: i < 3 ? "clamp(32px, 8vw, 64px)" : 0, position: "relative", overflow: "visible", paddingTop: 20 }}>
                   {/* Tilted badge */}
                   <div style={{ display: "flex", justifyContent: badgeAligns[i % 4], marginBottom: -8, paddingLeft: badgeAligns[i % 4] === "flex-start" ? "5%" : 0, paddingRight: badgeAligns[i % 4] === "flex-end" ? "5%" : 0 }}>
                     <span style={{
@@ -2262,8 +2264,8 @@ function AboutPage({ setPage }) {
               <EditableText contentKey="about.cta.script" as="span" />
             </p>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-              <Btn variant="ocean" onClick={() => nav("services")}>work with me →</Btn>
-              <Btn variant="outline" onClick={() => nav("resources")} style={{ borderColor: C.sand, color: C.sand }}>join the cabana club →</Btn>
+              <EditableBtn contentKey="about.closing.cta" variant="ocean" defaultLabel="work with me →" defaultLink="services" nav={nav} />
+              <EditableBtn contentKey="about.closing.ctaSecondary" variant="outline" defaultLabel="join the cabana club →" defaultLink="resources" nav={nav} style={{ borderColor: C.sand, color: C.sand }} />
             </div>
           </div>
         </FadeIn>
