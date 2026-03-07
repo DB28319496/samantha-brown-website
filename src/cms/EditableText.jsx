@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, useContext } from "react";
+import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
 import { useContent, useCMS } from "./useContent";
 import { useSelection } from "./SelectionContext";
 
@@ -35,16 +35,6 @@ export function EditableText({
     ...(lineHeightOverride ? { lineHeight: lineHeightOverride } : {}),
   };
 
-  // Sync innerHTML to preserve bold/italic formatting
-  useEffect(() => {
-    if (ref.current && !isFocused) {
-      const html = String(displayValue);
-      if (ref.current.innerHTML !== html) {
-        ref.current.innerHTML = html;
-      }
-    }
-  }, [displayValue, isFocused]);
-
   const handleBlur = useCallback(() => {
     setIsFocused(false);
     if (!ref.current) return;
@@ -60,7 +50,7 @@ export function EditableText({
     document.execCommand("insertText", false, text);
   }, []);
 
-  // Visitor mode — use dangerouslySetInnerHTML to render bold/italic
+  // Visitor mode — dangerouslySetInnerHTML preserves bold/italic
   if (!isEditing) {
     return (
       <Tag
@@ -71,7 +61,8 @@ export function EditableText({
     );
   }
 
-  // Admin editing mode
+  // Admin editing mode — dangerouslySetInnerHTML gives content immediately
+  // (React skips updating innerHTML while element is focused, so typing works)
   const editStyle = {
     ...style,
     ...overrideStyle,
@@ -99,6 +90,7 @@ export function EditableText({
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => select({ contentKey, type: "text" })}
       {...rest}
+      dangerouslySetInnerHTML={{ __html: String(displayValue) }}
     />
   );
 }
@@ -117,15 +109,6 @@ export function EditableArrayText({
   const [isHovered, setIsHovered] = useState(false);
 
   const itemValue = array?.[index]?.[field] ?? "";
-
-  useEffect(() => {
-    if (ref.current && !isFocused) {
-      const html = String(itemValue);
-      if (ref.current.innerHTML !== html) {
-        ref.current.innerHTML = html;
-      }
-    }
-  }, [itemValue, isFocused]);
 
   const handleBlur = useCallback(() => {
     setIsFocused(false);
@@ -174,11 +157,11 @@ export function EditableArrayText({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...rest}
+      dangerouslySetInnerHTML={{ __html: String(itemValue) }}
     />
   );
 }
 
-// Simple editable for flat array items (strings, not objects)
 export function EditableArrayString({
   contentKey,
   index,
@@ -192,15 +175,6 @@ export function EditableArrayString({
   const [isHovered, setIsHovered] = useState(false);
 
   const itemValue = array?.[index] ?? "";
-
-  useEffect(() => {
-    if (ref.current && !isFocused) {
-      const html = String(itemValue);
-      if (ref.current.innerHTML !== html) {
-        ref.current.innerHTML = html;
-      }
-    }
-  }, [itemValue, isFocused]);
 
   const handleBlur = useCallback(() => {
     setIsFocused(false);
@@ -248,6 +222,7 @@ export function EditableArrayString({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...rest}
+      dangerouslySetInnerHTML={{ __html: String(itemValue) }}
     />
   );
 }
