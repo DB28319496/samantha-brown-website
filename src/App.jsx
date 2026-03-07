@@ -24,30 +24,35 @@ import { AdminLoginListener, AdminLoginModal } from "./cms/AdminAuth";
    ══════════════════════════════════════════════════════════════ */
 
 const C = {
-  charcoal: "#2D2D2D",
-  warmTan: "#9B8B6B",
-  sand: "#DDD0BE",
-  sandLight: "#EDE5D8",
-  olive: "#5C5C00",
-  lavender: "#D5CEE3",
-  lavenderLight: "#EDE8F4",
-  yellow: "#E0E24A",
-  cream: "#FAF7F2",
-  white: "#FFFFFF",
-  warmWhite: "#FDF9F3",
-  pinkSoft: "#F5E6DC",
-  oceanBlue: "#7BA7B3",
-  oceanLight: "#D6E8EC",
-  coral: "#E8A87C",
-  body: "#555550",
-  muted: "#999990",
+  charcoal:     "#2C2C28",   // deep-dusk — dark backgrounds, nav
+  cream:        "#FDFAF4",   // warm-white — page background
+  sand:         "#E2DDD4",   // sand-line — borders, dividers
+  sandLight:    "#EEE9E2",   // lighter sand for section backgrounds
+  olive:        "#555407",   // primary action — buttons, links, highlights
+  oliveHover:   "#6B6A0A",   // olive hover state
+  motherEarth:  "#7A5C4E",   // warm brown accent
+  somethingBlue:"#D8EBF9",   // light blue accent — backgrounds
+  butter:       "#F2E84B",   // yellow accent
+  coral:        "#E8A87C",   // salmon — testimonial bubble, warm accents
+  warmTan:      "#8A877E",   // text-muted — secondary text, labels
+  body:         "#4A4840",   // text-body — primary body copy
+  white:        "#FFFFFF",
+  // Legacy aliases kept for compatibility with remaining references
+  oceanBlue:    "#555407",   // remapped → olive (primary action)
+  oceanLight:   "#D8EBF9",   // remapped → somethingBlue
+  lavender:     "#D8EBF9",   // remapped → somethingBlue
+  lavenderLight:"#EBF4FC",   // somethingBlue light tint
+  yellow:       "#F2E84B",   // remapped → butter
+  pinkSoft:     "#F5E6DC",   // kept — card accent tint
+  muted:        "#8A877E",   // remapped → warmTan
+  warmWhite:    "#FDFAF4",   // remapped → cream
 };
 
-/* ── Grid paper SVG pattern (PLM signature element) ── */
-const gridBgWhite = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23FAF7F2'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23DDD0BE' stroke-width='0.5' fill='none' opacity='0.5'/%3E%3C/svg%3E")`;
-const gridBgSand = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23EDE5D8'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23DDD0BE' stroke-width='0.5' fill='none' opacity='0.6'/%3E%3C/svg%3E")`;
-const gridBgOcean = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23D6E8EC'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%237BA7B3' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E")`;
-const gridBgLavender = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23EDE8F4'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23D5CEE3' stroke-width='0.5' fill='none' opacity='0.5'/%3E%3C/svg%3E")`;
+/* ── Grid paper SVG pattern — brand warm-white base ── */
+const gridBgWhite    = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23FDFAF4'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23E2DDD4' stroke-width='0.5' fill='none' opacity='0.5'/%3E%3C/svg%3E")`;
+const gridBgSand     = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23EEE9E2'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23E2DDD4' stroke-width='0.5' fill='none' opacity='0.6'/%3E%3C/svg%3E")`;
+const gridBgOcean    = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23D8EBF9'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23555407' stroke-width='0.5' fill='none' opacity='0.12'/%3E%3C/svg%3E")`;
+const gridBgLavender = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23EBF4FC'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23D8EBF9' stroke-width='0.5' fill='none' opacity='0.5'/%3E%3C/svg%3E")`;
 
 /* ── Hooks ── */
 function useScrollY() {
@@ -279,11 +284,11 @@ function Marquee({ text, bg = C.charcoal, color = C.sand, speed = 60 }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   SCRIPT LABEL (PLM's handwritten accent font)
+   SCRIPT LABEL (brand: Georgia italic accent)
    ══════════════════════════════════════════════════════════════ */
-function ScriptLabel({ children, color = C.warmTan, size = 20, style = {} }) {
+function ScriptLabel({ children, color = C.olive, size = 20, style = {} }) {
   return (
-    <span style={{ fontFamily: "'Caveat', cursive", fontSize: size, color, fontWeight: 600, display: "block", marginBottom: 8, ...style }}>{children}</span>
+    <span style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: size, color, fontWeight: 400, letterSpacing: "0.3px", display: "block", marginBottom: 8, ...style }}>{children}</span>
   );
 }
 
@@ -332,14 +337,14 @@ function Btn({ children, variant = "primary", onClick, style = {} }) {
     setMagnetic({ x: 0, y: 0 });
   }, []);
 
-  const base = { fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, border: "none", borderRadius: 50, padding: "14px 34px", cursor: "pointer", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", letterSpacing: "0.2px", position: "relative" };
+  const base = { fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, border: "none", borderRadius: 100, padding: "13px 32px", cursor: "pointer", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", letterSpacing: "1px", textTransform: "uppercase", position: "relative" };
   const v = {
-    primary: { ...base, background: C.charcoal, color: C.cream, border: `2px solid ${C.charcoal}` },
-    sand: { ...base, background: C.sand, color: C.charcoal, border: `2px solid ${C.sand}` },
-    outline: { ...base, background: "transparent", color: C.charcoal, border: `2px solid ${C.charcoal}` },
-    ocean: { ...base, background: C.oceanBlue, color: C.white, border: `2px solid ${C.oceanBlue}` },
-    yellow: { ...base, background: C.yellow, color: C.charcoal, border: `2px solid ${C.charcoal}` },
-    white: { ...base, background: C.white, color: C.charcoal, border: `2px solid ${C.charcoal}` },
+    primary: { ...base, background: C.olive, color: C.cream, border: `2px solid ${C.olive}` },
+    sand:    { ...base, background: C.sand, color: C.charcoal, border: `2px solid ${C.sand}` },
+    outline: { ...base, background: "transparent", color: C.olive, border: `2px solid ${C.olive}` },
+    ocean:   { ...base, background: C.olive, color: C.white, border: `2px solid ${C.olive}` },
+    yellow:  { ...base, background: C.butter, color: C.charcoal, border: `2px solid ${C.butter}` },
+    white:   { ...base, background: C.white, color: C.charcoal, border: `2px solid ${C.charcoal}` },
   };
 
   return (
@@ -474,7 +479,7 @@ function PullQuote({ quote, author, bg = C.charcoal }) {
   return (
     <FadeIn>
       <div style={{ background: bg, borderRadius: 20, padding: "clamp(36px, 5vw, 56px)", textAlign: "center", margin: "0 auto", maxWidth: 800 }}>
-        <p style={{ fontFamily: "'Caveat', cursive", fontSize: "clamp(24px, 3.5vw, 36px)", color: C.sand, lineHeight: 1.4, margin: "0 0 14px" }}>"{quote}"</p>
+        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: "clamp(24px, 3.5vw, 36px)", color: C.sand, lineHeight: 1.4, margin: "0 0 14px" }}>"{quote}"</p>
         {author && <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, color: `${C.sand}88`, margin: 0 }}>— {author}</p>}
       </div>
     </FadeIn>
@@ -871,7 +876,7 @@ function HomePage({ setPage }) {
             </h1>
           </div>
           <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(28px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.3s", marginBottom: 20 }}>
-            <p style={{ fontFamily: "'Caveat', cursive", fontSize: "clamp(20px, 2.5vw, 28px)", color: C.oceanBlue, minHeight: 36 }}>
+            <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: "clamp(20px, 2.5vw, 28px)", color: C.oceanBlue, minHeight: 36 }}>
               <TypewriterText phrases={["systems that scale", "revenue that grows", "a life you actually enjoy", "boundaries that stick", "growth without burnout"]} speed={70} deleteSpeed={35} pauseDuration={2200} />
             </p>
           </div>
@@ -1118,7 +1123,7 @@ function HomePage({ setPage }) {
               <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: `${C.sand}cc`, lineHeight: 1.7, marginBottom: 12 }}>
                 <EditableText contentKey="home.closing.body" as="span" />
               </p>
-              <p style={{ fontFamily: "'Caveat', cursive", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
+              <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
               <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
                 <Btn variant="ocean" onClick={() => nav("services")}><EditableText contentKey="home.closing.cta" as="span" /></Btn>
                 <Btn variant="outline" onClick={() => nav("contact")} style={{ borderColor: C.sand, color: C.sand }}>book a discovery call →</Btn>
@@ -1374,7 +1379,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
       <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)", textAlign: "center" }}>
         {price && <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 13, color: C.white, background: C.oceanBlue, padding: "6px 20px", borderRadius: 50, display: "inline-block", marginBottom: 16 }}>{price}</span>}
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(30px, 5vw, 52px)", color: C.charcoal, lineHeight: 1.05, margin: "0 0 8px", letterSpacing: "-0.8px" }}><EditableText contentKey={p + ".title"} as="span" /></h1>
-        <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.warmTan }}><EditableText contentKey={p + ".subtitle"} as="span" /></p>
+        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey={p + ".subtitle"} as="span" /></p>
       </section>
 
       <SectionWrap bg={C.charcoal} py="56px">
@@ -1477,7 +1482,7 @@ function AboutPage({ setPage }) {
             <ScriptLabel size={22}><EditableText contentKey="about.hero.scriptLabel" as="span" /></ScriptLabel>
             <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(34px, 5vw, 52px)", color: C.charcoal, lineHeight: 1.05, margin: "0 0 12px" }}><EditableText contentKey="about.hero.title" as="span" /></h1>
             {/* Typewriter personality traits */}
-            <p style={{ fontFamily: "'Caveat', cursive", fontSize: 21, color: C.oceanBlue, marginBottom: 20, minHeight: 30 }}>
+            <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 21, color: C.oceanBlue, marginBottom: 20, minHeight: 30 }}>
               <TypewriterText phrases={["global team leader", "fractional consultant", "certified notion nerd", "part-time mermaid", "pilates enthusiast", "iced latte connoisseur"]} speed={65} deleteSpeed={30} pauseDuration={1800} />
             </p>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75 }}><EditableText contentKey="about.hero.body" as="span" /></p>
@@ -1527,7 +1532,7 @@ function AboutPage({ setPage }) {
                   <div style={{ display: "flex", justifyContent: badgeAligns[i % 4], marginBottom: -8, paddingLeft: badgeAligns[i % 4] === "flex-start" ? "5%" : 0, paddingRight: badgeAligns[i % 4] === "flex-end" ? "5%" : 0 }}>
                     <span style={{
                       display: "inline-block",
-                      fontFamily: "'Caveat', cursive",
+                      fontFamily: "'Georgia', serif", fontStyle: "italic",
                       fontSize: 15,
                       color: "#fff",
                       background: colors[i % 4],
@@ -1599,7 +1604,7 @@ function AboutPage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: C.cream, margin: "0 0 12px" }}>
               <EditableText contentKey="about.cta.heading" as="span" />
             </h2>
-            <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.sand, marginBottom: 28 }}>
+            <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.sand, marginBottom: 28 }}>
               <EditableText contentKey="about.cta.script" as="span" />
             </p>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -1622,7 +1627,7 @@ function ResourcesPage() {
     <>
       <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(36px, 6vw, 60px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="resources.hero.heading" as="span" /></h1>
-        <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.warmTan }}><EditableText contentKey="resources.hero.subheading" as="span" /></p>
+        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="resources.hero.subheading" as="span" /></p>
       </section>
 
       <Marquee text="systems that actually work · no hustle culture · revenue expansion" bg={C.sand} color={C.charcoal} />
@@ -1705,7 +1710,7 @@ function ContactPage() {
     <>
       <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) 36px", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(38px, 6vw, 60px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="contact.hero.heading" as="span" /></h1>
-        <p style={{ fontFamily: "'Caveat', cursive", fontSize: 20, color: C.warmTan }}><EditableText contentKey="contact.hero.subheading" as="span" /></p>
+        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="contact.hero.subheading" as="span" /></p>
       </section>
 
       <SectionWrap bgImage={gridBgSand} py="64px">
@@ -1744,7 +1749,7 @@ function ContactPage() {
               <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, maxWidth: 400, margin: "0 auto 20px" }}>
                 <EditableText contentKey="contact.dubsado.placeholder" as="span" />
               </p>
-              <p style={{ fontFamily: "'Caveat', cursive", fontSize: 18, color: C.warmTan }}>
+              <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 18, color: C.warmTan }}>
                 dubsado form embed coming soon
               </p>
             </div>
@@ -1808,7 +1813,7 @@ export default function App() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Rubik:ital,wght@0,400;0,500;0,600;0,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
         body {
