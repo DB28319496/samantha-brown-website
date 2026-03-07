@@ -245,9 +245,19 @@ function BlinkEmoji({ emoji, size = 24, style = {} }) {
 
 /* ── Floating Tag (angled pill that hangs off image edges) ── */
 function FloatingTag({ emoji, text, contentKey, index, field, style = {} }) {
-  const { getContent, isEditing } = useCMS();
+  const { getContent, updateContent, isEditing } = useCMS();
   const val = contentKey ? (getContent(contentKey)?.[index]?.[field] ?? text) : text;
   const emojiVal = contentKey ? (getContent(contentKey)?.[index]?.emoji ?? emoji) : emoji;
+  const [editingEmoji, setEditingEmoji] = useState(false);
+  const [emojiDraft, setEmojiDraft] = useState(emojiVal);
+
+  const saveEmoji = () => {
+    if (!contentKey) return;
+    const arr = getContent(contentKey) || [];
+    const next = arr.map((item, i) => i === index ? { ...item, emoji: emojiDraft } : item);
+    updateContent(contentKey, next);
+    setEditingEmoji(false);
+  };
 
   return (
     <div style={{
@@ -260,11 +270,33 @@ function FloatingTag({ emoji, text, contentKey, index, field, style = {} }) {
       color: C.charcoal, whiteSpace: "nowrap",
       ...style,
     }}>
-      <span style={{ fontSize: 16 }}>{emojiVal}</span>
       {isEditing && contentKey ? (
-        <EditableArrayText contentKey={contentKey} index={index} field={field} as="span" />
+        <>
+          {editingEmoji ? (
+            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <input
+                value={emojiDraft}
+                onChange={e => setEmojiDraft(e.target.value)}
+                onBlur={saveEmoji}
+                onKeyDown={e => e.key === "Enter" && saveEmoji()}
+                autoFocus
+                style={{ width: 36, fontSize: 16, border: "1px solid #ccc", borderRadius: 4, padding: "2px 4px", textAlign: "center" }}
+              />
+            </span>
+          ) : (
+            <span
+              onClick={(e) => { e.stopPropagation(); setEmojiDraft(emojiVal); setEditingEmoji(true); }}
+              title="Click to edit emoji"
+              style={{ fontSize: 16, cursor: "pointer" }}
+            >{emojiVal}</span>
+          )}
+          <EditableArrayText contentKey={contentKey} index={index} field={field} as="span" />
+        </>
       ) : (
-        <span>{val}</span>
+        <>
+          <span style={{ fontSize: 16 }}>{emojiVal}</span>
+          <span>{val}</span>
+        </>
       )}
     </div>
   );
@@ -455,63 +487,263 @@ function Btn({ children, variant = "primary", onClick, style = {} }) {
   );
 }
 
-function SectionWrap({ children, bg, bgImage, py = "80px", style = {} }) {
+/* ── Editable Button (label + link destination in edit mode) ── */
+function EditableBtn({ contentKey, variant = "primary", defaultLabel = "button", defaultLink = "contact", nav, style = {}, setPage }) {
+  const { getContent, updateContent, isEditing } = useCMS();
+  const label = getContent(`${contentKey}.label`) ?? defaultLabel;
+  const link = getContent(`${contentKey}.link`) ?? defaultLink;
+  const [editing, setEditing] = useState(false);
+  const [draftLabel, setDraftLabel] = useState(label);
+  const [draftLink, setDraftLink] = useState(link);
+
+  const save = () => {
+    updateContent(`${contentKey}.label`, draftLabel);
+    updateContent(`${contentKey}.link`, draftLink);
+    setEditing(false);
+  };
+
+  const handleClick = () => {
+    if (isEditing) { setDraftLabel(label); setDraftLink(link); setEditing(true); return; }
+    if (link.startsWith("http")) { window.open(link, "_blank", "noopener"); }
+    else if (nav) { nav(link); }
+  };
+
+  const base = { fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, border: "none", borderRadius: 100, padding: "13px 32px", cursor: "pointer", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", letterSpacing: "1px", textTransform: "uppercase" };
+  const variants = {
+    primary: { ...base, background: C.olive, color: C.cream, border: `2px solid ${C.olive}` },
+    outline: { ...base, background: "transparent", color: C.olive, border: `2px solid ${C.olive}` },
+    sand: { ...base, background: C.sand, color: C.charcoal, border: `2px solid ${C.sand}` },
+    yellow: { ...base, background: C.butter, color: C.charcoal, border: `2px solid ${C.butter}` },
+    ocean: { ...base, background: C.olive, color: C.white, border: `2px solid ${C.olive}` },
+  };
+
   return (
-    <section style={{ background: bgImage || bg || C.cream, padding: `${py} clamp(20px, 5vw, 56px)`, overflowX: "hidden", ...style }}>
-      <div style={{ maxWidth: 1140, margin: "0 auto" }}>{children}</div>
+    <>
+      <button onClick={handleClick} style={{ ...variants[variant] || variants.primary, position: "relative", ...style }}>
+        {label}
+        {isEditing && (
+          <span data-editor-panel style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", borderRadius: 8, padding: "2px 6px", marginLeft: 4 }}>✏️</span>
+        )}
+      </button>
+      {editing && (
+        <div data-editor-panel style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "rgba(28,28,28,0.97)", backdropFilter: "blur(16px)", borderRadius: 16, padding: 24, zIndex: 9999, width: "min(440px, 90vw)", boxShadow: "0 24px 64px rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Edit button</p>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontFamily: "'Rubik', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 4 }}>LABEL</label>
+            <input value={draftLabel} onChange={e => setDraftLabel(e.target.value)} style={{ width: "100%", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 12px", color: "#fff", fontSize: 14, fontFamily: "'Rubik', sans-serif", boxSizing: "border-box" }} />
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontFamily: "'Rubik', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 4 }}>LINK (page name or full URL)</label>
+            <input value={draftLink} onChange={e => setDraftLink(e.target.value)} placeholder="services, contact, https://..." style={{ width: "100%", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 12px", color: "#fff", fontSize: 14, fontFamily: "'Rubik', sans-serif", boxSizing: "border-box" }} />
+            <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>Use a page name (home, services, about, contact) or a full URL (https://...)</p>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={save} style={{ flex: 1, background: C.olive, color: "#fff", border: "none", borderRadius: 8, padding: "10px 0", fontFamily: "'Rubik', sans-serif", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Save</button>
+            <button onClick={() => setEditing(false)} style={{ flex: 1, background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "10px 0", fontFamily: "'Rubik', sans-serif", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function SectionWrap({ children, bg, bgImage, py = "80px", style = {}, sectionKey }) {
+  const { getContent, updateContent, isEditing } = useCMS();
+
+  // CMS-controlled background (overrides props when set)
+  const bgType = sectionKey ? getContent(`style.section.${sectionKey}.bgType`) : null;
+  const bgValue = sectionKey ? getContent(`style.section.${sectionKey}.bgValue`) : null;
+  const bgOverlayOpacity = sectionKey ? (getContent(`style.section.${sectionKey}.bgOverlayOpacity`) ?? 0.85) : 0.85;
+
+  const solidColorOptions = [
+    { label: "cream", value: C.cream },
+    { label: "charcoal", value: C.charcoal },
+    { label: "sand", value: C.sand },
+    { label: "olive", value: C.olive },
+    { label: "butter", value: C.butter },
+    { label: "coral", value: C.coral },
+    { label: "blue", value: C.somethingBlue },
+    { label: "earth", value: C.motherEarth },
+  ];
+
+  const gridOptions = [
+    { label: "cream grid", value: "gridBgWhite" },
+    { label: "sand grid", value: "gridBgSand" },
+    { label: "blue grid", value: "gridBgOcean" },
+  ];
+
+  const gridMap = { gridBgWhite, gridBgSand, gridBgOcean };
+
+  // Resolved background
+  let resolvedBg = bgImage || bg || C.cream;
+
+  if (bgType === "solid" && bgValue) resolvedBg = bgValue;
+  else if (bgType === "grid" && bgValue) resolvedBg = gridMap[bgValue] || resolvedBg;
+  else if (bgType === "image" && bgValue) {
+    // Use CSS background-attachment for native parallax (degrades gracefully on mobile)
+    resolvedBg = `url(${bgValue}) center / cover fixed`;
+  }
+
+  return (
+    <section style={{ background: resolvedBg, padding: `${py} clamp(20px, 5vw, 56px)`, overflowX: "hidden", position: "relative", ...style }}>
+      {/* Color overlay when image bg is set */}
+      {bgType === "image" && bgValue && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 0, background: `rgba(253,250,244,${bgOverlayOpacity})`, pointerEvents: "none" }} />
+      )}
+
+      {/* Section background control — edit mode only */}
+      {isEditing && sectionKey && (
+        <SectionBgControl
+          sectionKey={sectionKey}
+          bgType={bgType}
+          bgValue={bgValue}
+          bgOverlayOpacity={bgOverlayOpacity}
+          solidColorOptions={solidColorOptions}
+          gridOptions={gridOptions}
+          updateContent={updateContent}
+        />
+      )}
+
+      <div style={{ maxWidth: 1140, margin: "0 auto", position: "relative", zIndex: 1 }}>{children}</div>
     </section>
   );
 }
 
-const stepColors = ["#F4B8A8", "#9AABE0", "#A8D5A2", "#E07E6A", "#D4A8E0"];
-const stepDividers = ["#F4B8A8", "#9AABE0", "#A8D5A2", "#E07E6A", "#D4A8E0"];
-const stepRotations = [-8, -6, -10, -7, -9];
+function SectionBgControl({ sectionKey, bgType, bgValue, bgOverlayOpacity, solidColorOptions, gridOptions, updateContent }) {
+  const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  return (
+    <div data-editor-panel style={{ position: "absolute", top: 8, right: 8, zIndex: 100 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, fontWeight: 600, padding: "4px 10px", borderRadius: 20, background: "rgba(28,28,28,0.7)", color: "#fff", border: "none", cursor: "pointer", backdropFilter: "blur(8px)" }}
+      >🎨 bg</button>
+      {open && (
+        <div style={{ position: "absolute", top: 30, right: 0, background: "rgba(28,28,28,0.97)", borderRadius: 12, padding: 16, zIndex: 200, width: 240, boxShadow: "0 16px 40px rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(16px)" }}>
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>Background</p>
+
+          {/* Solid colors */}
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>Solid Color</p>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+            {solidColorOptions.map(opt => (
+              <button key={opt.value} title={opt.label} onClick={() => { updateContent(`style.section.${sectionKey}.bgType`, "solid"); updateContent(`style.section.${sectionKey}.bgValue`, opt.value); }} style={{ width: 24, height: 24, borderRadius: 6, background: opt.value, border: bgType === "solid" && bgValue === opt.value ? "2px solid #fff" : "1px solid rgba(255,255,255,0.2)", cursor: "pointer" }} />
+            ))}
+          </div>
+
+          {/* Grid patterns */}
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>Grid Pattern</p>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+            {gridOptions.map(opt => (
+              <button key={opt.value} onClick={() => { updateContent(`style.section.${sectionKey}.bgType`, "grid"); updateContent(`style.section.${sectionKey}.bgValue`, opt.value); }} style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, fontWeight: 600, padding: "4px 10px", borderRadius: 8, background: bgType === "grid" && bgValue === opt.value ? "#fff" : "rgba(255,255,255,0.1)", color: bgType === "grid" && bgValue === opt.value ? "#000" : "rgba(255,255,255,0.7)", border: "none", cursor: "pointer" }}>{opt.label}</button>
+            ))}
+          </div>
+
+          {/* Image parallax upload */}
+          <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>Image Parallax</p>
+          <label style={{ display: "block", fontFamily: "'Rubik', sans-serif", fontSize: 11, fontWeight: 600, color: bgType === "image" ? C.butter : "rgba(255,255,255,0.7)", background: bgType === "image" ? `${C.butter}20` : "rgba(255,255,255,0.08)", border: bgType === "image" ? `1px solid ${C.butter}40` : "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 12px", cursor: uploading ? "wait" : "pointer", textAlign: "center", marginBottom: bgType === "image" ? 8 : 0 }}>
+            {uploading ? "Uploading…" : bgType === "image" ? "✓ image set (click to change)" : "Upload image"}
+            <input type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
+              const file = e.target.files?.[0]; if (!file) return;
+              setUploading(true);
+              try {
+                const { uploadImage } = await import("./supabase/storage");
+                const url = await uploadImage(file, `section.bg.${sectionKey}`);
+                updateContent(`style.section.${sectionKey}.bgType`, "image");
+                updateContent(`style.section.${sectionKey}.bgValue`, url);
+              } catch (err) { alert("Upload failed: " + err.message); }
+              finally { setUploading(false); e.target.value = ""; }
+            }} />
+          </label>
+
+          {/* Overlay opacity when image set */}
+          {bgType === "image" && bgValue && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.5)", whiteSpace: "nowrap" }}>Overlay</span>
+              <input type="range" min={0} max={1} step={0.05} value={bgOverlayOpacity} onChange={e => updateContent(`style.section.${sectionKey}.bgOverlayOpacity`, parseFloat(e.target.value))} style={{ flex: 1, accentColor: C.butter }} />
+              <span style={{ fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.5)", minWidth: 28 }}>{Math.round(bgOverlayOpacity * 100)}%</span>
+            </div>
+          )}
+
+          {/* Reset */}
+          <button onClick={() => { updateContent(`style.section.${sectionKey}.bgType`, null); updateContent(`style.section.${sectionKey}.bgValue`, null); setOpen(false); }} style={{ width: "100%", marginTop: 4, fontFamily: "'Rubik', sans-serif", fontSize: 10, color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer", textAlign: "center", padding: "4px 0" }}>reset to default</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Process step brand colors (alternating angles: odd = left tilt, even = right tilt)
+const stepBrandColors = [C.butter, C.coral, C.somethingBlue, C.motherEarth, C.olive];
+const stepTextColors = [C.charcoal, C.charcoal, C.charcoal, C.white, C.white];
+const stepRotations = [-8, 6, -10, 7, -9]; // alternating left / right
+
+// Brand star SVG (4-pointed, filled) used as bullet/icon across all pages
+function BrandStar({ size = 16, color = C.olive, style = {} }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0, ...style }}>
+      <path d="M12 2 L13.8 9.2 L21 12 L13.8 14.8 L12 22 L10.2 14.8 L3 12 L10.2 9.2 Z" />
+    </svg>
+  );
+}
 
 function ProcessStep({ num, text, total }) {
-  const idx = (num - 1) % stepColors.length;
-  const color = stepColors[idx];
+  const idx = (num - 1) % stepBrandColors.length;
+  const bgColor = stepBrandColors[idx];
+  const textColor = stepTextColors[idx];
   const rotation = stepRotations[idx];
-  const dividerColor = stepDividers[idx];
   const isLast = num === total;
 
   return (
     <div style={{ padding: "28px 0 20px", position: "relative" }}>
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
         <div style={{
-          width: 38,
-          height: 38,
-          borderRadius: 8,
-          background: color,
+          width: 40,
+          height: 40,
+          borderRadius: 10,
+          background: bgColor,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontFamily: "'Rubik', sans-serif",
           fontWeight: 700,
           fontSize: 14,
-          color: C.white,
+          color: textColor,
           flexShrink: 0,
           transform: `rotate(${rotation}deg)`,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 3px 10px rgba(0,0,0,0.12)",
         }}>
           {String(num).padStart(2, "0")}
         </div>
         <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, margin: 0 }}>{text}</p>
       </div>
       {!isLast && (
-        <div style={{ height: 2, background: dividerColor, opacity: 0.45, marginTop: 24, borderRadius: 2 }} />
+        <div style={{ height: 2, background: C.sand, opacity: 0.6, marginTop: 24, borderRadius: 2 }} />
       )}
     </div>
   );
 }
 
 function FAQAccordion({ faqs, contentKey }) {
+  const { update, isEditing } = useContent(contentKey || "__none__");
   const [openIndex, setOpenIndex] = useState(null);
+
+  const addFaq = () => {
+    const next = [...faqs, { q: "New question?", a: "Answer here..." }];
+    update(next);
+  };
+
+  const deleteFaq = (idx) => {
+    const next = faqs.filter((_, i) => i !== idx);
+    update(next);
+  };
+
   return (
     <div>
       {faqs.map((faq, i) => {
         const isOpen = openIndex === i;
         return (
-          <div key={i} style={{ borderBottom: `1px solid ${C.sand}` }}>
+          <div key={i} style={{ borderBottom: `1px solid ${C.sand}`, position: "relative" }}>
             <button
               onClick={() => setOpenIndex(isOpen ? null : i)}
               style={{
@@ -533,7 +765,7 @@ function FAQAccordion({ faqs, contentKey }) {
               <span style={{
                 fontFamily: "system-ui",
                 fontSize: 20,
-                color: C.oceanBlue,
+                color: C.olive,
                 flexShrink: 0,
                 transition: "transform 0.3s",
                 transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
@@ -548,9 +780,85 @@ function FAQAccordion({ faqs, contentKey }) {
                 {contentKey ? <EditableArrayText contentKey={contentKey} index={i} field="a" as="span" /> : faq.a}
               </p>
             </div>
+            {isEditing && contentKey && (
+              <button
+                data-editor-panel
+                onClick={(e) => { e.stopPropagation(); if (window.confirm("Delete this FAQ?")) deleteFaq(i); }}
+                style={{
+                  position: "absolute", top: 18, right: 40,
+                  background: `${C.coral}18`, border: `1px solid ${C.coral}40`,
+                  color: C.coral, fontSize: 11, fontWeight: 600,
+                  fontFamily: "'Rubik', sans-serif", padding: "3px 10px",
+                  borderRadius: 20, cursor: "pointer",
+                }}
+              >✕ delete</button>
+            )}
           </div>
         );
       })}
+      {isEditing && contentKey && (
+        <button
+          data-editor-panel
+          onClick={addFaq}
+          style={{
+            marginTop: 16, width: "100%", padding: "12px",
+            background: `${C.olive}08`, border: `2px dashed ${C.olive}40`,
+            borderRadius: 10, fontFamily: "'Rubik', sans-serif",
+            fontSize: 13, fontWeight: 600, color: C.olive,
+            cursor: "pointer",
+          }}
+        >+ add FAQ</button>
+      )}
+    </div>
+  );
+}
+
+/* ── Editable tag list (feature tags, timeline items) with add/delete in edit mode ── */
+function EditableTagList({ contentKey, items = [], tagBg = C.butter, tagColor = C.charcoal }) {
+  const { update, isEditing } = useContent(contentKey);
+  const [adding, setAdding] = useState(false);
+  const [newTag, setNewTag] = useState("");
+
+  const deleteTag = (idx) => {
+    update(items.filter((_, i) => i !== idx));
+  };
+
+  const addTag = () => {
+    if (!newTag.trim()) { setAdding(false); return; }
+    update([...items, newTag.trim()]);
+    setNewTag("");
+    setAdding(false);
+  };
+
+  if (items.length === 0 && !isEditing) return null;
+
+  return (
+    <div style={{ display: "flex", gap: 8, marginTop: 20, flexWrap: "wrap", alignItems: "center" }}>
+      {items.map((t, i) => (
+        <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, background: tagBg, color: tagColor, padding: "5px 16px", borderRadius: 50, position: "relative" }}>
+          <EditableArrayString contentKey={contentKey} index={i} as="span" />
+          {isEditing && (
+            <button onClick={() => deleteTag(i)} style={{ background: "none", border: "none", cursor: "pointer", color: tagColor, fontSize: 12, padding: 0, lineHeight: 1, opacity: 0.6 }}>✕</button>
+          )}
+        </span>
+      ))}
+      {isEditing && (
+        adding ? (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <input
+              value={newTag}
+              onChange={e => setNewTag(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") addTag(); if (e.key === "Escape") { setAdding(false); setNewTag(""); } }}
+              placeholder="tag text..."
+              autoFocus
+              style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12, padding: "4px 10px", borderRadius: 20, border: `1px solid ${C.olive}`, outline: "none", width: 120 }}
+            />
+            <button onClick={addTag} style={{ fontFamily: "'Rubik', sans-serif", fontSize: 11, fontWeight: 700, background: C.olive, color: "#fff", border: "none", borderRadius: 20, padding: "4px 10px", cursor: "pointer" }}>add</button>
+          </span>
+        ) : (
+          <button onClick={() => setAdding(true)} style={{ fontFamily: "'Rubik', sans-serif", fontSize: 11, fontWeight: 600, color: C.olive, background: `${C.olive}10`, border: `1px dashed ${C.olive}60`, borderRadius: 20, padding: "4px 12px", cursor: "pointer" }}>+ tag</button>
+        )
+      )}
     </div>
   );
 }
@@ -560,11 +868,11 @@ function TwoColFit({ perfect, notFit }) {
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 20 }}>
       <div style={{ background: C.white, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%" }}>
         <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.charcoal, margin: "0 0 16px" }}>perfect if you:</h4>
-        {perfect.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}><span style={{ color: C.oceanBlue, flexShrink: 0 }}>✦</span>{p}</div>)}
+        {perfect.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}><BrandStar size={14} color={C.olive} style={{ marginTop: 2 }} />{p}</div>)}
       </div>
-      <div style={{ background: C.warmWhite, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%" }}>
+      <div style={{ background: C.cream, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%" }}>
         <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.charcoal, margin: "0 0 16px" }}>not a fit if you:</h4>
-        {notFit.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.muted, lineHeight: 1.55 }}><span style={{ flexShrink: 0 }}>—</span>{p}</div>)}
+        {notFit.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.warmTan, lineHeight: 1.55 }}><span style={{ flexShrink: 0, color: C.coral }}>—</span>{p}</div>)}
       </div>
     </div>
   );
@@ -581,55 +889,151 @@ function PullQuote({ quote, author, bg = C.charcoal }) {
   );
 }
 
-/* ── Social Proof / Logos — parallax scroll-in ── */
+/* ── Social Proof — parallax-style scroll-in with uploadable logos ── */
 function SocialProof() {
-  const { getContent } = useCMS();
+  const { getContent, updateContent, isEditing } = useCMS();
   const badges = getContent("home.socialProof.badges") || [];
+  const images = getContent("home.socialProof.images") || [];
   const [ref, inView] = useInView(0.1);
+  const scrollY = useScrollY();
+  const sectionRef = useRef(null);
 
-  const badgeColors = [
-    { bg: C.butter, color: C.charcoal },
-    { bg: C.somethingBlue, color: C.charcoal },
-    { bg: `${C.coral}22`, color: C.charcoal },
-  ];
+  let parallaxOffset = 0;
+  if (sectionRef.current) {
+    const rect = sectionRef.current.getBoundingClientRect();
+    const viewH = window.innerHeight;
+    if (rect.top < viewH && rect.bottom > 0) {
+      parallaxOffset = (viewH / 2 - rect.top) * 0.04;
+    }
+  }
+
+  const removeImage = (idx) => {
+    const next = images.filter((_, i) => i !== idx);
+    updateContent("home.socialProof.images", next);
+  };
 
   return (
-    <div ref={ref} style={{ textAlign: "center", padding: "56px 0" }}>
-      <h2 style={{
-        fontFamily: "'Rubik', sans-serif", fontWeight: 800,
-        fontSize: "clamp(22px, 3vw, 32px)", color: C.charcoal,
-        letterSpacing: "-0.3px", marginBottom: 8,
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.7s cubic-bezier(.22,.61,.36,1)",
-      }}>
-        <EditableText contentKey="home.socialProof.label" as="span" />
-      </h2>
-      <div style={{
-        width: 48, height: 3, background: C.butter, borderRadius: 2,
-        margin: "0 auto 40px", opacity: inView ? 1 : 0, transition: "opacity 0.7s 0.2s",
-      }} />
-      <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", alignItems: "center" }}>
-        {badges.map((badge, i) => {
-          const { bg, color } = badgeColors[i % badgeColors.length];
-          return (
-            <div key={i} style={{
-              fontFamily: "'Rubik', sans-serif", fontSize: 15, fontWeight: 700,
-              color, background: bg,
-              padding: "14px 28px", borderRadius: 50,
-              border: `2px solid ${C.sand}`,
-              transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
-              cursor: "default",
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0) scale(1)" : "translateY(30px) scale(0.9)",
-              transitionDelay: `${0.15 + i * 0.12}s`,
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.04)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "none"; }}>
-              <EditableArrayString contentKey="home.socialProof.badges" index={i} />
-            </div>
-          );
-        })}
+    <div ref={sectionRef} style={{ textAlign: "center", padding: "56px 0" }}>
+      <div ref={ref}>
+        <h2 style={{
+          fontFamily: "'Rubik', sans-serif", fontWeight: 900,
+          fontSize: "clamp(28px, 4vw, 48px)", color: C.charcoal,
+          letterSpacing: "-0.5px", marginBottom: 6,
+          opacity: inView ? 1 : 0,
+          transform: inView ? "translateY(0)" : "translateY(24px)",
+          transition: "all 0.7s cubic-bezier(.22,.61,.36,1)",
+        }}>
+          <EditableText contentKey="home.socialProof.label" as="span" />
+        </h2>
+        <div style={{
+          width: 64, height: 4, background: C.butter, borderRadius: 2,
+          margin: "0 auto 48px",
+          opacity: inView ? 1 : 0,
+          transition: "opacity 0.7s 0.2s",
+        }} />
+
+        {/* Logo/image grid — parallax on scroll */}
+        {images.length > 0 && (
+          <div style={{
+            display: "flex", justifyContent: "center", alignItems: "center",
+            gap: "clamp(24px, 4vw, 56px)", flexWrap: "wrap", marginBottom: 40,
+            transform: `translateY(${parallaxOffset}px)`,
+            transition: "transform 0.1s linear",
+          }}>
+            {images.map((imgUrl, i) => (
+              <div key={i} style={{
+                position: "relative",
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0) scale(1)" : "translateY(40px) scale(0.85)",
+                transition: `all 0.7s cubic-bezier(.22,.61,.36,1) ${0.1 + i * 0.12}s`,
+              }}>
+                <img
+                  src={imgUrl}
+                  alt={`certification ${i + 1}`}
+                  style={{
+                    height: "clamp(56px, 8vw, 96px)",
+                    maxWidth: 180,
+                    objectFit: "contain",
+                    filter: "grayscale(20%)",
+                    transition: "filter 0.3s, transform 0.3s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.filter = "grayscale(0%)"; e.currentTarget.style.transform = "scale(1.08)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.filter = "grayscale(20%)"; e.currentTarget.style.transform = "scale(1)"; }}
+                />
+                {isEditing && (
+                  <button
+                    data-editor-panel
+                    onClick={() => removeImage(i)}
+                    style={{
+                      position: "absolute", top: -8, right: -8,
+                      width: 22, height: 22, borderRadius: "50%",
+                      background: C.coral, border: "none",
+                      color: C.white, fontSize: 12, cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontFamily: "'Rubik', sans-serif", fontWeight: 700,
+                    }}
+                  >✕</button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upload button in edit mode */}
+        {isEditing && images.length < 6 && (
+          <div data-editor-panel style={{ marginBottom: 32 }}>
+            <label style={{
+              display: "inline-block",
+              fontFamily: "'Rubik', sans-serif", fontSize: 13, fontWeight: 600,
+              color: C.olive, background: `${C.olive}08`,
+              border: `2px dashed ${C.olive}40`,
+              borderRadius: 10, padding: "10px 24px", cursor: "pointer",
+            }}>
+              + upload certification logo ({images.length}/6)
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  try {
+                    const { uploadImage } = await import("./supabase/storage");
+                    const url = await uploadImage(file, `socialProof.image.${Date.now()}`);
+                    const next = [...images, url];
+                    updateContent("home.socialProof.images", next);
+                  } catch (err) {
+                    alert("Upload failed: " + err.message);
+                  }
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+        )}
+
+        {/* Text badges */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+          {badges.map((badge, i) => {
+            const badgeBgs = [C.butter, C.somethingBlue, `${C.coral}30`, `${C.motherEarth}20`, C.sand];
+            return (
+              <div key={i} style={{
+                fontFamily: "'Rubik', sans-serif", fontSize: 14, fontWeight: 700,
+                color: C.charcoal, background: badgeBgs[i % badgeBgs.length],
+                padding: "12px 24px", borderRadius: 50,
+                border: `1.5px solid ${C.sand}`,
+                transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0) scale(1)" : "translateY(30px) scale(0.9)",
+                transitionDelay: `${0.3 + i * 0.1}s`,
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.04)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "none"; }}>
+                <EditableArrayString contentKey="home.socialProof.badges" index={i} />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -728,6 +1132,8 @@ function TestimonialSection({ scrollY }) {
   const sectionRef = useRef(null);
   const bgUrl = getContent("image.home.testimonials.bg");
   const bgOpacity = getContent("style.home.testimonials.bgOpacity") ?? 0.82;
+  const fitMode = getContent("style.image.home.testimonials.bg.objectFit") || "cover";
+  const fitPosition = getContent("style.image.home.testimonials.bg.objectPosition") || "center";
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   let parallaxOffset = 0;
@@ -746,16 +1152,22 @@ function TestimonialSection({ scrollY }) {
       background: bgUrl ? "transparent" : gridBgSand,
       backgroundColor: bgUrl ? C.charcoal : undefined,
     }}>
-      {/* Parallax background image */}
+      {/* Parallax background image — uses <img> so objectFit/objectPosition work */}
       {bgUrl && (
         <>
-          <div style={{
-            position: "absolute", inset: "-40px 0", zIndex: 0,
-            backgroundImage: `url(${bgUrl})`,
-            backgroundSize: "cover", backgroundPosition: "center",
-            transform: isMobile ? "none" : `translateY(${parallaxOffset}px)`,
-            willChange: isMobile ? "auto" : "transform",
-          }} />
+          <img
+            src={bgUrl}
+            alt=""
+            style={{
+              position: "absolute", top: "-40px", left: 0, right: 0,
+              width: "100%", height: "calc(100% + 80px)",
+              objectFit: fitMode, objectPosition: fitPosition,
+              zIndex: 0,
+              transform: isMobile ? "none" : `translateY(${parallaxOffset}px)`,
+              willChange: isMobile ? "auto" : "transform",
+              display: "block",
+            }}
+          />
           <div style={{ position: "absolute", inset: 0, zIndex: 0, background: `rgba(250,247,242,${bgOpacity})` }} />
         </>
       )}
@@ -963,15 +1375,15 @@ function BackToTop({ scrollY }) {
         width: 48,
         height: 48,
         borderRadius: "50%",
-        background: C.oceanBlue,
-        border: `2px solid ${C.white}`,
-        color: C.white,
+        background: C.charcoal,
+        border: `2px solid ${C.cream}`,
+        color: C.cream,
         fontSize: 20,
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+        boxShadow: "0 4px 16px rgba(44,44,40,0.25)",
         opacity: visible ? 1 : 0,
         transform: visible ? (isHovered ? "translateY(-4px) scale(1.05)" : "translateY(0)") : "translateY(20px)",
         transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -998,7 +1410,7 @@ function HomePage({ setPage }) {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const parallaxY = isMobile ? 0 : Math.min(scrollY * 0.15, 150);
 
-  const defaultOrder = ["hero", "marquee", "welcome", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
+  const defaultOrder = ["hero", "marquee", "welcome", "coreValues", "problem", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
   const sectionOrder = getContent("home.sectionOrder") || defaultOrder;
 
   const moveSection = (from, to) => {
@@ -1011,8 +1423,9 @@ function HomePage({ setPage }) {
 
   const sectionLabels = {
     hero: "Hero", marquee: "Marquee", welcome: "Welcome", coreValues: "Core Values",
-    systems: "Systems", pathCards: "Path Cards", stats: "Stats", socialProof: "Social Proof",
-    testimonials: "Testimonials", newsletter: "Newsletter", closing: "Closing CTA", closingMarquee: "Marquee",
+    problem: "Problem", systems: "Systems", pathCards: "Path Cards", stats: "Stats",
+    socialProof: "Social Proof", testimonials: "Testimonials", newsletter: "Newsletter",
+    closing: "Closing CTA", closingMarquee: "Marquee",
   };
 
   const sectionDefs = {
@@ -1105,7 +1518,7 @@ function HomePage({ setPage }) {
 
     welcome: () => (
       <>
-        <SectionWrap bgImage={gridBgSand} py="80px">
+        <SectionWrap bgImage={gridBgSand} py="80px" sectionKey="home.welcome">
           <FadeIn>
             <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
               <ScriptLabel size={22} color={C.olive} style={{ textAlign: "center" }}><EditableText contentKey="home.welcome.scriptLabel" as="span" /></ScriptLabel>
@@ -1130,7 +1543,7 @@ function HomePage({ setPage }) {
 
     coreValues: () => (
       <>
-        <SectionWrap bg={C.white} py="72px">
+        <SectionWrap bg={C.white} py="72px" sectionKey="home.coreValues">
           <FadeIn>
             <div style={{ textAlign: "center", marginBottom: 40 }}>
               <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="home.coreValues.scriptLabel" as="span" /></ScriptLabel>
@@ -1161,34 +1574,39 @@ function HomePage({ setPage }) {
       </>
     ),
 
-    systems: () => (
-      <section style={{ background: gridBgOcean, padding: "72px clamp(20px, 5vw, 56px)", overflowX: "hidden", position: "relative" }}>
-        {/* Rotating wheel decoration in the background */}
-        <div style={{ position: "absolute", right: "-10%", top: "50%", transform: "translateY(-50%)", width: "clamp(300px, 40vw, 560px)", height: "clamp(300px, 40vw, 560px)", opacity: 0.07, pointerEvents: "none", zIndex: 0 }}>
-          <svg viewBox="0 0 200 200" style={{ width: "100%", height: "100%", animation: "wheelSpin 18s linear infinite" }}>
-            <circle cx="100" cy="100" r="90" fill="none" stroke={C.olive} strokeWidth="2" strokeDasharray="8 6" />
-            <circle cx="100" cy="100" r="68" fill="none" stroke={C.olive} strokeWidth="1.5" strokeDasharray="4 8" />
-            <circle cx="100" cy="100" r="46" fill="none" stroke={C.olive} strokeWidth="2" />
-            <circle cx="100" cy="100" r="24" fill="none" stroke={C.olive} strokeWidth="1.5" strokeDasharray="4 4" />
-            {[0,45,90,135,180,225,270,315].map((deg) => {
-              const r = deg * Math.PI / 180;
-              return <line key={deg} x1="100" y1="100" x2={100 + 90 * Math.cos(r)} y2={100 + 90 * Math.sin(r)} stroke={C.olive} strokeWidth="1" opacity="0.5" />;
-            })}
-            <circle cx="100" cy="100" r="8" fill={C.olive} />
-          </svg>
-        </div>
-        <div style={{ position: "absolute", left: "-8%", top: "20%", width: "clamp(180px, 24vw, 320px)", height: "clamp(180px, 24vw, 320px)", opacity: 0.05, pointerEvents: "none", zIndex: 0 }}>
-          <svg viewBox="0 0 200 200" style={{ width: "100%", height: "100%", animation: "wheelSpin 28s linear infinite reverse" }}>
-            <circle cx="100" cy="100" r="90" fill="none" stroke={C.olive} strokeWidth="2" strokeDasharray="12 6" />
-            <circle cx="100" cy="100" r="60" fill="none" stroke={C.motherEarth} strokeWidth="2" />
-            {[0,60,120,180,240,300].map((deg) => {
-              const r = deg * Math.PI / 180;
-              return <line key={deg} x1="100" y1="100" x2={100 + 90 * Math.cos(r)} y2={100 + 90 * Math.sin(r)} stroke={C.olive} strokeWidth="1.5" />;
-            })}
-          </svg>
-        </div>
+    problem: () => (
+      <EditableSection contentKey="visibility.home.problem">
+      <SectionWrap bg={C.charcoal} py="72px">
+        <FadeIn>
+          <div style={{ maxWidth: 800, margin: "0 auto" }}>
+            <ScriptLabel color={C.coral} size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.problem.scriptLabel" as="span" /></ScriptLabel>
+            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 42px)", color: C.cream, margin: "0 0 28px", textAlign: "center", lineHeight: 1.1 }}><EditableText contentKey="home.problem.heading" as="span" /></h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
+              {(getContent("home.problem.points") || []).map((point, i) => (
+                <div key={i} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 16, padding: "20px 22px", border: `1px solid rgba(255,255,255,0.1)` }}>
+                  <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13, color: C.coral, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: `${C.sand}cc`, lineHeight: 1.65, margin: 0 }}>
+                    <EditableArrayString contentKey="home.problem.points" index={i} />
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div style={{ textAlign: "center", marginTop: 32 }}>
+              <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: "clamp(18px, 2vw, 22px)", color: C.butter, lineHeight: 1.5 }}>
+                <EditableText contentKey="home.problem.punchline" as="span" />
+              </p>
+            </div>
+          </div>
+        </FadeIn>
+      </SectionWrap>
+      </EditableSection>
+    ),
 
-        <div style={{ maxWidth: 1140, margin: "0 auto", position: "relative", zIndex: 1 }}>
+    systems: () => (
+      <section style={{ background: gridBgOcean, padding: "72px clamp(20px, 5vw, 56px)", overflowX: "hidden" }}>
+        <div style={{ maxWidth: 1140, margin: "0 auto" }}>
           <FadeIn>
             <div style={{ textAlign: "center", marginBottom: 40 }}>
               <ScriptLabel size={22} color={C.olive} style={{ textAlign: "center" }}><EditableText contentKey="home.systemsComparison.scriptLabel" as="span" /></ScriptLabel>
@@ -1229,7 +1647,7 @@ function HomePage({ setPage }) {
 
     pathCards: () => (
       <>
-        <SectionWrap bg={C.cream} py="80px">
+        <SectionWrap bg={C.cream} py="80px" sectionKey="home.pathCards">
           <FadeIn>
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <ScriptLabel size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.pathCards.scriptLabel" as="span" /></ScriptLabel>
@@ -1246,8 +1664,8 @@ function HomePage({ setPage }) {
             defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
             gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, alignItems: "stretch" }}
             renderCard={(c, i) => {
-              const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
-              const accents = [C.coral, C.oceanBlue, C.lavender];
+              const bgColors = [`${C.coral}25`, `${C.somethingBlue}`, `${C.butter}40`];
+              const accents = [C.coral, C.olive, C.motherEarth];
               return (
                 <div onClick={() => nav(c.page || "contact")} style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: isEditing ? "default" : "pointer", display: "flex", flexDirection: "column", flex: 1, transition: "transform 0.3s, box-shadow 0.3s" }}
                   onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
@@ -1261,7 +1679,7 @@ function HomePage({ setPage }) {
                     <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
                       <EditableArrayText contentKey="home.pathCards" index={i} field="body" as="span" />
                     </p>
-                    <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>
+                    <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.olive, marginTop: "auto" }}>
                       <EditableArrayText contentKey="home.pathCards" index={i} field="cta" as="span" />
                     </span>
                   </div>
@@ -1276,7 +1694,7 @@ function HomePage({ setPage }) {
 
     stats: () => (
       <EditableSection contentKey="visibility.home.stats">
-      <SectionWrap bgImage={gridBgOcean} py="80px">
+      <SectionWrap bgImage={gridBgOcean} py="80px" sectionKey="home.stats">
         <FadeIn>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="home.stats.scriptLabel" as="span" /></ScriptLabel>
@@ -1291,8 +1709,8 @@ function HomePage({ setPage }) {
             <div
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px) scale(1.02)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)"; }}
-              style={{ background: C.white, borderRadius: 16, padding: "28px 20px", textAlign: "center", border: `1px solid ${C.oceanLight}`, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", cursor: "default", boxShadow: "0 4px 12px rgba(123, 167, 179, 0.05)" }}>
-              <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 7vw, 36px)", color: C.oceanBlue, marginBottom: 8 }}>
+              style={{ background: C.white, borderRadius: 16, padding: "28px 20px", textAlign: "center", border: `1px solid ${C.sand}`, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", cursor: "default", boxShadow: "0 4px 12px rgba(44,44,40,0.05)" }}>
+              <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 7vw, 36px)", color: C.olive, marginBottom: 8 }}>
                 <AnimatedCounter end={s.stat} duration={2000} />
               </div>
               <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 12.5, color: C.body, lineHeight: 1.5, margin: 0 }}>
@@ -1333,7 +1751,7 @@ function HomePage({ setPage }) {
 
     newsletter: () => (
       <EditableSection contentKey="visibility.home.newsletter">
-      <SectionWrap bgImage={gridBgLavender} py="72px">
+      <SectionWrap bgImage={gridBgLavender} py="72px" sectionKey="home.newsletter">
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
           <FadeIn>
             <span style={{ fontSize: 40, display: "block", marginBottom: 8 }}>🏖️</span>
@@ -1380,11 +1798,11 @@ function HomePage({ setPage }) {
 
   const sectionMoveBtn = (direction, onClick, disabled) => (
     <button onClick={onClick} disabled={disabled} style={{
-      width: 36, height: 36, borderRadius: "50%", background: C.oceanBlue,
-      border: `2px solid ${C.white}`, cursor: disabled ? "default" : "pointer",
+      width: 36, height: 36, borderRadius: "50%", background: C.charcoal,
+      border: `2px solid ${C.cream}`, cursor: disabled ? "default" : "pointer",
       display: "flex", alignItems: "center", justifyContent: "center",
-      color: C.white, fontSize: 16,
-      boxShadow: "0 4px 16px rgba(123, 167, 179, 0.3)",
+      color: C.cream, fontSize: 16,
+      boxShadow: "0 4px 16px rgba(44,44,40,0.25)",
       opacity: disabled ? 0.3 : 1,
       transition: "all 0.3s",
     }} aria-label={direction === "up" ? "Move section up" : "Move section down"}>
@@ -1629,25 +2047,23 @@ function ServiceDetailPage({ setPage, serviceKey }) {
         </FadeIn>
       </SectionWrap>
 
-      <SectionWrap bgImage={gridBgWhite} py="64px">
+      <SectionWrap bgImage={gridBgWhite} py="64px" sectionKey={p + ".whatThis"}>
         <FadeIn>
           <div style={{ maxWidth: 700, margin: "0 auto" }}>
             <ScriptLabel>what this is</ScriptLabel>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75, marginBottom: 20 }}><EditableText contentKey={p + ".whatIntro"} as="span" /></p>
             {includes.map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 7 }}>
-                <span style={{ color: C.oceanBlue, flexShrink: 0, paddingTop: 2 }}>✦</span>
+                <BrandStar size={14} color={C.olive} style={{ marginTop: 3 }} />
                 <span style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.6 }}><EditableArrayString contentKey={p + ".includes"} index={i} /></span>
               </div>
             ))}
-            {timeline.length > 0 && <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
-              {timeline.map((t, i) => <span key={i} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 12, background: C.yellow, color: C.charcoal, padding: "5px 16px", borderRadius: 50 }}>{t}</span>)}
-            </div>}
+            <EditableTagList contentKey={p + ".timeline"} items={timeline} tagBg={C.butter} tagColor={C.charcoal} />
           </div>
         </FadeIn>
       </SectionWrap>
 
-      <SectionWrap bg={C.cream} py="64px">
+      <SectionWrap bg={C.cream} py="64px" sectionKey={p + ".process"}>
         <FadeIn>
           <div style={{ maxWidth: 700, margin: "0 auto" }}>
             <ScriptLabel>the process</ScriptLabel>
@@ -1759,8 +2175,8 @@ function AboutPage({ setPage }) {
           </FadeIn>
 
           {(getContent("about.beliefs") || []).map((c, i) => {
-            const colors = ["#E8A8A0", "#9AB07A", "#E07E6A", "#7BA0D4"];
-            const headingColors = [`${colors[i % 4]}90`, `${colors[i % 4]}80`, `${colors[i % 4]}90`, `${colors[i % 4]}80`];
+            const colors = [C.coral, C.butter, C.motherEarth, C.somethingBlue];
+            const headingColors = [`${C.coral}70`, `${C.olive}50`, `${C.motherEarth}80`, `${C.somethingBlue}`];
             const rotations = [-10, 8, -7, 12];
             const badgeAligns = ["flex-start", "flex-end", "flex-start", "flex-end"];
             return (

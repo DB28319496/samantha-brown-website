@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
+import { useRef, useState, useCallback, useLayoutEffect } from "react";
 import { useContent, useCMS } from "./useContent";
 import { useSelection } from "./SelectionContext";
 
@@ -35,6 +35,16 @@ export function EditableText({
     ...(lineHeightOverride ? { lineHeight: lineHeightOverride } : {}),
   };
 
+  // Sync innerHTML before paint — only when NOT focused (avoids cursor jump on re-render)
+  useLayoutEffect(() => {
+    if (ref.current && !isFocused) {
+      const html = sanitizeHtml(String(displayValue));
+      if (ref.current.innerHTML !== html) {
+        ref.current.innerHTML = html;
+      }
+    }
+  }, [displayValue, isFocused]);
+
   const handleBlur = useCallback(() => {
     setIsFocused(false);
     if (!ref.current) return;
@@ -61,8 +71,8 @@ export function EditableText({
     );
   }
 
-  // Admin editing mode — dangerouslySetInnerHTML gives content immediately
-  // (React skips updating innerHTML while element is focused, so typing works)
+  // Admin editing mode — no dangerouslySetInnerHTML (prevents cursor jump on re-render)
+  // Content synced via useLayoutEffect before paint when not focused
   const editStyle = {
     ...style,
     ...overrideStyle,
@@ -90,7 +100,6 @@ export function EditableText({
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => select({ contentKey, type: "text" })}
       {...rest}
-      dangerouslySetInnerHTML={{ __html: String(displayValue) }}
     />
   );
 }
@@ -109,6 +118,15 @@ export function EditableArrayText({
   const [isHovered, setIsHovered] = useState(false);
 
   const itemValue = array?.[index]?.[field] ?? "";
+
+  useLayoutEffect(() => {
+    if (ref.current && !isFocused) {
+      const html = sanitizeHtml(String(itemValue));
+      if (ref.current.innerHTML !== html) {
+        ref.current.innerHTML = html;
+      }
+    }
+  }, [itemValue, isFocused]);
 
   const handleBlur = useCallback(() => {
     setIsFocused(false);
@@ -157,7 +175,6 @@ export function EditableArrayText({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...rest}
-      dangerouslySetInnerHTML={{ __html: String(itemValue) }}
     />
   );
 }
@@ -175,6 +192,15 @@ export function EditableArrayString({
   const [isHovered, setIsHovered] = useState(false);
 
   const itemValue = array?.[index] ?? "";
+
+  useLayoutEffect(() => {
+    if (ref.current && !isFocused) {
+      const html = sanitizeHtml(String(itemValue));
+      if (ref.current.innerHTML !== html) {
+        ref.current.innerHTML = html;
+      }
+    }
+  }, [itemValue, isFocused]);
 
   const handleBlur = useCallback(() => {
     setIsFocused(false);
@@ -222,7 +248,6 @@ export function EditableArrayString({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       {...rest}
-      dangerouslySetInnerHTML={{ __html: String(itemValue) }}
     />
   );
 }

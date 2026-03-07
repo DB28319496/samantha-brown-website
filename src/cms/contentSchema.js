@@ -94,6 +94,19 @@ export const defaultContent = {
     { emoji: "🌱", title: "progress over perfection", desc: "done is better than perfect. we build, iterate, and improve — not wait for the \"right\" time." },
   ],
 
+  // ─── HOME: PROBLEM (the loop you're in) ───
+  "home.problem.scriptLabel": "the loop you're in",
+  "home.problem.heading": "sound familiar?",
+  "home.problem.points": [
+    "you're copying & pasting from 17 different google docs",
+    "all your income is tied to one revenue stream — and it terrifies you",
+    "you keep downloading notion templates that collect dust",
+    "you're \"on\" 24/7 just to keep things from falling apart",
+    "you've tried every productivity hack and still feel behind",
+    "your client experience is inconsistent (and you know it)",
+  ],
+  "home.problem.punchline": "you're not the problem. the systems are.",
+
   // ─── HOME: SYSTEMS COMPARISON ───
   "home.systemsComparison.scriptLabel": "the difference",
   "home.systemsComparison.heading": "what good systems look like",
