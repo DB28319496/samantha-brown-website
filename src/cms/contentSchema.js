@@ -21,9 +21,9 @@ export const defaultContent = {
   "home.hero.ctaSecondary": "brand partnerships",
   "home.hero.typewriterPhrases": ["systems that scale", "revenue that grows", "a life you actually enjoy", "boundaries that stick", "growth without burnout"],
   "home.hero.bubbleTags": [
-    { emoji: "🏖️", text: "feel-good systems" },
-    { emoji: "☕", text: "life-first business" },
-    { emoji: "✨", text: "built with intention" },
+    { emoji: "🏖️", text: "feel-good systems", bg: "#FFFFFF" },
+    { emoji: "☕", text: "life-first business", bg: "#FFFFFF" },
+    { emoji: "✨", text: "built with intention", bg: "#F2E84B" },
   ],
 
   // ─── HOME: MARQUEES ───

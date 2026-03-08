@@ -244,59 +244,113 @@ function BlinkEmoji({ emoji, size = 24, style = {} }) {
 }
 
 /* ── Floating Tag (angled pill that hangs off image edges) ── */
+const bubbleColorOptions = [
+  { label: "white",  value: "#FFFFFF" },
+  { label: "cream",  value: "#FDFAF4" },
+  { label: "butter", value: "#F2E84B" },
+  { label: "blue",   value: "#D8EBF9" },
+  { label: "earth",  value: "#7A5C4E" },
+  { label: "olive",  value: "#555407" },
+  { label: "sand",   value: "#E2DDD4" },
+  { label: "charcoal", value: "#2C2C28" },
+];
+
 function FloatingTag({ emoji, text, contentKey, index, field, style = {} }) {
   const { getContent, updateContent, isEditing } = useCMS();
-  const val = contentKey ? (getContent(contentKey)?.[index]?.[field] ?? text) : text;
-  const emojiVal = contentKey ? (getContent(contentKey)?.[index]?.emoji ?? emoji) : emoji;
+  const item = contentKey ? getContent(contentKey)?.[index] : null;
+  const val = item?.[field] ?? text ?? "";
+  const emojiVal = item?.emoji ?? emoji ?? "";
+  const bgVal = item?.bg ?? style.background ?? C.white;
+
   const [editingEmoji, setEditingEmoji] = useState(false);
   const [emojiDraft, setEmojiDraft] = useState(emojiVal);
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
-  const saveEmoji = () => {
+  const updateField = (fields) => {
     if (!contentKey) return;
     const arr = getContent(contentKey) || [];
-    const next = arr.map((item, i) => i === index ? { ...item, emoji: emojiDraft } : item);
+    const next = arr.map((it, i) => i === index ? { ...it, ...fields } : it);
     updateContent(contentKey, next);
-    setEditingEmoji(false);
   };
 
+  const saveEmoji = () => { updateField({ emoji: emojiDraft }); setEditingEmoji(false); };
+
+  // Text color: dark bg → white text, light bg → charcoal text
+  const isDarkBg = ["#555407", "#2C2C28", "#7A5C4E"].includes(bgVal);
+  const textColor = isDarkBg ? C.white : C.charcoal;
+  const borderColor = isDarkBg ? "transparent" : C.sand;
+
   return (
-    <div style={{
-      display: "inline-flex", alignItems: "center", gap: 8,
-      background: C.white, borderRadius: 50,
-      padding: "10px 18px",
-      border: `1.5px solid ${C.sand}`,
-      boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-      fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13,
-      color: C.charcoal, whiteSpace: "nowrap",
-      ...style,
-    }}>
-      {isEditing && contentKey ? (
-        <>
-          {editingEmoji ? (
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <input
-                value={emojiDraft}
-                onChange={e => setEmojiDraft(e.target.value)}
-                onBlur={saveEmoji}
-                onKeyDown={e => e.key === "Enter" && saveEmoji()}
-                autoFocus
-                style={{ width: 36, fontSize: 16, border: "1px solid #ccc", borderRadius: 4, padding: "2px 4px", textAlign: "center" }}
-              />
-            </span>
-          ) : (
+    <div style={{ position: "relative", display: "inline-block" }}>
+      <div style={{
+        display: "inline-flex", alignItems: "center", gap: 8,
+        background: bgVal, borderRadius: 50,
+        padding: "10px 18px",
+        border: `1.5px solid ${borderColor}`,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+        fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13,
+        color: textColor, whiteSpace: "nowrap",
+        ...style, background: bgVal,
+      }}>
+        {isEditing && contentKey ? (
+          <>
+            {editingEmoji ? (
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <input
+                  value={emojiDraft}
+                  onChange={e => setEmojiDraft(e.target.value)}
+                  onBlur={saveEmoji}
+                  onKeyDown={e => e.key === "Enter" && saveEmoji()}
+                  autoFocus
+                  style={{ width: 36, fontSize: 16, border: "1px solid #ccc", borderRadius: 4, padding: "2px 4px", textAlign: "center" }}
+                />
+              </span>
+            ) : (
+              <span
+                onClick={(e) => { e.stopPropagation(); setEmojiDraft(emojiVal); setEditingEmoji(true); }}
+                title="Click to edit emoji"
+                style={{ fontSize: 16, cursor: "pointer" }}
+              >{emojiVal}</span>
+            )}
+            <EditableArrayText contentKey={contentKey} index={index} field={field} as="span" style={{ color: textColor }} />
+            {/* Color picker toggle */}
             <span
-              onClick={(e) => { e.stopPropagation(); setEmojiDraft(emojiVal); setEditingEmoji(true); }}
-              title="Click to edit emoji"
-              style={{ fontSize: 16, cursor: "pointer" }}
-            >{emojiVal}</span>
-          )}
-          <EditableArrayText contentKey={contentKey} index={index} field={field} as="span" />
-        </>
-      ) : (
-        <>
-          <span style={{ fontSize: 16 }}>{emojiVal}</span>
-          <span>{val}</span>
-        </>
+              data-editor-panel
+              onClick={(e) => { e.stopPropagation(); setShowColorPicker(p => !p); }}
+              title="Change bubble color"
+              style={{ fontSize: 12, cursor: "pointer", opacity: 0.6, marginLeft: 2 }}
+            >🎨</span>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: 16 }}>{emojiVal}</span>
+            <span style={{ color: textColor }}>{val}</span>
+          </>
+        )}
+      </div>
+
+      {/* Bubble color picker popover */}
+      {showColorPicker && isEditing && (
+        <div data-editor-panel style={{
+          position: "absolute", top: "110%", left: 0, zIndex: 9999,
+          background: "rgba(28,28,28,0.97)", backdropFilter: "blur(12px)",
+          borderRadius: 12, padding: 10, display: "flex", gap: 6, flexWrap: "wrap",
+          border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+          width: 140,
+        }}>
+          {bubbleColorOptions.map(opt => (
+            <button
+              key={opt.value}
+              onClick={(e) => { e.stopPropagation(); updateField({ bg: opt.value }); setShowColorPicker(false); }}
+              title={opt.label}
+              style={{
+                width: 24, height: 24, borderRadius: "50%", background: opt.value,
+                border: bgVal === opt.value ? "2px solid #3B82F6" : "1.5px solid rgba(255,255,255,0.2)",
+                cursor: "pointer", flexShrink: 0,
+              }}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -1446,17 +1500,17 @@ function HomePage({ setPage }) {
               </div>
 
               {/* Floating tags — angled, hanging off image edges */}
-              {/* index 0: feel-good systems — middle left */}
-              <div style={{ position: "absolute", top: "42%", left: -20, transform: "rotate(-5deg)", zIndex: 10 }}>
+              {/* index 0: feel-good systems — far left (75% off image, 25% on), opposite angle */}
+              <div style={{ position: "absolute", top: "42%", left: -100, transform: "rotate(5deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={0} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
               {/* index 1: life-first business — top right */}
               <div style={{ position: "absolute", top: "10%", right: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={1} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
-              {/* index 2: built with intention — lower center-left of image */}
-              <div style={{ position: "absolute", bottom: "18%", left: "20%", transform: "rotate(-4deg)", zIndex: 10 }}>
-                <FloatingTag contentKey="home.hero.bubbleTags" index={2} field="text" style={{ background: C.butter, boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
+              {/* index 2: built with intention — hanging off the bottom edge */}
+              <div style={{ position: "absolute", bottom: -22, left: "50%", transform: "translateX(-50%) rotate(-4deg)", zIndex: 10 }}>
+                <FloatingTag contentKey="home.hero.bubbleTags" index={2} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
             </div>
 
