@@ -1451,6 +1451,154 @@ function BackToTop({ scrollY }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   PROBLEM SECTION — "The loop you're in" with JS parallax bg
+   ══════════════════════════════════════════════════════════════ */
+function ProblemSection() {
+  const { getContent, updateContent, isEditing } = useCMS();
+  const sectionRef = useRef(null);
+  const [bgY, setBgY] = useState(0);
+
+  const bgType  = getContent("style.section.home.problem.bgType");
+  const bgValue = getContent("style.section.home.problem.bgValue");
+  const bgOverlayOpacity = getContent("style.section.home.problem.bgOverlayOpacity") ?? 0.72;
+  const hasParallaxImg = bgType === "image" && bgValue;
+
+  useEffect(() => {
+    if (!hasParallaxImg) return;
+    const el = sectionRef.current;
+    const update = () => {
+      if (!el) return;
+      if (window.innerWidth < 768) { setBgY(0); return; }
+      const rect = el.getBoundingClientRect();
+      setBgY((rect.top + rect.height / 2 - window.innerHeight / 2) * 0.25);
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", update);
+  }, [hasParallaxImg]);
+
+  const points = getContent("home.problem.points") || [];
+
+  // Resolve non-image backgrounds
+  const gridMap = { gridBgWhite, gridBgSand, gridBgOcean };
+  let sectionBg = C.charcoal;
+  if (bgType === "solid" && bgValue) sectionBg = bgValue;
+  else if (bgType === "grid" && bgValue) sectionBg = gridMap[bgValue] || C.charcoal;
+
+  const solidColorOptions = [
+    { label: "charcoal", value: C.charcoal },
+    { label: "cream",    value: C.cream    },
+    { label: "sand",     value: C.sand     },
+    { label: "olive",    value: C.olive    },
+    { label: "butter",   value: C.butter   },
+    { label: "blue",     value: C.somethingBlue },
+    { label: "earth",    value: C.motherEarth   },
+  ];
+  const gridOptions = [
+    { label: "cream grid", value: "gridBgWhite" },
+    { label: "sand grid",  value: "gridBgSand"  },
+    { label: "blue grid",  value: "gridBgOcean" },
+  ];
+
+  // Text colors depend on whether bg is light or dark
+  const lightBgs = [C.cream, C.sand, C.somethingBlue, C.butter, "#FFFFFF", gridBgWhite, gridBgSand, gridBgOcean];
+  const isLight = !hasParallaxImg && lightBgs.some(lb => sectionBg === lb || (typeof sectionBg === "string" && sectionBg.includes(lb.replace("#", ""))));
+  const headingColor   = isLight ? C.charcoal : C.cream;
+  const bodyColor      = isLight ? C.body     : `${C.sand}e0`;
+  const accentColor    = isLight ? C.olive    : C.butter;
+  const borderColor    = isLight ? `${C.sand}` : "rgba(255,255,255,0.1)";
+  const cardBg         = isLight ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.05)";
+  const dividerColor   = isLight ? C.sand : "rgba(255,255,255,0.12)";
+
+  return (
+    <EditableSection contentKey="visibility.home.problem">
+      <section ref={sectionRef} style={{ position: "relative", overflowX: "hidden", padding: "96px clamp(20px, 5vw, 56px)" }}>
+
+        {/* Parallax image background */}
+        {hasParallaxImg ? (
+          <>
+            <img src={bgValue} alt="" style={{
+              position: "absolute", top: -60, left: 0, right: 0,
+              width: "100%", height: "calc(100% + 120px)",
+              objectFit: "cover", objectPosition: "center",
+              transform: `translateY(${bgY}px)`,
+              zIndex: 0, display: "block",
+            }} />
+            <div style={{ position: "absolute", inset: 0, background: `rgba(28,28,28,${bgOverlayOpacity})`, zIndex: 1 }} />
+          </>
+        ) : (
+          <div style={{ position: "absolute", inset: 0, background: sectionBg, zIndex: 0 }} />
+        )}
+
+        {/* Background control (edit mode) */}
+        {isEditing && (
+          <SectionBgControl
+            sectionKey="home.problem"
+            bgType={bgType}
+            bgValue={bgValue}
+            bgOverlayOpacity={bgOverlayOpacity}
+            solidColorOptions={solidColorOptions}
+            gridOptions={gridOptions}
+            updateContent={updateContent}
+          />
+        )}
+
+        {/* Content */}
+        <FadeIn>
+          <div style={{ position: "relative", zIndex: 2, maxWidth: 760, margin: "0 auto" }}>
+
+            <ScriptLabel color={accentColor} size={22} style={{ textAlign: "center" }}>
+              <EditableText contentKey="home.problem.scriptLabel" as="span" />
+            </ScriptLabel>
+
+            <h2 style={{
+              fontFamily: "'Rubik', sans-serif", fontWeight: 700,
+              fontSize: "clamp(32px, 5vw, 52px)", color: headingColor,
+              margin: "0 0 44px", textAlign: "center", lineHeight: 1.1,
+            }}>
+              <EditableText contentKey="home.problem.heading" as="span" />
+            </h2>
+
+            {/* Bullet list */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 48 }}>
+              {points.map((point, i) => (
+                <div key={i} style={{
+                  display: "flex", gap: 16, alignItems: "flex-start",
+                  padding: "16px 22px",
+                  background: cardBg, borderRadius: 14,
+                  border: `1px solid ${borderColor}`,
+                }}>
+                  <span style={{ color: accentColor, fontWeight: 700, fontSize: 18, flexShrink: 0, lineHeight: 1.65 }}>✕</span>
+                  <p style={{
+                    fontFamily: "'Rubik', sans-serif",
+                    fontSize: "clamp(14px, 1.8vw, 16px)",
+                    color: bodyColor, lineHeight: 1.7, margin: 0,
+                  }}>
+                    <EditableArrayString contentKey="home.problem.points" index={i} />
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Punchline */}
+            <div style={{ textAlign: "center", borderTop: `1px solid ${dividerColor}`, paddingTop: 36 }}>
+              <p style={{
+                fontFamily: "'Georgia', serif", fontStyle: "italic",
+                fontSize: "clamp(18px, 2.5vw, 24px)", color: accentColor,
+                lineHeight: 1.5, margin: 0,
+              }}>
+                <EditableText contentKey="home.problem.punchline" as="span" />
+              </p>
+            </div>
+
+          </div>
+        </FadeIn>
+      </section>
+    </EditableSection>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
    PAGE: HOME
    ══════════════════════════════════════════════════════════════ */
 function HomePage({ setPage }) {
@@ -1630,35 +1778,7 @@ function HomePage({ setPage }) {
       </>
     ),
 
-    problem: () => (
-      <EditableSection contentKey="visibility.home.problem">
-      <SectionWrap bg={C.charcoal} py="72px">
-        <FadeIn>
-          <div style={{ maxWidth: 800, margin: "0 auto" }}>
-            <ScriptLabel color={C.butter} size={22} style={{ textAlign: "center" }}><EditableText contentKey="home.problem.scriptLabel" as="span" /></ScriptLabel>
-            <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 42px)", color: C.cream, margin: "0 0 28px", textAlign: "center", lineHeight: 1.1 }}><EditableText contentKey="home.problem.heading" as="span" /></h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
-              {(getContent("home.problem.points") || []).map((point, i) => (
-                <div key={i} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 16, padding: "20px 22px", border: `1px solid rgba(255,255,255,0.1)` }}>
-                  <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13, color: C.butter, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </div>
-                  <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: `${C.sand}cc`, lineHeight: 1.65, margin: 0 }}>
-                    <EditableArrayString contentKey="home.problem.points" index={i} />
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div style={{ textAlign: "center", marginTop: 32 }}>
-              <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: "clamp(18px, 2vw, 22px)", color: C.butter, lineHeight: 1.5 }}>
-                <EditableText contentKey="home.problem.punchline" as="span" />
-              </p>
-            </div>
-          </div>
-        </FadeIn>
-      </SectionWrap>
-      </EditableSection>
-    ),
+    problem: () => <ProblemSection />,
 
     systems: () => (
       <section style={{ background: gridBgOcean, padding: "72px clamp(20px, 5vw, 56px)", overflowX: "hidden" }}>
