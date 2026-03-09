@@ -2732,11 +2732,14 @@ export default function App() {
           .testimonial-arrows-mobile { display: flex !important; }
           /* Hero image: restore portrait 4/5 ratio at smaller width — natural photo format */
           .hero-img-wrap { width: 68% !important; max-width: 230px !important; height: auto !important; aspect-ratio: 4/5 !important; max-height: unset !important; margin: 0 auto !important; }
-          /* Floating tags: shrink via font+padding (not scale), hang off image edges */
-          .hero-float-tag > div > div { font-size: 10px !important; padding: 6px 11px !important; gap: 5px !important; }
-          .hero-float-tag > div > div span[style*="fontSize: 20"] { font-size: 14px !important; }
-          .hero-float-tag-0 { top: 40% !important; left: -20px !important; right: auto !important; bottom: auto !important; transform: rotate(3deg) !important; }
-          .hero-float-tag-1 { top: 8% !important; right: -20px !important; left: auto !important; bottom: auto !important; transform: rotate(-5deg) !important; }
+          /* Floating tags: smaller pill + emoji, right/left edges touch photo edge */
+          .hero-float-tag > div > div { font-size: 8px !important; padding: 5px 9px !important; gap: 4px !important; }
+          .hero-float-tag > div > div span:first-child { font-size: 12px !important; }
+          /* feel-good: emerges from left screen edge, right end touches photo's left edge */
+          .hero-float-tag-0 { top: 38% !important; left: -50px !important; right: auto !important; bottom: auto !important; transform: rotate(3deg) !important; }
+          /* life-first: emerges from right screen edge, left end touches photo's right edge */
+          .hero-float-tag-1 { top: 10% !important; right: -50px !important; left: auto !important; bottom: auto !important; transform: rotate(-5deg) !important; }
+          /* built with intention: hangs just below photo */
           .hero-float-tag-2 { bottom: -18px !important; left: 50% !important; right: auto !important; top: auto !important; transform: translateX(-50%) rotate(-2deg) !important; }
           /* Tighten grid gap + image column on mobile */
           .hero-two-col { gap: 14px !important; padding-top: 8px; }
