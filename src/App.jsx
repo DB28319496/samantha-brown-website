@@ -1635,7 +1635,7 @@ function HomePage({ setPage }) {
       const useOmbre = getContent("style.home.hero.heading.useOmbre") !== false;
       const headingGradient = "linear-gradient(135deg, #2C2C28 0%, #555407 45%, #7A5C4E 100%)";
       return (
-        <section style={{ minHeight: "100svh", display: "flex", alignItems: "center", background: gridBgWhite, padding: "clamp(88px, 12vw, 112px) clamp(20px, 5vw, 56px) clamp(60px, 8vw, 80px)", position: "relative", overflowX: "hidden", zIndex: 2 }}>
+        <section className="hero-section" style={{ minHeight: "100svh", display: "flex", alignItems: "center", background: gridBgWhite, padding: "clamp(88px, 12vw, 112px) clamp(20px, 5vw, 56px) clamp(60px, 8vw, 80px)", position: "relative", overflowX: "hidden", zIndex: 2 }}>
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(85,84,7,0.04) 0%, rgba(216,235,249,0.06) 50%, rgba(242,232,75,0.04) 100%)", backgroundSize: "200% 200%", animation: "gradientShift 15s ease infinite", zIndex: 0, pointerEvents: "none" }} />
 
           <div style={{ maxWidth: 1140, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(32px, 6vw, 72px)", alignItems: "center", position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }} className="hero-two-col">
@@ -2741,8 +2741,10 @@ export default function App() {
           .hero-float-tag-1 { top: 10% !important; right: -50px !important; left: auto !important; bottom: auto !important; transform: rotate(-5deg) !important; }
           /* built with intention: hangs just below photo */
           .hero-float-tag-2 { bottom: -18px !important; left: 50% !important; right: auto !important; top: auto !important; transform: translateX(-50%) rotate(-2deg) !important; }
+          /* Pull image up closer to nav */
+          .hero-section { padding-top: 74px !important; align-items: flex-start !important; }
           /* Tighten grid gap + image column on mobile */
-          .hero-two-col { gap: 14px !important; padding-top: 8px; }
+          .hero-two-col { gap: 14px !important; padding-top: 4px; }
           .hero-two-col > div:first-child { max-width: min(100%, 420px); margin-left: auto; margin-right: auto; }
           /* Smaller heading + tighter spacing so CTA fits on screen */
           .hero-two-col h1 { font-size: clamp(24px, 7vw, 64px) !important; line-height: 1.1 !important; margin-bottom: 10px !important; }
