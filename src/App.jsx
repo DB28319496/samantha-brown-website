@@ -2730,9 +2730,8 @@ export default function App() {
           .mob-toggle { display: block !important; }
           .testimonial-arrows-desktop { display: none !important; }
           .testimonial-arrows-mobile { display: flex !important; }
-          /* Hero image: constrain to ~260px, crop to show subject not just sky */
-          .hero-img-wrap { height: 260px !important; aspect-ratio: unset !important; max-height: unset !important; }
-          .hero-img-wrap img { object-position: center 30% !important; }
+          /* Hero image: restore portrait 4/5 ratio at smaller width — natural photo format */
+          .hero-img-wrap { width: 68% !important; max-width: 230px !important; height: auto !important; aspect-ratio: 4/5 !important; max-height: unset !important; margin: 0 auto !important; }
           /* Floating tags: reposition to sit inside image bounds on mobile */
           .hero-float-tag-0 { top: 38% !important; left: 10px !important; right: auto !important; bottom: auto !important; transform: rotate(3deg) !important; }
           .hero-float-tag-1 { top: 12% !important; right: 10px !important; left: auto !important; bottom: auto !important; transform: rotate(-5deg) !important; }
