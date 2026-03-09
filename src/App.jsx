@@ -2730,17 +2730,19 @@ export default function App() {
           .mob-toggle { display: block !important; }
           .testimonial-arrows-desktop { display: none !important; }
           .testimonial-arrows-mobile { display: flex !important; }
-          /* Hero image: constrain to ~300px tall, crop to show upper subject not sky */
-          .hero-img-wrap { height: 300px !important; aspect-ratio: unset !important; max-height: unset !important; }
+          /* Hero image: constrain to ~260px, crop to show subject not just sky */
+          .hero-img-wrap { height: 260px !important; aspect-ratio: unset !important; max-height: unset !important; }
           .hero-img-wrap img { object-position: center 30% !important; }
           /* Floating tags: reposition to sit inside image bounds on mobile */
           .hero-float-tag-0 { top: 38% !important; left: 10px !important; right: auto !important; bottom: auto !important; transform: rotate(3deg) !important; }
           .hero-float-tag-1 { top: 12% !important; right: 10px !important; left: auto !important; bottom: auto !important; transform: rotate(-5deg) !important; }
           .hero-float-tag-2 { bottom: 10px !important; left: 50% !important; right: auto !important; top: auto !important; transform: translateX(-50%) rotate(-2deg) !important; }
-          /* Gap between image column and text on mobile */
-          .hero-two-col > div:first-child { margin-bottom: 16px; max-width: min(100%, 420px); margin-left: auto; margin-right: auto; }
-          /* Extra breathing room below nav on mobile */
-          .hero-two-col { padding-top: 8px; }
+          /* Tighten grid gap + image column on mobile */
+          .hero-two-col { gap: 14px !important; padding-top: 8px; }
+          .hero-two-col > div:first-child { max-width: min(100%, 420px); margin-left: auto; margin-right: auto; }
+          /* Smaller heading + tighter spacing so CTA fits on screen */
+          .hero-two-col h1 { font-size: clamp(24px, 7vw, 64px) !important; line-height: 1.1 !important; margin-bottom: 10px !important; }
+          .hero-two-col > div:last-child > div { margin-bottom: 8px !important; }
         }
         @media (max-width: 480px) {
           .core-values-grid { grid-template-columns: 1fr; }
