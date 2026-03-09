@@ -1643,21 +1643,21 @@ function HomePage({ setPage }) {
             {/* LEFT COLUMN: image + floating tags */}
             <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateX(-32px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.1s", position: "relative" }}>
               {/* Rounded image */}
-              <div style={{ borderRadius: 28, overflow: "hidden", position: "relative", aspectRatio: "4/5", maxHeight: 580 }}>
+              <div className="hero-img-wrap" style={{ borderRadius: 28, overflow: "hidden", position: "relative", aspectRatio: "4/5", maxHeight: 580 }}>
                 <EditableImage contentKey="image.home.hero" alt="samantha brown" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", borderRadius: 28 }} placeholderEmoji="📸" placeholderLabel="upload your photo" placeholderHeight={520} placeholderBg={C.sandLight} placeholderRadius={28} />
               </div>
 
-              {/* Floating tags — angled, hanging off image edges (hidden on mobile) */}
+              {/* Floating tags — angled, hanging off image edges */}
               {/* index 0: feel-good systems — far left (75% off image, 25% on), opposite angle */}
-              <div className="hero-float-tag" style={{ position: "absolute", top: "42%", left: -100, transform: "rotate(5deg)", zIndex: 10 }}>
+              <div className="hero-float-tag hero-float-tag-0" style={{ position: "absolute", top: "42%", left: -100, transform: "rotate(5deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={0} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
               {/* index 1: life-first business — top right */}
-              <div className="hero-float-tag" style={{ position: "absolute", top: "10%", right: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
+              <div className="hero-float-tag hero-float-tag-1" style={{ position: "absolute", top: "10%", right: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={1} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
               {/* index 2: built with intention — hanging off the bottom edge */}
-              <div className="hero-float-tag" style={{ position: "absolute", bottom: -22, left: "50%", transform: "translateX(-50%) rotate(-4deg)", zIndex: 10 }}>
+              <div className="hero-float-tag hero-float-tag-2" style={{ position: "absolute", bottom: -22, left: "50%", transform: "translateX(-50%) rotate(-4deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={2} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
             </div>
@@ -1673,7 +1673,7 @@ function HomePage({ setPage }) {
                     WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                     backgroundClip: "text", animation: "gradientText 8s ease infinite",
                   } : { color: C.charcoal })),
-                  lineHeight: 1.05, margin: "0 0 20px", textTransform: "lowercase", letterSpacing: "-1px",
+                  lineHeight: 1.15, margin: "0 0 20px", textTransform: "lowercase", letterSpacing: "-1px",
                 }}>
                   <EditableText contentKey="home.hero.heading" as="span" style={{ background: "inherit", WebkitBackgroundClip: "inherit", WebkitTextFillColor: "inherit", backgroundClip: "inherit" }} />
                 </h1>
@@ -2730,8 +2730,16 @@ export default function App() {
           .mob-toggle { display: block !important; }
           .testimonial-arrows-desktop { display: none !important; }
           .testimonial-arrows-mobile { display: flex !important; }
-          .hero-float-tag { display: none !important; }
-          .hero-two-col > div:first-child { margin-bottom: 24px; max-width: min(100%, 400px); margin-left: auto; margin-right: auto; }
+          /* Hero image: shorter on mobile so text is visible without scroll */
+          .hero-img-wrap { height: 240px !important; aspect-ratio: unset !important; max-height: unset !important; }
+          /* Floating tags: reposition to sit inside image bounds on mobile */
+          .hero-float-tag-0 { top: 38% !important; left: 10px !important; right: auto !important; bottom: auto !important; transform: rotate(3deg) !important; }
+          .hero-float-tag-1 { top: 12% !important; right: 10px !important; left: auto !important; bottom: auto !important; transform: rotate(-5deg) !important; }
+          .hero-float-tag-2 { bottom: 10px !important; left: 50% !important; right: auto !important; top: auto !important; transform: translateX(-50%) rotate(-2deg) !important; }
+          /* Gap between image column and text on mobile */
+          .hero-two-col > div:first-child { margin-bottom: 16px; max-width: min(100%, 420px); margin-left: auto; margin-right: auto; }
+          /* Extra breathing room below nav on mobile */
+          .hero-two-col { padding-top: 8px; }
         }
         @media (max-width: 480px) {
           .core-values-grid { grid-template-columns: 1fr; }
