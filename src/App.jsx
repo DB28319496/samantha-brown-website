@@ -1512,7 +1512,7 @@ function ProblemSection() {
 
   return (
     <EditableSection contentKey="visibility.home.problem">
-      <section ref={sectionRef} style={{ position: "relative", overflowX: "hidden", padding: "96px clamp(20px, 5vw, 56px)" }}>
+      <section ref={sectionRef} style={{ position: "relative", overflowX: "hidden", padding: "clamp(64px, 8vw, 96px) clamp(20px, 5vw, 56px)" }}>
 
         {/* Parallax image background */}
         {hasParallaxImg ? (
@@ -1635,7 +1635,7 @@ function HomePage({ setPage }) {
       const useOmbre = getContent("style.home.hero.heading.useOmbre") !== false;
       const headingGradient = "linear-gradient(135deg, #2C2C28 0%, #555407 45%, #7A5C4E 100%)";
       return (
-        <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", background: gridBgWhite, padding: "clamp(88px, 12vw, 112px) clamp(20px, 5vw, 56px) 48px", position: "relative", overflow: "hidden", zIndex: 2 }}>
+        <section style={{ minHeight: "100svh", display: "flex", alignItems: "center", background: gridBgWhite, padding: "clamp(88px, 12vw, 112px) clamp(20px, 5vw, 56px) clamp(60px, 8vw, 80px)", position: "relative", overflowX: "hidden", zIndex: 2 }}>
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(85,84,7,0.04) 0%, rgba(216,235,249,0.06) 50%, rgba(242,232,75,0.04) 100%)", backgroundSize: "200% 200%", animation: "gradientShift 15s ease infinite", zIndex: 0, pointerEvents: "none" }} />
 
           <div style={{ maxWidth: 1140, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(32px, 6vw, 72px)", alignItems: "center", position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }} className="hero-two-col">
@@ -1647,17 +1647,17 @@ function HomePage({ setPage }) {
                 <EditableImage contentKey="image.home.hero" alt="samantha brown" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", borderRadius: 28 }} placeholderEmoji="📸" placeholderLabel="upload your photo" placeholderHeight={520} placeholderBg={C.sandLight} placeholderRadius={28} />
               </div>
 
-              {/* Floating tags — angled, hanging off image edges */}
+              {/* Floating tags — angled, hanging off image edges (hidden on mobile) */}
               {/* index 0: feel-good systems — far left (75% off image, 25% on), opposite angle */}
-              <div style={{ position: "absolute", top: "42%", left: -100, transform: "rotate(5deg)", zIndex: 10 }}>
+              <div className="hero-float-tag" style={{ position: "absolute", top: "42%", left: -100, transform: "rotate(5deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={0} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
               {/* index 1: life-first business — top right */}
-              <div style={{ position: "absolute", top: "10%", right: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
+              <div className="hero-float-tag" style={{ position: "absolute", top: "10%", right: -28, transform: "rotate(-8deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={1} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
               {/* index 2: built with intention — hanging off the bottom edge */}
-              <div style={{ position: "absolute", bottom: -22, left: "50%", transform: "translateX(-50%) rotate(-4deg)", zIndex: 10 }}>
+              <div className="hero-float-tag" style={{ position: "absolute", bottom: -22, left: "50%", transform: "translateX(-50%) rotate(-4deg)", zIndex: 10 }}>
                 <FloatingTag contentKey="home.hero.bubbleTags" index={2} field="text" style={{ boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }} />
               </div>
             </div>
@@ -2701,6 +2701,9 @@ export default function App() {
           .hero-two-col > div:last-child > div > div {
             justify-content: center;
           }
+          .hero-two-col > div:last-child > div[style*="flex"] {
+            justify-content: center;
+          }
         }
 
         /* Enhanced Form Inputs */
@@ -2727,6 +2730,8 @@ export default function App() {
           .mob-toggle { display: block !important; }
           .testimonial-arrows-desktop { display: none !important; }
           .testimonial-arrows-mobile { display: flex !important; }
+          .hero-float-tag { display: none !important; }
+          .hero-two-col > div:first-child { margin-bottom: 24px; max-width: min(100%, 400px); margin-left: auto; margin-right: auto; }
         }
         @media (max-width: 480px) {
           .core-values-grid { grid-template-columns: 1fr; }
