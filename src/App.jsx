@@ -1741,7 +1741,7 @@ function HomePage({ setPage }) {
             </div>
           </FadeIn>
         </SectionWrap>
-        <EditableBlockList contentKey="blocks.home.welcome" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
+        <EditableBlockList contentKey="blocks.home.welcome2" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 clamp(20px, 5vw, 56px)" }} />
       </>
     ),
 

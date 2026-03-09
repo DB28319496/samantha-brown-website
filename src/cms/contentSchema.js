@@ -436,7 +436,7 @@ export const defaultContent = {
   "image.about.hero": null,
 
   // ─── CONTENT BLOCKS (dynamic headings, paragraphs, spacers) ───
-  "blocks.home.welcome": [],
+  "blocks.home.welcome2": [],
   "blocks.home.coreValues": [],
   "blocks.home.pathCards": [],
   "blocks.home.stats": [],
@@ -452,6 +452,7 @@ export const defaultContent = {
   "home.sectionOrder": ["hero", "marquee", "welcome", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"],
 
   // ─── SECTION VISIBILITY ───
+  "visibility.home.problem": true,
   "visibility.home.socialProof": true,
   "visibility.home.stats": true,
   "visibility.home.testimonials": true,
