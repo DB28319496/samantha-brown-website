@@ -2743,8 +2743,8 @@ export default function App() {
           .hero-float-tag-2 { bottom: -18px !important; left: 50% !important; right: auto !important; top: auto !important; transform: translateX(-50%) rotate(-2deg) !important; }
           /* Pull image up closer to nav */
           .hero-section { padding-top: 74px !important; align-items: flex-start !important; }
-          /* Tighten grid gap + image column on mobile */
-          .hero-two-col { gap: 14px !important; padding-top: 4px; }
+          /* Tighten grid gap + image column on mobile; gap must clear the -18px bottom tag */
+          .hero-two-col { gap: 42px !important; padding-top: 4px; }
           .hero-two-col > div:first-child { max-width: min(100%, 420px); margin-left: auto; margin-right: auto; }
           /* Smaller heading + tighter spacing so CTA fits on screen */
           .hero-two-col h1 { font-size: clamp(24px, 7vw, 64px) !important; line-height: 1.1 !important; margin-bottom: 10px !important; }
