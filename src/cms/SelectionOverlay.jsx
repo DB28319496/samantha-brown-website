@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSelection } from "./SelectionContext";
+import { useSelection } from "./useSelection";
 import { EDITOR } from "./editorConstants";
 
 export function SelectionOverlay() {
@@ -15,13 +15,14 @@ export function SelectionOverlay() {
   }, [selectedElement]);
 
   useEffect(() => {
-    if (!selectedElement) { setRect(null); return; }
-    measure();
+    const raf = requestAnimationFrame(measure);
+    if (!selectedElement) return () => cancelAnimationFrame(raf);
     const onScroll = () => requestAnimationFrame(measure);
     const onResize = () => requestAnimationFrame(measure);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };

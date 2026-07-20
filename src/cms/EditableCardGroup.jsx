@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { useContent } from "./useContent";
-import { useSelection } from "./SelectionContext";
+import { useSelection } from "./useSelection";
 import { EDITOR } from "./editorConstants";
 
 export function EditableCardGroup({
@@ -15,11 +15,11 @@ export function EditableCardGroup({
 }) {
   const { value: items, update, isEditing } = useContent(contentKey);
   const { select, selectedElement, pushUndo } = useSelection();
-  const [dragIndex, setDragIndex] = useState(null);
+  const [, setDragIndex] = useState(null);
   const [dropIndex, setDropIndex] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
   const gridRef = useRef(null);
-  const arr = Array.isArray(items) ? items : [];
+  const arr = useMemo(() => (Array.isArray(items) ? items : []), [items]);
 
   const addCard = useCallback(() => {
     if (arr.length >= maxCards) return;

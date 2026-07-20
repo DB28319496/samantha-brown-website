@@ -1,9 +1,10 @@
-import { createContext, useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ContentContext } from "./ContentContext";
 import { onAuthChange } from "../supabase/auth";
 import { fetchContent, saveContent } from "../supabase/firestore";
 import { defaultContent } from "./contentSchema";
 
-export const ContentContext = createContext();
+export { ContentContext };
 
 export function ContentProvider({ children }) {
   const [isAdmin, setIsAdmin] = useState(false);

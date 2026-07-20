@@ -1,6 +1,5 @@
-import { createContext, useState, useCallback, useContext, useRef } from "react";
-
-const SelectionContext = createContext();
+import { useState, useCallback, useRef, useEffect } from "react";
+import { SelectionContext } from "./useSelection";
 
 export function SelectionProvider({ children }) {
   const [selectedElement, setSelectedElement] = useState(null);
@@ -9,8 +8,8 @@ export function SelectionProvider({ children }) {
   const [redoStack, setRedoStack] = useState([]);
   const undoRef = useRef(undoStack);
   const redoRef = useRef(redoStack);
-  undoRef.current = undoStack;
-  redoRef.current = redoStack;
+  useEffect(() => { undoRef.current = undoStack; }, [undoStack]);
+  useEffect(() => { redoRef.current = redoStack; }, [redoStack]);
 
   const select = useCallback((info) => {
     setSelectedElement(info);
@@ -54,8 +53,4 @@ export function SelectionProvider({ children }) {
       {children}
     </SelectionContext.Provider>
   );
-}
-
-export function useSelection() {
-  return useContext(SelectionContext);
 }

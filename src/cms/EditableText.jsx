@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useLayoutEffect } from "react";
 import { useContent, useCMS } from "./useContent";
-import { useSelection } from "./SelectionContext";
+import { useSelection } from "./useSelection";
 
 /* Sanitize HTML — allow only safe inline formatting tags */
 function sanitizeHtml(html) {
@@ -20,7 +20,7 @@ function getCursorOffset(el) {
     preRange.selectNodeContents(el);
     preRange.setEnd(range.startContainer, range.startOffset);
     return preRange.toString().length;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -52,7 +52,7 @@ function restoreCursor(el, savedOffset) {
     }
     sel?.removeAllRanges();
     sel?.addRange(range);
-  } catch (e) {
+  } catch {
     // ignore
   }
 }

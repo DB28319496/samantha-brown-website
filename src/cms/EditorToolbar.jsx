@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useCMS } from "./useContent";
-import { useSelection } from "./SelectionContext";
+import { useSelection } from "./useSelection";
 import { adminSignOut } from "../supabase/auth";
 import { EDITOR } from "./editorConstants";
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { adminSignIn, adminSignOut } from "../supabase/auth";
+import { adminSignIn } from "../supabase/auth";
 import { useCMS } from "./useContent";
 
 const C = {
@@ -172,4 +172,3 @@ export function AdminLoginModal() {
   );
 }
 
-export { adminSignOut };

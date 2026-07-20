@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { useContent } from "./useContent";
-import { useSelection } from "./SelectionContext";
+import { useSelection } from "./useSelection";
 import { EDITOR } from "./editorConstants";
 
 /* ══════════════════════════════════════════════════════════════
@@ -10,9 +10,9 @@ export function EditableBlockList({ contentKey, style = {} }) {
   const { value: blocks, update, isEditing } = useContent(contentKey);
   const { select, selectedElement, pushUndo } = useSelection();
   const [hoveredBlock, setHoveredBlock] = useState(null);
-  const [dragIndex, setDragIndex] = useState(null);
+  const [, setDragIndex] = useState(null);
   const [dropIndex, setDropIndex] = useState(null);
-  const arr = Array.isArray(blocks) ? blocks : [];
+  const arr = useMemo(() => (Array.isArray(blocks) ? blocks : []), [blocks]);
 
   const addBlock = useCallback((type) => {
     const defaults = {

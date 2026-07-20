@@ -10,7 +10,7 @@ import { EditorToolbar } from "./cms/EditorToolbar";
 import { SelectionOverlay } from "./cms/SelectionOverlay";
 import { PropertyPanel } from "./cms/PropertyPanel";
 import { AdminLoginListener, AdminLoginModal } from "./cms/AdminAuth";
-import { Icon, EmojiIcon } from "./icons";
+import { Icon, EmojiIcon, BrandGlyph, brandForLabel } from "./icons";
 
 /* ══════════════════════════════════════════════════════════════
    DESIGN SYSTEM — Beachy palette from color swatch
@@ -463,7 +463,7 @@ function Btn({ children, variant = "primary", onClick, style = {} }) {
 }
 
 /* ── Editable Button (label + link destination in edit mode) ── */
-function EditableBtn({ contentKey, variant = "primary", defaultLabel = "button", defaultLink = "contact", nav, style = {}, setPage }) {
+function EditableBtn({ contentKey, variant = "primary", defaultLabel = "button", defaultLink = "contact", nav, style = {} }) {
   const { getContent, updateContent, isEditing } = useCMS();
   const label = getContent(`${contentKey}.label`) ?? defaultLabel;
   const link = getContent(`${contentKey}.link`) ?? defaultLink;
@@ -869,17 +869,23 @@ function SocialProof() {
   const badges = getContent("home.socialProof.badges") || [];
   const images = getContent("home.socialProof.images") || [];
   const [ref, inView] = useInView(0.1);
-  const scrollY = useScrollY();
   const sectionRef = useRef(null);
+  const [parallaxOffset, setParallaxOffset] = useState(0);
 
-  let parallaxOffset = 0;
-  if (sectionRef.current) {
-    const rect = sectionRef.current.getBoundingClientRect();
-    const viewH = window.innerHeight;
-    if (rect.top < viewH && rect.bottom > 0) {
-      parallaxOffset = (viewH / 2 - rect.top) * 0.04;
-    }
-  }
+  useEffect(() => {
+    const update = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      if (rect.top < viewH && rect.bottom > 0) {
+        setParallaxOffset((viewH / 2 - rect.top) * 0.04);
+      }
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", update);
+  }, []);
 
   const removeImage = (idx) => {
     const next = images.filter((_, i) => i !== idx);
@@ -989,6 +995,7 @@ function SocialProof() {
         {/* Text badges */}
         <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
           {badges.map((badge, i) => {
+            const brand = brandForLabel(badge);
             return (
               <div key={i} style={{
                 fontFamily: "'Rubik', sans-serif", fontSize: 13, fontWeight: 600,
@@ -1005,7 +1012,9 @@ function SocialProof() {
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.04)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(44,44,40,0.05)"; }}>
-                <BrandStar size={12} color={C.olive} />
+                {brand
+                  ? <BrandGlyph brand={brand} size={15} color={C.charcoal} />
+                  : <BrandStar size={12} color={C.olive} />}
                 <EditableArrayString contentKey="home.socialProof.badges" index={i} />
               </div>
             );
@@ -1104,7 +1113,7 @@ function TestimonialCarousel() {
 }
 
 /* ── Testimonial Section (parallax background + bubble carousel) ── */
-function TestimonialSection({ scrollY }) {
+function TestimonialSection() {
   const { getContent, updateContent, isEditing } = useCMS();
   const sectionRef = useRef(null);
   const bgUrl = getContent("image.home.testimonials.bg");
@@ -1112,22 +1121,29 @@ function TestimonialSection({ scrollY }) {
   const fitMode = getContent("style.image.home.testimonials.bg.objectFit") || "cover";
   const fitPosition = getContent("style.image.home.testimonials.bg.objectPosition") || "center";
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const [parallaxOffset, setParallaxOffset] = useState(0);
 
-  let parallaxOffset = 0;
-  if (!isMobile && sectionRef.current) {
-    const rect = sectionRef.current.getBoundingClientRect();
-    const viewH = window.innerHeight;
-    if (rect.top < viewH && rect.bottom > 0) {
-      parallaxOffset = (viewH - rect.top) * 0.08;
-    }
-  }
+  useEffect(() => {
+    if (isMobile) return;
+    const update = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      if (rect.top < viewH && rect.bottom > 0) {
+        setParallaxOffset((viewH - rect.top) * 0.08);
+      }
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", update);
+  }, [isMobile]);
 
   return (
     <section ref={sectionRef} style={{
       position: "relative", overflow: "hidden",
       padding: "clamp(56px, 8vw, 80px) clamp(20px, 5vw, 56px)",
-      background: bgUrl ? "transparent" : C.sandLight,
-      backgroundColor: bgUrl ? C.charcoal : undefined,
+      background: bgUrl ? C.charcoal : C.sandLight,
     }}>
       {/* Parallax background image — uses <img> so objectFit/objectPosition work */}
       {bgUrl && (
@@ -1529,7 +1545,6 @@ function HomePage({ setPage }) {
   const { getContent, updateContent, isEditing } = useCMS();
   const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   const [loaded, setLoaded] = useState(false);
-  const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
 
   const defaultOrder = ["hero", "marquee", "welcome", "problem", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
@@ -1821,11 +1836,15 @@ function HomePage({ setPage }) {
         <FadeIn delay={400}>
           <div style={{ textAlign: "center" }}>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 18, flexWrap: "wrap" }}>
-              {(getContent("home.stats.badges") || []).map((t, i) => (
-                <span key={i} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 11, color: C.charcoal, background: C.yellow, padding: "5px 16px", borderRadius: 50, letterSpacing: "0.3px" }}>
-                  <EditableArrayString contentKey="home.stats.badges" index={i} />
-                </span>
-              ))}
+              {(getContent("home.stats.badges") || []).map((t, i) => {
+                const brand = brandForLabel(t);
+                return (
+                  <span key={i} style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 11, color: C.charcoal, background: C.yellow, padding: "5px 16px", borderRadius: 50, letterSpacing: "0.3px", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    {brand && <BrandGlyph brand={brand} size={12} color={C.charcoal} />}
+                    <EditableArrayString contentKey="home.stats.badges" index={i} />
+                  </span>
+                );
+              })}
             </div>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, maxWidth: 580, margin: "0 auto" }}><EditableText contentKey="home.stats.footnote" as="span" /></p>
           </div>
@@ -1844,7 +1863,7 @@ function HomePage({ setPage }) {
 
     testimonials: () => (
       <EditableSection contentKey="visibility.home.testimonials">
-      <TestimonialSection scrollY={scrollY} />
+      <TestimonialSection />
       </EditableSection>
     ),
 
@@ -1942,7 +1961,7 @@ function HomePage({ setPage }) {
    PAGE: SERVICES HUB
    ══════════════════════════════════════════════════════════════ */
 function ServicesPage({ setPage }) {
-  const { getContent, isEditing } = useCMS();
+  const { isEditing } = useCMS();
   const nav = (p) => { if (!isEditing) { setPage(p); window.scrollTo({ top: 0 }); } };
   const foundersRef = useRef(null);
   const corporateRef = useRef(null);
@@ -2417,7 +2436,9 @@ function ResourcesPage() {
                 <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center" }}>
                   {isEditing
                     ? <span style={{ fontSize: 40 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="emoji" as="span" /></span>
-                    : <EmojiIcon emoji={tool.emoji} size={36} color={C.charcoal} />}
+                    : (brandForLabel(tool.title)
+                        ? <BrandGlyph brand={brandForLabel(tool.title)} size={34} color={C.charcoal} />
+                        : <EmojiIcon emoji={tool.emoji} size={36} color={C.charcoal} />)}
                 </div>
                 <div style={{ padding: "20px 20px 24px" }}>
                   <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.charcoal, margin: "0 0 8px" }}><EditableArrayText contentKey="resources.tools.items" index={i} field="title" as="span" /></h3>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSelection } from "./SelectionContext";
+import { useSelection } from "./useSelection";
 import { useCMS } from "./useContent";
 import { EDITOR } from "./editorConstants";
 
@@ -9,11 +9,7 @@ import { EDITOR } from "./editorConstants";
 export function PropertyPanel() {
   const { selectedElement, deselect } = useSelection();
   const { isEditing } = useCMS();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    setVisible(!!(selectedElement && isEditing));
-  }, [selectedElement, isEditing]);
+  const visible = !!(selectedElement && isEditing);
 
   if (!visible || !selectedElement) return null;
 
