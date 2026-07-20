@@ -10,6 +10,7 @@ import { EditorToolbar } from "./cms/EditorToolbar";
 import { SelectionOverlay } from "./cms/SelectionOverlay";
 import { PropertyPanel } from "./cms/PropertyPanel";
 import { AdminLoginListener, AdminLoginModal } from "./cms/AdminAuth";
+import { Icon, EmojiIcon } from "./icons";
 
 /* ══════════════════════════════════════════════════════════════
    DESIGN SYSTEM — Beachy palette from color swatch
@@ -94,18 +95,10 @@ function FadeIn({ children, delay = 0, y = 28, style = {} }) {
   );
 }
 
-/* ── Animated Counter (counts up on scroll + repeats every 5s) ── */
+/* ── Animated Counter (counts up once on scroll into view) ── */
 function AnimatedCounter({ end, duration = 2000, suffix = "" }) {
   const [ref, v] = useInView(0.1);
   const [count, setCount] = useState(0);
-  const [tick, setTick] = useState(0);
-
-  // Auto-replay every 5 seconds once in view
-  useEffect(() => {
-    if (!v) return;
-    const interval = setInterval(() => setTick((t) => t + 1), 5000);
-    return () => clearInterval(interval);
-  }, [v]);
 
   useEffect(() => {
     if (!v) return;
@@ -123,7 +116,7 @@ function AnimatedCounter({ end, duration = 2000, suffix = "" }) {
       }
     };
     animate();
-  }, [v, tick, end, duration]);
+  }, [v, end, duration]);
 
   const formatted = end.toString().includes('+')
     ? `${Math.floor(count)}+`
@@ -136,111 +129,40 @@ function AnimatedCounter({ end, duration = 2000, suffix = "" }) {
   return <div ref={ref}>{formatted}{suffix}</div>;
 }
 
-/* ── 3D Card Tilt Hook (premium hover effect) ── */
-function use3DTilt() {
-  const ref = useRef(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = useCallback((e) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-    setTilt({ x: rotateX, y: rotateY });
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 });
-  }, []);
-
-  return { ref, tilt, handleMouseMove, handleMouseLeave };
-}
-
-/* ── Text Reveal Animation ── */
-function TextReveal({ children, delay = 0 }) {
-  const [ref, v] = useInView(0.1);
-  return (
-    <div ref={ref} style={{
-      opacity: v ? 1 : 0,
-      transform: v ? "translateY(0)" : "translateY(20px)",
-      transition: `all 0.8s cubic-bezier(.22,.61,.36,1) ${delay}ms`,
-      willChange: "opacity, transform"
-    }}>
-      {children}
-    </div>
-  );
-}
-
-/* ── 3D Tilt Card Component ── */
-function TiltCard({ children, style = {}, onClick }) {
-  const { ref, tilt, handleMouseMove, handleMouseLeave } = use3DTilt();
-  return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      style={{
-        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-        willChange: "transform",
-        ...style
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-/* ── Typewriter Animation (cycles through phrases) ── */
-function TypewriterText({ phrases = [], speed = 80, deleteSpeed = 40, pauseDuration = 2000, style = {} }) {
-  const [text, setText] = useState("");
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [phase, setPhase] = useState("typing"); // typing | pausing | deleting
+/* ── Rotating Text (soft crossfade through phrases) ── */
+function RotatingText({ phrases = [], interval = 3200, style = {} }) {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (!phrases.length) return;
-    const current = phrases[phraseIndex];
+    if (phrases.length < 2) return;
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % phrases.length);
+        setVisible(true);
+      }, 350);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [phrases.length, interval]);
 
-    if (phase === "typing") {
-      if (text.length < current.length) {
-        const t = setTimeout(() => setText(current.slice(0, text.length + 1)), speed);
-        return () => clearTimeout(t);
-      }
-      // Fully typed — pause before deleting
-      const t = setTimeout(() => setPhase("deleting"), pauseDuration);
-      return () => clearTimeout(t);
-    }
-
-    if (phase === "deleting") {
-      if (text.length > 0) {
-        const t = setTimeout(() => setText(text.slice(0, -1)), deleteSpeed);
-        return () => clearTimeout(t);
-      }
-      // Fully deleted — move to next phrase
-      setPhraseIndex((phraseIndex + 1) % phrases.length);
-      setPhase("typing");
-    }
-  }, [text, phraseIndex, phase, phrases, speed, deleteSpeed, pauseDuration]);
-
+  if (!phrases.length) return null;
   return (
-    <span style={{ ...style }}>
-      {text}<span className="typewriter-cursor" style={{ opacity: 1, animation: "blink 0.8s step-end infinite" }}>|</span>
+    <span style={{
+      display: "inline-block",
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(6px)",
+      transition: "opacity 0.35s ease, transform 0.35s ease",
+      ...style,
+    }}>
+      {phrases[index]}
     </span>
   );
 }
 
-/* ── Blinking Emoji (pulse animation) ── */
-function BlinkEmoji({ emoji, size = 24, style = {} }) {
-  return (
-    <span style={{ fontSize: size, display: "inline-block", animation: "emojiPulse 2.5s ease-in-out infinite", ...style }}>
-      {emoji}
-    </span>
-  );
+/* ── Brand icon (emoji strings from the CMS render as line icons) ── */
+function BlinkEmoji({ emoji, size = 24, color = C.olive, style = {} }) {
+  return <EmojiIcon emoji={emoji} size={size} color={color} style={style} />;
 }
 
 /* ── Floating Tag (angled pill that hangs off image edges) ── */
@@ -284,7 +206,7 @@ function FloatingTag({ emoji, text, contentKey, index, field, style = {} }) {
     <div style={{ position: "relative", display: "inline-block" }}>
       <div style={{
         display: "inline-flex", alignItems: "center", gap: 8,
-        background: bgVal, borderRadius: 50,
+        borderRadius: 50,
         padding: "10px 18px",
         border: `1.5px solid ${borderColor}`,
         boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
@@ -323,7 +245,7 @@ function FloatingTag({ emoji, text, contentKey, index, field, style = {} }) {
           </>
         ) : (
           <>
-            <span style={{ fontSize: 16 }}>{emojiVal}</span>
+            <EmojiIcon emoji={emojiVal} size={16} color={textColor} />
             <span style={{ color: textColor }}>{val}</span>
           </>
         )}
@@ -374,7 +296,7 @@ function BubbleTag({ emoji, text, bg = C.white, color = C.charcoal, style = {} }
       whiteSpace: "nowrap",
       ...style,
     }}>
-      <BlinkEmoji emoji={emoji} size={16} />{text}
+      <EmojiIcon emoji={emoji} size={16} color={C.olive} />{text}
     </span>
   );
 }
@@ -469,7 +391,7 @@ function Marquee({ text, contentKey, bg = C.charcoal, color = C.sand, speed = 60
    ══════════════════════════════════════════════════════════════ */
 function ScriptLabel({ children, color = C.olive, size = 20, style = {} }) {
   return (
-    <span style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: size, color, fontWeight: 400, letterSpacing: "0.3px", display: "block", marginBottom: 8, ...style }}>{children}</span>
+    <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: size, color, fontWeight: 400, letterSpacing: "0.3px", display: "block", marginBottom: 8, ...style }}>{children}</span>
   );
 }
 
@@ -935,7 +857,7 @@ function PullQuote({ quote, author, bg = C.charcoal }) {
   return (
     <FadeIn>
       <div style={{ background: bg, borderRadius: 20, padding: "clamp(36px, 5vw, 56px)", textAlign: "center", margin: "0 auto", maxWidth: 800 }}>
-        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: "clamp(24px, 3.5vw, 36px)", color: C.sand, lineHeight: 1.4, margin: "0 0 14px" }}>"{quote}"</p>
+        <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: "clamp(24px, 3.5vw, 36px)", color: C.sand, lineHeight: 1.4, margin: "0 0 14px" }}>"{quote}"</p>
         {author && <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13, color: `${C.sand}88`, margin: 0 }}>— {author}</p>}
       </div>
     </FadeIn>
@@ -1068,13 +990,15 @@ function SocialProof() {
         {/* Text badges */}
         <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
           {badges.map((badge, i) => {
-            const badgeBgs = [C.butter, C.somethingBlue, `${C.motherEarth}30`, `${C.motherEarth}20`, C.sand];
             return (
               <div key={i} style={{
-                fontFamily: "'Rubik', sans-serif", fontSize: 14, fontWeight: 700,
-                color: C.charcoal, background: badgeBgs[i % badgeBgs.length],
+                fontFamily: "'Rubik', sans-serif", fontSize: 13, fontWeight: 600,
+                letterSpacing: "0.4px",
+                color: C.charcoal, background: C.white,
                 padding: "12px 24px", borderRadius: 50,
-                border: `1.5px solid ${C.sand}`,
+                border: `1px solid ${C.sand}`,
+                boxShadow: "0 1px 3px rgba(44,44,40,0.05)",
+                display: "inline-flex", alignItems: "center", gap: 8,
                 transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 opacity: inView ? 1 : 0,
                 transform: inView ? "translateY(0) scale(1)" : "translateY(30px) scale(0.9)",
@@ -1082,6 +1006,7 @@ function SocialProof() {
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.04)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "none"; }}>
+                <BrandStar size={12} color={C.olive} />
                 <EditableArrayString contentKey="home.socialProof.badges" index={i} />
               </div>
             );
@@ -1583,7 +1508,7 @@ function ProblemSection() {
             {/* Punchline */}
             <div style={{ textAlign: "center", borderTop: `1px solid ${dividerColor}`, paddingTop: 36 }}>
               <p style={{
-                fontFamily: "'Georgia', serif", fontStyle: "italic",
+                fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic",
                 fontSize: "clamp(18px, 2.5vw, 24px)", color: accentColor,
                 lineHeight: 1.5, margin: 0,
               }}>
@@ -1607,9 +1532,6 @@ function HomePage({ setPage }) {
   const [loaded, setLoaded] = useState(false);
   const scrollY = useScrollY();
   useEffect(() => { setTimeout(() => setLoaded(true), 100); }, []);
-
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const parallaxY = isMobile ? 0 : Math.min(scrollY * 0.15, 150);
 
   const defaultOrder = ["hero", "marquee", "welcome", "problem", "coreValues", "systems", "pathCards", "stats", "socialProof", "testimonials", "newsletter", "closing", "closingMarquee"];
   const sectionOrder = getContent("home.sectionOrder") || defaultOrder;
@@ -1636,9 +1558,9 @@ function HomePage({ setPage }) {
       const headingGradient = "linear-gradient(135deg, #2C2C28 0%, #555407 45%, #7A5C4E 100%)";
       return (
         <section className="hero-section" style={{ minHeight: "100svh", display: "flex", alignItems: "center", background: gridBgWhite, padding: "clamp(88px, 12vw, 112px) clamp(20px, 5vw, 56px) clamp(60px, 8vw, 80px)", position: "relative", overflowX: "hidden", zIndex: 2 }}>
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(85,84,7,0.04) 0%, rgba(216,235,249,0.06) 50%, rgba(242,232,75,0.04) 100%)", backgroundSize: "200% 200%", animation: "gradientShift 15s ease infinite", zIndex: 0, pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(85,84,7,0.04) 0%, rgba(216,235,249,0.06) 50%, rgba(242,232,75,0.04) 100%)", zIndex: 0, pointerEvents: "none" }} />
 
-          <div style={{ maxWidth: 1140, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(32px, 6vw, 72px)", alignItems: "center", position: "relative", zIndex: 1, transform: `translate3d(0, ${parallaxY}px, 0)`, willChange: "transform" }} className="hero-two-col">
+          <div style={{ maxWidth: 1140, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(32px, 6vw, 72px)", alignItems: "center", position: "relative", zIndex: 1 }} className="hero-two-col">
 
             {/* LEFT COLUMN: image + floating tags */}
             <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateX(-32px)", transition: "all 0.9s cubic-bezier(.22,.61,.36,1) 0.1s", position: "relative" }}>
@@ -1669,9 +1591,9 @@ function HomePage({ setPage }) {
                   fontFamily: "'Rubik', sans-serif", fontWeight: 700,
                   fontSize: "clamp(32px, 5vw, 64px)",
                   ...(heroColor ? { color: heroColor } : (useOmbre ? {
-                    background: headingGradient, backgroundSize: "200% 200%",
+                    background: headingGradient,
                     WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                    backgroundClip: "text", animation: "gradientText 8s ease infinite",
+                    backgroundClip: "text",
                   } : { color: C.charcoal })),
                   lineHeight: 1.15, margin: "0 0 20px", textTransform: "lowercase", letterSpacing: "-1px",
                 }}>
@@ -1679,8 +1601,8 @@ function HomePage({ setPage }) {
                 </h1>
               </div>
               <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(16px)", transition: "all 0.7s cubic-bezier(.22,.61,.36,1) 0.35s", marginBottom: 16 }}>
-                <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: "clamp(18px, 2.2vw, 24px)", color: C.olive, minHeight: 32 }}>
-                  <TypewriterText phrases={getContent("home.hero.typewriterPhrases") || ["systems that scale", "revenue that grows", "a life you actually enjoy"]} speed={70} deleteSpeed={35} pauseDuration={2200} />
+                <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: "clamp(18px, 2.2vw, 24px)", color: C.olive, minHeight: 32 }}>
+                  <RotatingText phrases={getContent("home.hero.typewriterPhrases") || ["systems that scale", "revenue that grows", "a life you actually enjoy"]} />
                 </p>
               </div>
               <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(16px)", transition: "all 0.7s cubic-bezier(.22,.61,.36,1) 0.45s" }}>
@@ -1763,7 +1685,9 @@ function HomePage({ setPage }) {
               <div style={{ background: C.cream, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.sand}`, textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", transition: "transform 0.3s, box-shadow 0.3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-                <BlinkEmoji emoji={v.emoji} size={32} style={{ marginBottom: 12 }} />
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: `${C.olive}10`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                  <EmojiIcon emoji={v.emoji} size={26} color={C.olive} />
+                </div>
                 <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.charcoal, margin: "0 0 8px" }}>
                   <EditableArrayText contentKey="home.coreValues.cards" index={i} field="title" as="span" />
                 </h3>
@@ -1793,7 +1717,7 @@ function HomePage({ setPage }) {
             <FadeIn delay={0} style={{ display: "flex" }}>
               <div style={{ background: `${C.motherEarth}18`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.motherEarth}40`, flex: 1, display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.motherEarth, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
-                  <BlinkEmoji emoji="😵‍💫" size={20} /> without systems
+                  <EmojiIcon emoji="😵‍💫" size={20} color={C.motherEarth} /> without systems
                 </h3>
                 {(getContent("home.systemsComparison.without") || []).map((item, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}>
@@ -1806,7 +1730,7 @@ function HomePage({ setPage }) {
             <FadeIn delay={150} style={{ display: "flex" }}>
               <div style={{ background: `${C.olive}10`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.olive}30`, flex: 1, display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.olive, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
-                  <BlinkEmoji emoji="✨" size={20} /> with systems
+                  <EmojiIcon emoji="✨" size={20} color={C.olive} /> with systems
                 </h3>
                 {(getContent("home.systemsComparison.with") || []).map((item, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}>
@@ -1930,7 +1854,7 @@ function HomePage({ setPage }) {
       <SectionWrap bgImage={gridBgLavender} py="72px" sectionKey="home.newsletter">
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
           <FadeIn>
-            <span style={{ fontSize: 40, display: "block", marginBottom: 8 }}>🏖️</span>
+            <div style={{ marginBottom: 12 }}><Icon name="umbrella" size={36} color={C.olive} /></div>
             <ScriptLabel size={24} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="home.newsletter.scriptLabel" as="span" /></ScriptLabel>
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 40px)", color: C.charcoal, margin: "0 0 16px" }}><EditableText contentKey="home.newsletter.heading" as="span" /></h2>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, marginBottom: 28 }}><EditableText contentKey="home.newsletter.body" as="span" /></p>
@@ -1948,14 +1872,14 @@ function HomePage({ setPage }) {
         <SectionWrap bg={C.charcoal} py="80px">
           <FadeIn>
             <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
-              <BlinkEmoji emoji="✨" size={36} style={{ marginBottom: 16 }} />
+              <div style={{ marginBottom: 16 }}><Icon name="sparkles" size={32} color={C.butter} /></div>
               <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4vw, 42px)", color: C.cream, lineHeight: 1.1, margin: "0 0 16px" }}>
                 <EditableText contentKey="home.closing.heading" as="span" />
               </h2>
               <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 16, color: `${C.sand}cc`, lineHeight: 1.7, marginBottom: 12 }}>
                 <EditableText contentKey="home.closing.body" as="span" />
               </p>
-              <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
+              <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 22, color: C.sand, marginBottom: 32 }}><EditableText contentKey="home.closing.script" as="span" /></p>
               <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
                 <EditableBtn contentKey="home.closing.cta" variant="ocean" defaultLabel="explore services →" defaultLink="services" nav={nav} />
                 <EditableBtn contentKey="home.closing.ctaSecondary" variant="outline" defaultLabel="book a discovery call →" defaultLink="contact" nav={nav} style={{ borderColor: C.sand, color: C.sand }} />
@@ -2211,7 +2135,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
       <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)", textAlign: "center" }}>
         {price && <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 13, color: C.white, background: C.oceanBlue, padding: "6px 20px", borderRadius: 50, display: "inline-block", marginBottom: 16 }}>{price}</span>}
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(30px, 5vw, 52px)", color: C.charcoal, lineHeight: 1.05, margin: "0 0 8px", letterSpacing: "-0.8px" }}><EditableText contentKey={p + ".title"} as="span" /></h1>
-        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey={p + ".subtitle"} as="span" /></p>
+        <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey={p + ".subtitle"} as="span" /></p>
       </section>
 
       <SectionWrap bg={C.charcoal} py="56px">
@@ -2312,8 +2236,8 @@ function AboutPage({ setPage }) {
             <ScriptLabel size={22}><EditableText contentKey="about.hero.scriptLabel" as="span" /></ScriptLabel>
             <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(34px, 5vw, 52px)", color: C.charcoal, lineHeight: 1.05, margin: "0 0 12px" }}><EditableText contentKey="about.hero.title" as="span" /></h1>
             {/* Typewriter personality traits */}
-            <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 21, color: C.oceanBlue, marginBottom: 20, minHeight: 30 }}>
-              <TypewriterText phrases={["global team leader", "fractional consultant", "certified notion nerd", "part-time mermaid", "pilates enthusiast", "iced latte connoisseur"]} speed={65} deleteSpeed={30} pauseDuration={1800} />
+            <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 21, color: C.oceanBlue, marginBottom: 20, minHeight: 30 }}>
+              <RotatingText phrases={["global team leader", "fractional consultant", "certified notion nerd", "part-time mermaid", "pilates enthusiast", "iced latte connoisseur"]} interval={2600} />
             </p>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.75 }}><EditableText contentKey="about.hero.body" as="span" /></p>
           </div>
@@ -2362,7 +2286,7 @@ function AboutPage({ setPage }) {
                   <div style={{ display: "flex", justifyContent: badgeAligns[i % 4], marginBottom: -8, paddingLeft: badgeAligns[i % 4] === "flex-start" ? "5%" : 0, paddingRight: badgeAligns[i % 4] === "flex-end" ? "5%" : 0 }}>
                     <span style={{
                       display: "inline-block",
-                      fontFamily: "'Georgia', serif", fontStyle: "italic",
+                      fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic",
                       fontSize: 15,
                       color: "#fff",
                       background: colors[i % 4],
@@ -2434,7 +2358,7 @@ function AboutPage({ setPage }) {
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(24px, 3vw, 34px)", color: C.cream, margin: "0 0 12px" }}>
               <EditableText contentKey="about.cta.heading" as="span" />
             </h2>
-            <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.sand, marginBottom: 28 }}>
+            <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 20, color: C.sand, marginBottom: 28 }}>
               <EditableText contentKey="about.cta.script" as="span" />
             </p>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -2452,12 +2376,12 @@ function AboutPage({ setPage }) {
    PAGE: RESOURCES
    ══════════════════════════════════════════════════════════════ */
 function ResourcesPage() {
-  const { getContent } = useCMS();
+  const { getContent, isEditing } = useCMS();
   return (
     <>
       <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) clamp(32px, 8vw, 56px)", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(36px, 6vw, 60px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="resources.hero.heading" as="span" /></h1>
-        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="resources.hero.subheading" as="span" /></p>
+        <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="resources.hero.subheading" as="span" /></p>
       </section>
 
       <Marquee text="systems that actually work · no hustle culture · revenue expansion" bg={C.sand} color={C.charcoal} />
@@ -2467,7 +2391,7 @@ function ResourcesPage() {
       <SectionWrap bgImage={gridBgOcean} py="72px">
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
           <FadeIn>
-            <BlinkEmoji emoji="🏖️" size={36} style={{ marginBottom: 8 }} />
+            <div style={{ marginBottom: 10 }}><Icon name="umbrella" size={34} color={C.olive} /></div>
             <ScriptLabel size={24} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="resources.newsletter.scriptLabel" as="span" /></ScriptLabel>
             <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4vw, 38px)", color: C.charcoal, margin: "0 0 16px" }}><EditableText contentKey="resources.newsletter.heading" as="span" /></h2>
             <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, marginBottom: 20 }}><EditableText contentKey="resources.newsletter.body" as="span" /></p>
@@ -2492,7 +2416,9 @@ function ResourcesPage() {
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
                 <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center" }}>
-                  <span style={{ fontSize: 40 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="emoji" as="span" /></span>
+                  {isEditing
+                    ? <span style={{ fontSize: 40 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="emoji" as="span" /></span>
+                    : <EmojiIcon emoji={tool.emoji} size={36} color={C.charcoal} />}
                 </div>
                 <div style={{ padding: "20px 20px 24px" }}>
                   <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.charcoal, margin: "0 0 8px" }}><EditableArrayText contentKey="resources.tools.items" index={i} field="title" as="span" /></h3>
@@ -2540,7 +2466,7 @@ function ContactPage() {
     <>
       <section style={{ background: gridBgWhite, padding: "clamp(80px, 18vw, 130px) clamp(20px, 5vw, 56px) 36px", textAlign: "center" }}>
         <h1 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(38px, 6vw, 60px)", color: C.charcoal, lineHeight: 1.02, margin: "0 0 12px", letterSpacing: "-1px" }}><EditableText contentKey="contact.hero.heading" as="span" /></h1>
-        <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="contact.hero.subheading" as="span" /></p>
+        <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="contact.hero.subheading" as="span" /></p>
       </section>
 
       <SectionWrap bgImage={gridBgSand} py="64px">
@@ -2574,12 +2500,12 @@ function ContactPage() {
               border: `1px solid ${C.sand}`,
               textAlign: "center",
             }}>
-              <BlinkEmoji emoji="📋" size={40} style={{ marginBottom: 12 }} />
+              <div style={{ marginBottom: 12 }}><Icon name="clipboard" size={36} color={C.olive} /></div>
               <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 22, color: C.charcoal, margin: "0 0 8px" }}>discovery call booking</h2>
               <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 15, color: C.body, lineHeight: 1.7, maxWidth: 400, margin: "0 auto 20px" }}>
                 <EditableText contentKey="contact.dubsado.placeholder" as="span" />
               </p>
-              <p style={{ fontFamily: "'Georgia', serif", fontStyle: "italic", fontSize: 18, color: C.warmTan }}>
+              <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 18, color: C.warmTan }}>
                 dubsado form embed coming soon
               </p>
             </div>
@@ -2643,7 +2569,6 @@ export default function App() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
         body {
@@ -2658,32 +2583,6 @@ export default function App() {
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-100%); }
-        }
-
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-
-        @keyframes gradientText {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-
-        @keyframes blink {
-          50% { opacity: 0; }
-        }
-
-        @keyframes emojiPulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
-        }
-
-        @keyframes wheelSpin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
         }
 
         /* Hero two-column responsive */
