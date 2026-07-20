@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npx vite build:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(python3 -)"
     ]
   }
 }

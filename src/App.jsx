@@ -53,7 +53,6 @@ const C = {
 const gridBgWhite    = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23FDFAF4'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23E2DDD4' stroke-width='0.7' fill='none' opacity='0.8'/%3E%3C/svg%3E")`;
 const gridBgSand     = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23EEE9E2'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23C8C2B8' stroke-width='0.7' fill='none' opacity='0.85'/%3E%3C/svg%3E")`;
 const gridBgOcean    = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23D8EBF9'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23555407' stroke-width='0.7' fill='none' opacity='0.22'/%3E%3C/svg%3E")`;
-const gridBgLavender = `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='%23EBF4FC'/%3E%3Cpath d='M40 0v40M0 40h40' stroke='%23B8D0E8' stroke-width='0.7' fill='none' opacity='0.8'/%3E%3C/svg%3E")`;
 
 /* ── Hooks ── */
 function useScrollY() {
@@ -208,7 +207,7 @@ function FloatingTag({ emoji, text, contentKey, index, field, style = {} }) {
         display: "inline-flex", alignItems: "center", gap: 8,
         borderRadius: 50,
         padding: "10px 18px",
-        border: `1.5px solid ${borderColor}`,
+        border: `1px solid ${borderColor}`,
         boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
         fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 13,
         color: textColor, whiteSpace: "nowrap",
@@ -292,7 +291,7 @@ function BubbleTag({ emoji, text, bg = C.white, color = C.charcoal, style = {} }
       display: "inline-flex",
       alignItems: "center",
       gap: 8,
-      border: `1.5px solid ${C.sand}`,
+      border: `1px solid ${C.sand}`,
       whiteSpace: "nowrap",
       ...style,
     }}>
@@ -841,7 +840,7 @@ function EditableTagList({ contentKey, items = [], tagBg = C.butter, tagColor = 
 function TwoColFit({ perfect, notFit }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 20 }}>
-      <div style={{ background: C.white, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%" }}>
+      <div style={{ background: C.white, borderRadius: 16, padding: "28px 24px", border: `1px solid ${C.sand}`, height: "100%", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}>
         <h4 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 15, color: C.charcoal, margin: "0 0 16px" }}>perfect if you:</h4>
         {perfect.map((p, i) => <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.55 }}><BrandStar size={14} color={C.olive} style={{ marginTop: 2 }} />{p}</div>)}
       </div>
@@ -1005,7 +1004,7 @@ function SocialProof() {
                 transitionDelay: `${0.3 + i * 0.1}s`,
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.04)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "none"; }}>
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(44,44,40,0.05)"; }}>
                 <BrandStar size={12} color={C.olive} />
                 <EditableArrayString contentKey="home.socialProof.badges" index={i} />
               </div>
@@ -1127,7 +1126,7 @@ function TestimonialSection({ scrollY }) {
     <section ref={sectionRef} style={{
       position: "relative", overflow: "hidden",
       padding: "clamp(56px, 8vw, 80px) clamp(20px, 5vw, 56px)",
-      background: bgUrl ? "transparent" : gridBgSand,
+      background: bgUrl ? "transparent" : C.sandLight,
       backgroundColor: bgUrl ? C.charcoal : undefined,
     }}>
       {/* Parallax background image — uses <img> so objectFit/objectPosition work */}
@@ -1644,7 +1643,7 @@ function HomePage({ setPage }) {
 
     welcome: () => (
       <>
-        <SectionWrap bgImage={gridBgSand} py="80px" sectionKey="home.welcome">
+        <SectionWrap bg={C.sandLight} py="80px" sectionKey="home.welcome">
           <FadeIn>
             <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
               <ScriptLabel size={22} color={C.olive} style={{ textAlign: "center" }}><EditableText contentKey="home.welcome.scriptLabel" as="span" /></ScriptLabel>
@@ -1682,9 +1681,9 @@ function HomePage({ setPage }) {
             gridStyle={{ maxWidth: 900, margin: "0 auto", alignItems: "stretch" }}
             gridClassName="core-values-grid"
             renderCard={(v, i) => (
-              <div style={{ background: C.cream, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.sand}`, textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", transition: "transform 0.3s, box-shadow 0.3s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+              <div style={{ background: C.cream, borderRadius: 20, padding: "28px 24px", border: `1px solid ${C.sand}`, textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", transition: "transform 0.3s, box-shadow 0.3s", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}>
                 <div style={{ width: 56, height: 56, borderRadius: 16, background: `${C.olive}10`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
                   <EmojiIcon emoji={v.emoji} size={26} color={C.olive} />
                 </div>
@@ -1705,7 +1704,7 @@ function HomePage({ setPage }) {
     problem: () => <ProblemSection />,
 
     systems: () => (
-      <section style={{ background: gridBgOcean, padding: "72px clamp(20px, 5vw, 56px)", overflowX: "hidden" }}>
+      <section style={{ background: C.somethingBlue, padding: "72px clamp(20px, 5vw, 56px)", overflowX: "hidden" }}>
         <div style={{ maxWidth: 1140, margin: "0 auto" }}>
           <FadeIn>
             <div style={{ textAlign: "center", marginBottom: 40 }}>
@@ -1715,7 +1714,7 @@ function HomePage({ setPage }) {
           </FadeIn>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, maxWidth: 800, margin: "0 auto", alignItems: "stretch" }}>
             <FadeIn delay={0} style={{ display: "flex" }}>
-              <div style={{ background: `${C.motherEarth}18`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.motherEarth}40`, flex: 1, display: "flex", flexDirection: "column" }}>
+              <div style={{ background: `${C.motherEarth}18`, borderRadius: 20, padding: "28px 24px", border: `1px solid ${C.motherEarth}40`, flex: 1, display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.motherEarth, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                   <EmojiIcon emoji="😵‍💫" size={20} color={C.motherEarth} /> without systems
                 </h3>
@@ -1728,7 +1727,7 @@ function HomePage({ setPage }) {
               </div>
             </FadeIn>
             <FadeIn delay={150} style={{ display: "flex" }}>
-              <div style={{ background: `${C.olive}10`, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${C.olive}30`, flex: 1, display: "flex", flexDirection: "column" }}>
+              <div style={{ background: `${C.olive}10`, borderRadius: 20, padding: "28px 24px", border: `1px solid ${C.olive}30`, flex: 1, display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 16, color: C.olive, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 8 }}>
                   <EmojiIcon emoji="✨" size={20} color={C.olive} /> with systems
                 </h3>
@@ -1767,9 +1766,9 @@ function HomePage({ setPage }) {
               const bgColors = [`${C.motherEarth}20`, `${C.somethingBlue}`, `${C.butter}40`];
               const accents = [C.motherEarth, C.olive, C.motherEarth];
               return (
-                <div onClick={() => nav(c.page || "contact")} style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: isEditing ? "default" : "pointer", display: "flex", flexDirection: "column", flex: 1, transition: "transform 0.3s, box-shadow 0.3s" }}
-                  onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
-                  onMouseLeave={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+                <div onClick={() => nav(c.page || "contact")} style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: isEditing ? "default" : "pointer", display: "flex", flexDirection: "column", flex: 1, transition: "transform 0.3s, box-shadow 0.3s", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
+                  onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
+                  onMouseLeave={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}>
                   <div style={{ background: bgColors[i % 3], padding: "32px 24px 28px", borderBottom: `3px solid ${accents[i % 3]}` }}>
                     <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>
                       <EditableArrayText contentKey="home.pathCards" index={i} field="title" as="span" />
@@ -1794,7 +1793,7 @@ function HomePage({ setPage }) {
 
     stats: () => (
       <EditableSection contentKey="visibility.home.stats">
-      <SectionWrap bgImage={gridBgOcean} py="80px" sectionKey="home.stats">
+      <SectionWrap bg={C.somethingBlue} py="80px" sectionKey="home.stats">
         <FadeIn>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}><EditableText contentKey="home.stats.scriptLabel" as="span" /></ScriptLabel>
@@ -1807,9 +1806,9 @@ function HomePage({ setPage }) {
           gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 36, alignItems: "stretch" }}
           renderCard={(s, i) => (
             <div
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px) scale(1.02)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(123, 167, 179, 0.15)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(123, 167, 179, 0.05)"; }}
-              style={{ background: C.white, borderRadius: 16, padding: "28px 20px", textAlign: "center", border: `1px solid ${C.sand}`, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", cursor: "default", boxShadow: "0 4px 12px rgba(44,44,40,0.05)" }}>
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-8px) scale(1.02)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}
+              style={{ background: C.white, borderRadius: 16, padding: "28px 20px", textAlign: "center", border: `1px solid ${C.sand}`, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)", cursor: "default", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}>
               <div style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(28px, 7vw, 36px)", color: C.olive, marginBottom: 8 }}>
                 <AnimatedCounter end={s.stat} duration={2000} />
               </div>
@@ -1851,7 +1850,7 @@ function HomePage({ setPage }) {
 
     newsletter: () => (
       <EditableSection contentKey="visibility.home.newsletter">
-      <SectionWrap bgImage={gridBgLavender} py="72px" sectionKey="home.newsletter">
+      <SectionWrap bg={C.lavenderLight} py="72px" sectionKey="home.newsletter">
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
           <FadeIn>
             <div style={{ marginBottom: 12 }}><Icon name="umbrella" size={36} color={C.olive} /></div>
@@ -1986,9 +1985,9 @@ function ServicesPage({ setPage }) {
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             return (
-              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}
                 onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{c.num}</span>
@@ -2032,9 +2031,9 @@ function ServicesPage({ setPage }) {
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             return (
-              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}
                 onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{c.num}</span>
@@ -2064,7 +2063,7 @@ function ServicesPage({ setPage }) {
       {/* BRANDS */}
       <EditableSection contentKey="visibility.services.brands">
       <div ref={brandsRef} style={{ scrollMarginTop: 80 }} />
-      <SectionWrap bgImage={gridBgLavender} py="72px">
+      <SectionWrap bg={C.lavenderLight} py="72px">
         <FadeIn>
           <ScriptLabel size={22} color={C.oceanBlue}><EditableText contentKey="services.brands.scriptLabel" as="span" /></ScriptLabel>
           <h2 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(26px, 3.5vw, 38px)", color: C.charcoal, margin: "0 0 12px" }}><EditableText contentKey="services.brands.heading" as="span" /></h2>
@@ -2078,9 +2077,9 @@ function ServicesPage({ setPage }) {
           renderCard={(c, i) => {
             const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
             return (
-              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.08)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: "pointer", transition: "transform 0.3s, box-shadow 0.3s", flex: 1, display: "flex", flexDirection: "column", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}
                 onClick={() => nav(c.page || "contact")}>
                 <div style={{ background: c.bg || bgColors[i % 3], padding: "32px 24px 24px" }}>
                   <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{c.num}</span>
@@ -2147,7 +2146,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
         </FadeIn>
       </SectionWrap>
 
-      <SectionWrap bgImage={gridBgWhite} py="64px" sectionKey={p + ".whatThis"}>
+      <SectionWrap bg={C.white} py="64px" sectionKey={p + ".whatThis"}>
         <FadeIn>
           <div style={{ maxWidth: 700, margin: "0 auto" }}>
             <ScriptLabel>what this is</ScriptLabel>
@@ -2173,7 +2172,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
       </SectionWrap>
 
       {hasFit && (
-        <SectionWrap bgImage={gridBgSand} py="64px">
+        <SectionWrap bg={C.sandLight} py="64px">
           <FadeIn>
             <div style={{ maxWidth: 700, margin: "0 auto" }}>
               <ScriptLabel>who this is for</ScriptLabel>
@@ -2184,7 +2183,7 @@ function ServiceDetailPage({ setPage, serviceKey }) {
       )}
 
       {faqs.length > 0 && (
-        <SectionWrap bgImage={gridBgWhite} py="64px">
+        <SectionWrap bg={C.white} py="64px">
           <FadeIn>
             <div style={{ maxWidth: 700, margin: "0 auto" }}>
               <ScriptLabel>frequently asked</ScriptLabel>
@@ -2248,7 +2247,7 @@ function AboutPage({ setPage }) {
 
       {/* THE PROBLEM — What Sam saw wrong */}
       <EditableSection contentKey="visibility.about.backstory">
-      <SectionWrap bgImage={gridBgSand} py="72px">
+      <SectionWrap bg={C.sandLight} py="72px">
         <FadeIn>
           <div style={{ maxWidth: 720, margin: "0 auto" }}>
             <ScriptLabel size={22}><EditableText contentKey="about.backstory.scriptLabel" as="span" /></ScriptLabel>
@@ -2337,7 +2336,7 @@ function AboutPage({ setPage }) {
 
       {/* THE PERSON — Lifestyle (tightened) */}
       <EditableSection contentKey="visibility.about.lifestyle">
-      <SectionWrap bgImage={gridBgLavender} py="72px">
+      <SectionWrap bg={C.lavenderLight} py="72px">
         <FadeIn>
           <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
             <ScriptLabel size={22} color={C.oceanBlue} style={{ textAlign: "center" }}>when i'm not consulting</ScriptLabel>
@@ -2388,7 +2387,7 @@ function ResourcesPage() {
 
       {/* NEWSLETTER with preferences */}
       <EditableSection contentKey="visibility.resources.newsletter">
-      <SectionWrap bgImage={gridBgOcean} py="72px">
+      <SectionWrap bg={C.somethingBlue} py="72px">
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
           <FadeIn>
             <div style={{ marginBottom: 10 }}><Icon name="umbrella" size={34} color={C.olive} /></div>
@@ -2412,7 +2411,7 @@ function ResourcesPage() {
         <HorizontalScroll gap={20}>
           {(getContent("resources.tools.items") || []).map((tool, i) => (
             <FadeIn key={i} delay={i * 80}>
-              <div style={{ minWidth: "min(260px, 75vw)", maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s", cursor: "pointer" }}
+              <div style={{ minWidth: "min(260px, 75vw)", maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s, box-shadow 0.3s", cursor: "pointer", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
                 <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center" }}>
@@ -2469,7 +2468,7 @@ function ContactPage() {
         <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: "italic", fontSize: 20, color: C.warmTan }}><EditableText contentKey="contact.hero.subheading" as="span" /></p>
       </section>
 
-      <SectionWrap bgImage={gridBgSand} py="64px">
+      <SectionWrap bg={C.sandLight} py="64px">
         <div style={{ maxWidth: 780, margin: "0 auto" }}>
           {/* Dubsado form embed */}
           {dubsadoUrl ? (
