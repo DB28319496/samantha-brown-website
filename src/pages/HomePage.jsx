@@ -741,22 +741,22 @@ function HomePage({ setPage }) {
             defaultNewItem={{ title: "new path", body: "description here", cta: "learn more →", page: "contact" }}
             gridStyle={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 24, alignItems: "stretch" }}
             renderCard={(c, i) => {
-              const bgColors = [`${C.motherEarth}20`, `${C.somethingBlue}`, `${C.butter}40`];
-              const accents = [C.motherEarth, C.olive, C.motherEarth];
+              const bgColors = [C.pinkSoft, C.oceanLight, C.lavenderLight];
               return (
                 <div onClick={() => nav(c.page || "contact")} style={{ background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, cursor: isEditing ? "default" : "pointer", display: "flex", flexDirection: "column", flex: 1, transition: "transform 0.3s, box-shadow 0.3s", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
                   onMouseEnter={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 2px 4px rgba(44,44,40,0.04), 0 14px 32px rgba(44,44,40,0.10)"; }}
                   onMouseLeave={isEditing ? undefined : e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)"; }}>
-                  <div style={{ background: bgColors[i % 3], padding: "32px 24px 28px", borderBottom: `3px solid ${accents[i % 3]}` }}>
-                    <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 20, color: C.charcoal, margin: 0, lineHeight: 1.2 }}>
+                  <div style={{ background: bgColors[i % 3], padding: "32px 24px 24px" }}>
+                    <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: "clamp(32px, 8vw, 48px)", color: `${C.charcoal}20` }}>{String(i + 1).padStart(2, "0")}</span>
+                  </div>
+                  <div style={{ padding: "24px 22px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
+                    <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 18, color: C.charcoal, margin: "0 0 10px", lineHeight: 1.2 }}>
                       <EditableArrayText contentKey="home.pathCards" index={i} field="title" as="span" />
                     </h3>
-                  </div>
-                  <div style={{ padding: "24px 24px 28px", display: "flex", flexDirection: "column", flex: 1 }}>
                     <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 14, color: C.body, lineHeight: 1.65, margin: "0 0 16px" }}>
                       <EditableArrayText contentKey="home.pathCards" index={i} field="body" as="span" />
                     </p>
-                    <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.olive, marginTop: "auto" }}>
+                    <span style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 600, fontSize: 14, color: C.oceanBlue, marginTop: "auto" }}>
                       <EditableArrayText contentKey="home.pathCards" index={i} field="cta" as="span" />
                     </span>
                   </div>

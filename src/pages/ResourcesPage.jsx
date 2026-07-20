@@ -46,18 +46,18 @@ function ResourcesPage() {
         </FadeIn>
         <HorizontalScroll gap={20}>
           {(getContent("resources.tools.items") || []).map((tool, i) => (
-            <FadeIn key={i} delay={i * 80}>
-              <div style={{ minWidth: "min(260px, 75vw)", maxWidth: 280, flexShrink: 0, scrollSnapAlign: "start", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s, box-shadow 0.3s", cursor: "pointer", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
+            <FadeIn key={i} delay={i * 80} style={{ width: "min(280px, 75vw)", flexShrink: 0, scrollSnapAlign: "start", display: "flex" }}>
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", background: C.white, borderRadius: 20, overflow: "hidden", border: `1px solid ${C.sand}`, transition: "transform 0.3s, box-shadow 0.3s", cursor: "pointer", boxShadow: "0 1px 2px rgba(44,44,40,0.03), 0 6px 16px rgba(44,44,40,0.05)" }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
-                <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center" }}>
+                <div style={{ background: tool.bg || C.pinkSoft, padding: "28px 24px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 96 }}>
                   {isEditing
                     ? <span style={{ fontSize: 40 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="emoji" as="span" /></span>
                     : (brandForLabel(tool.title)
                         ? <BrandGlyph brand={brandForLabel(tool.title)} size={34} color={C.charcoal} />
                         : <EmojiIcon emoji={tool.emoji} size={36} color={C.charcoal} />)}
                 </div>
-                <div style={{ padding: "20px 20px 24px" }}>
+                <div style={{ padding: "20px 20px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
                   <h3 style={{ fontFamily: "'Rubik', sans-serif", fontWeight: 700, fontSize: 17, color: C.charcoal, margin: "0 0 8px" }}><EditableArrayText contentKey="resources.tools.items" index={i} field="title" as="span" /></h3>
                   <p style={{ fontFamily: "'Rubik', sans-serif", fontSize: 13.5, color: C.body, lineHeight: 1.6, margin: 0 }}><EditableArrayText contentKey="resources.tools.items" index={i} field="desc" as="span" /></p>
                 </div>
