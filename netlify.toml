@@ -3,6 +3,29 @@
   publish = "dist"
   command = "npm run build"
 
+# /ugc is the UGC portfolio — a separate static page dropped into public/ugc,
+# not a route in the React app, and deliberately not linked from it. Netlify
+# serves real files ahead of the non-forced catch-all below, so it only needs
+# the bare path normalised onto the trailing slash the export is built for.
+[[redirects]]
+  from = "/ugc"
+  to = "/ugc/"
+  status = 301
+
+# Explicit, and ABOVE the catch-all on purpose: first match wins, so /ugc/*
+# is served from its own files even if someone later adds `force = true` to
+# the SPA rule below and it would otherwise swallow the whole path.
+[[redirects]]
+  from = "/ugc/*"
+  to = "/ugc/:splat"
+  status = 200
+
+# Next.js chunk and font names are content-hashed, so they can be cached hard.
+[[headers]]
+  for = "/ugc/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
