@@ -1,3 +1,24 @@
+# by samantha brown
+
+## `/ugc` — the UGC portfolio page
+
+`public/ugc/` is a **separate static page** served at bysamanthabrown.com/ugc. It is built in its
+own repo (`Sam-UGC-Portfolio-Site`, Next.js) and synced in here as plain files — nothing in
+`src/` knows about it, it is not in the nav, and it does not link back to the main site. Same
+domain, separate page, on purpose.
+
+- Update it from the UGC repo: `SITE_DIR=<this folder> npm run sync:site`, then commit `public/ugc/`.
+- `netlify.toml` routes `/ugc/*` to those files ahead of the SPA catch-all.
+- `public/sitemap.xml` lists `/ugc/` — that is how search finds it, since nothing links there.
+- `npm run build` first runs `scripts/check-ugc-demo.mjs`, which **refuses a production deploy**
+  while `public/ugc/` is a demo or placeholder build. Deploy previews and branch deploys are
+  allowed through with a warning, so a demo can be reviewed on a `*.netlify.app` URL — but it
+  must never be merged to `main` as-is. To look at one locally, `npx vite build` skips the guard.
+- `public/ugc/demo/` holds the stand-in posters and clip while the page is in demo. A real sync
+  replaces the whole folder; real media comes from a video host, not from here.
+
+---
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
